@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HealthFirst — Package of Protection Comparison Tool</title>
+<style>
+  :root{
+    --navy:#12213b; --navy-strip:#1c3a63; --navy-band:#122238;
+    --gold:#c69a3c; --gold-brand:#c99a3f; --gold-pill:#cea955; --gold-lt:#d8b25a;
+    --maroon:#9c3b2f; --green:#1f6a43; --green-soft:#e7f0e6;
+    --tan:#ecdcb0; --tan-row:#efe1bb; --cream-block:#f7edd3;
+    --ink:#20293a; --muted:#6b7280; --line:#e2ddd1; --line2:#eef1f6;
+    --paper:#f4f0e6; --white:#fff;
+    --serif:Georgia,'Iowan Old Style','Palatino Linotype','Palatino','Times New Roman',serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.45 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1120px;margin:0 auto;padding:16px 14px 40px}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 4px rgba(30,25,10,.05);margin:16px 0;overflow:hidden}
+  .pad{padding:18px}
+  h1,h2,h3{margin:0}
+  .brandbar{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff;border-radius:14px 14px 0 0;padding:16px 20px;gap:12px;flex-wrap:wrap}
+  .brand{display:flex;align-items:baseline;gap:12px}
+  .brand b{font-family:var(--serif);color:var(--gold-brand);font-size:23px;letter-spacing:.3px;font-weight:700}
+  .brand span{color:#b9c2d4;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid transparent;padding:8px 12px}
+  .btn-ghost{background:transparent;color:#e7ecf5;border-color:#3a527d}
+  .btn-ghost:hover{background:#213c66}
+  .btn-gold{background:var(--gold-pill);color:#26324a;font-weight:700;border-color:#b0872f}
+  .btn-gold:hover{filter:brightness(1.04)}
+  .seg{display:inline-flex;background:#0e1b31;border-radius:999px;padding:3px;border:1px solid #2b446e}
+  .seg button{background:transparent;color:#c4cee0;border:none;border-radius:999px;padding:7px 15px;font-weight:700;letter-spacing:.06em;font-size:12px}
+  .seg button.on{background:var(--gold-pill);color:#26324a}
+  .clientbar{background:var(--navy-strip);border-radius:0 0 14px 14px;padding:14px 18px;margin-top:-16px;margin-bottom:16px}
+  .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .grid8{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .fld label{display:block;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .fld input{width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:#fbfaf6;font:inherit}
+  .clientbar .fld label{color:#b7c3da}
+  .clientbar .fld input{background:#22406b;border-color:#38578a;color:#fff}
+  .clientbar .fld input::placeholder{color:#8fa1c2}
+  .tabs{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:2px solid var(--line)}
+  .tabs button{background:transparent;border:none;padding:14px 8px;text-align:center;border-bottom:3px solid transparent;color:#8a8f99}
+  .tabs button .t{font-family:var(--serif);font-weight:700;letter-spacing:.06em;font-size:17px;display:block;color:#2a3346}
+  .tabs button .s{font-size:12px;color:#8a8f99}
+  .tabs button.on{border-bottom-color:var(--gold)}
+  .tabs button.on .t{color:var(--navy)}
+  .sectitle{font-family:var(--serif);font-weight:700;font-size:16px;color:var(--navy);display:flex;align-items:center;gap:8px}
+  .dot{color:var(--gold);font-size:12px}
+  .cols{display:grid;grid-template-columns:1fr 44px 1fr;align-items:start;gap:0}
+  .panel{border:1px solid var(--line);border-top:4px solid var(--muted);border-radius:10px;overflow:hidden;background:#fff}
+  .panel.aca{border-top-color:var(--maroon)}
+  .panel.pop{border-top-color:var(--green)}
+  .ptitle{padding:12px 15px 8px;font-family:var(--serif);font-weight:700;font-size:17px}
+  .panel.aca .ptitle{color:var(--maroon)}
+  .panel.pop .ptitle{color:var(--green)}
+  .ptitle small{display:block;font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-weight:400;color:var(--muted);font-size:11.5px;margin-top:2px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 15px;border-top:1px solid var(--line2)}
+  .row .lab{flex:1}
+  .row .lab small{display:block;color:var(--muted);font-size:11px}
+  .row input.num{width:100px;text-align:right;padding:6px 8px;border:1px solid #cfd6e2;border-radius:7px;font:inherit;background:#fff}
+  .row .val{min-width:100px;text-align:right;font-variant-numeric:tabular-nums;font-family:var(--serif);font-weight:700}
+  .row.sum{font-weight:700}
+  .row.sum .lab{font-family:var(--serif)}
+  .row.hi{background:var(--tan-row)}
+  .vsbadge{display:flex;flex-direction:column;align-items:center}
+  .vsbadge span{background:var(--navy);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.05em;margin-top:16px}
+  .ribbon{writing-mode:vertical-rl;transform:rotate(180deg);color:#9aa3b2;font-size:10px;letter-spacing:.16em;margin-top:14px;white-space:nowrap;font-weight:600}
+  .prodrow .lab{display:flex;gap:6px;align-items:center}
+  .prodrow select.pick{border:1px solid #cfd6e2;border-radius:7px;padding:5px 6px;font:inherit;background:#fbfaf6;max-width:150px;color:#3a4358}
+  .prodrow input.pname{flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;min-width:0;background:#fff}
+  .prodrow button.del{border:none;background:transparent;color:#b23;font-size:16px;line-height:1;padding:0 4px}
+  .addbtn{margin:8px 15px;background:#f3efe3;border:1px dashed #cdbf9c;color:var(--navy);border-radius:8px;padding:7px 10px;font-weight:600}
+  .lbblock{background:var(--cream-block);border-top:1px dashed var(--gold)!important}
+  .note{color:var(--muted);font-size:12px;font-style:italic;padding:8px 4px 0}
+  .band-navy{background:var(--navy-band);color:#e6ecf5;border-radius:12px;padding:6px 4px;overflow:hidden}
+  .savegrid{display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:0}
+  .savegrid .h{font-weight:700;padding:10px 14px;text-align:center;font-family:var(--serif)}
+  .savegrid .h.l{text-align:left;letter-spacing:.04em}
+  .band-navy .savegrid .h{color:var(--gold-lt)}
+  .band-navy .savegrid .c{padding:10px 14px;border-top:1px solid #24375b}
+  .band-navy .savegrid .c.l{color:#cdd7e7;font-weight:600}
+  .band-navy .savegrid .c.l.tt{color:#fff;font-weight:700}
+  .band-navy .savegrid .c.a{color:#eef2f9;text-align:center;font-weight:800;font-family:var(--serif);font-variant-numeric:tabular-nums}
+  .band-navy .savegrid .c.t{color:var(--gold-lt);text-align:center;font-weight:800;font-family:var(--serif);font-variant-numeric:tabular-nums}
+  .band-navy .note{color:#9fb0cc;padding:6px 14px 8px}
+  .greenband{background:var(--green);color:#fff;font-family:var(--serif);font-weight:700;padding:10px 14px;border-radius:10px 10px 0 0;letter-spacing:.02em}
+  .savegrid.green{border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+  .savegrid.green .h{background:#f6f3ea}
+  .savegrid.green .c{padding:10px 14px;border-top:1px solid var(--line2)}
+  .savegrid.green .c.l{font-weight:600}
+  .savegrid.green .c.money{text-align:center;font-weight:800;color:var(--green);font-family:var(--serif);font-variant-numeric:tabular-nums}
+  .plainband{background:var(--navy);color:#fff;font-family:var(--serif);font-weight:700;padding:10px 14px;border-radius:10px;letter-spacing:.02em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  .plainband .desc{background:#22406b;border:1px solid #38578a;color:#fff;border-radius:8px;padding:4px 10px;font-family:-apple-system,sans-serif;font-weight:400;font-size:13px}
+  .claim{border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+  .moneypair{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line2)}
+  .moneypair .mp{padding:12px 15px}
+  .moneypair .mp+.mp{border-left:1px solid var(--line2)}
+  .mp .cap{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .mp .big{font-family:var(--serif);font-weight:700;font-size:23px;color:var(--green);margin:2px 0}
+  .mp .big.red{color:var(--maroon)}
+  .mp .sub{font-size:11px;color:var(--muted)}
+  .bottomline{margin-top:12px;background:var(--green-soft);border:1px solid #cfe4cf;border-radius:10px;padding:12px 14px;text-align:center;font-family:var(--serif);font-weight:700;color:var(--navy);font-size:15px}
+  .bottomline b{color:var(--green);font-size:20px}
+  .discl{color:var(--muted);font-size:11px;padding:8px 2px}
+  /* modal */
+  .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(10,15,25,.5);z-index:50;overflow:auto}
+  .modal-backdrop.open{display:block}
+  .modal{max-width:760px;margin:24px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 12px 44px rgba(0,0,0,.35)}
+  .modal-head{display:flex;align-items:center;gap:10px;background:var(--navy);color:#fff;padding:13px 16px}
+  .modal-head b{font-family:var(--serif);color:var(--gold-brand);font-size:17px}
+  .modal-head span{color:#b9c2d4;font-size:12px;flex:1}
+  .modal-body{padding:16px;max-height:70vh;overflow:auto}
+  .librow{display:flex;gap:8px;align-items:center;padding:4px 0}
+  .librow input.lname{flex:1;border:1px solid var(--line);border-radius:7px;padding:7px 9px;font:inherit}
+  .librow input.lprice{width:110px;text-align:right;border:1px solid var(--line);border-radius:7px;padding:7px 9px;font:inherit}
+  .librow button{border:none;background:transparent;color:#b23;font-size:17px;line-height:1;padding:0 4px}
+  .libhead{display:flex;gap:8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:0 4px 4px}
+  .libhead .a{flex:1}.libhead .b{width:118px;text-align:right}.libhead .c{width:22px}
+  body.client .hidein-client{display:none!important}
+  body.client input,body.client select{pointer-events:none;background:transparent!important;border-color:transparent!important;color:var(--ink)!important;-webkit-text-fill-color:var(--ink);appearance:none}
+  body.client .addbtn,body.client .prodrow button.del,body.client .prodrow select.pick{display:none!important}
+  @media print{
+    body{background:#fff}.noprint{display:none!important}.wrap{max-width:none;padding:0}
+    .card{box-shadow:none;border:1px solid #ddd;margin:8px 0}
+    .band-navy,.greenband,.plainband,.row.hi,.bottomline,.mp .big{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .cols{grid-template-columns:1fr 34px 1fr}.prodrow select.pick{display:none!important}
+  }
+  @media(max-width:860px){.grid5{grid-template-columns:1fr 1fr}.grid8{grid-template-columns:1fr 1fr}.cols{grid-template-columns:1fr;gap:14px}.vsbadge{display:none}.moneypair{grid-template-columns:1fr}.moneypair .mp+.mp{border-left:none;border-top:1px solid var(--line2)}.prodrow select.pick{max-width:120px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brandbar">
+    <div class="brand"><b>HealthFirst</b><span>Package of Protection · Comparison Tool</span></div>
+    <div class="toolbar noprint">
+      <div class="seg" id="viewseg">
+        <button data-view="agent" class="on">Agent Setup</button>
+        <button data-view="client">Client View</button>
+      </div>
+      <button class="btn-ghost" id="managePlansBtn">Manage Plans</button>
+      <button class="btn-ghost" id="newBtn">New</button>
+      <button class="btn-ghost" id="loadBtn">Load Quote</button>
+      <button class="btn-gold" id="saveBtn">Save Quote</button>
+      <button class="btn-gold" id="printBtn">Print Quote</button>
+      <input type="file" id="fileInput" accept="application/json" style="display:none">
+    </div>
+  </div>
+
+  <div class="clientbar">
+    <div class="grid8">
+      <div class="fld"><label>Primary name</label><input id="c_pname" placeholder="Primary"></div>
+      <div class="fld"><label>Spouse name</label><input id="c_sname" placeholder="Spouse (optional)"></div>
+      <div class="fld"><label>Date</label><input id="c_date" placeholder="MM/DD/YYYY"></div>
+      <div class="fld"><label>Agent</label><input id="c_agent" placeholder="Your name"></div>
+      <div class="fld"><label>State</label><input id="c_state" placeholder="TX"></div>
+      <div class="fld"><label>ZIP</label><input id="c_zip" placeholder="78163"></div>
+      <div class="fld"><label>Primary age</label><input id="c_page" placeholder="49"></div>
+      <div class="fld"><label>Spouse age</label><input id="c_sage" placeholder="45"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tabs" id="tabs">
+      <button data-tab="good"><span class="t">GOOD</span><span class="s" id="tl_good">Affordable core</span></button>
+      <button data-tab="better"><span class="t">BETTER</span><span class="s" id="tl_better">Solid package</span></button>
+      <button data-tab="best" class="on"><span class="t">BEST</span><span class="s" id="tl_best">Full package of protection</span></button>
+    </div>
+
+    <div class="pad hidein-client" style="border-bottom:1px solid var(--line)">
+      <div class="sectitle"><span class="dot">●</span> Before you present: Doctors &amp; Drugs check</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px">
+        <div class="fld"><label>Key doctors / specialists to verify in-network</label><input id="d_docs" placeholder="e.g., Dr. Ramirez (cardiology), Dr. Lin (PCP)"></div>
+        <div class="fld"><label>Current medications</label><input id="d_meds" placeholder="e.g., Metformin, Lisinopril, Atorvastatin"></div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:24px;flex-wrap:wrap">
+        <label><input type="checkbox" id="d_net"> Network status verified with client (First Health)</label>
+        <label><input type="checkbox" id="d_rx"> Rx priced via SingleCare / RXedo / AFC reimbursement</label>
+      </div>
+      <div class="note">This step exists so the savings below never get presented before the client's actual doctors and prescriptions have been checked.</div>
+    </div>
+
+    <div class="pad">
+      <div class="cols">
+        <!-- ACA -->
+        <div class="panel aca">
+          <div class="ptitle">Your ACA / Marketplace Plan<small>The plan they have — or would buy on the exchange</small></div>
+          <div class="row"><div class="lab">Monthly premium<small>From HealthSherpa / HealthCare.gov</small></div><input class="num" id="a_prem" type="number" step="0.01"></div>
+          <div class="row"><div class="lab">Annual deductible</div><input class="num" id="a_ded" type="number"></div>
+          <div class="row"><div class="lab">Annual out-of-pocket max</div><input class="num" id="a_oop" type="number"></div>
+          <div class="row"><div class="lab">Medications (per month)</div><input class="num" id="a_med" type="number" step="0.01"></div>
+          <div class="row"><div class="lab">Doctor visits / year (you + family)</div><input class="num" id="a_visits" type="number"></div>
+          <div class="row"><div class="lab">Average co-pay per visit</div><input class="num" id="a_copay" type="number" step="0.01"></div>
+          <div class="row sum"><div class="lab">Annual premium</div><div class="val" id="o_a_annprem">—</div></div>
+          <div class="row"><div class="lab">Deductible impact / month<small>deductible ÷ 12</small></div><div class="val" id="o_a_dedmo">—</div></div>
+          <div class="row"><div class="lab">Office-visit co-pays / month<small>(visits × co-pay) ÷ 12</small></div><div class="val" id="o_a_copaymo">—</div></div>
+          <div class="row hi sum"><div class="lab">TRUE monthly cost</div><div class="val" id="o_a_truemo">—</div></div>
+          <div class="row sum"><div class="lab">TRUE annual cost</div><div class="val" id="o_a_trueyr">—</div></div>
+          <div class="row hidein-client"><div class="lab" style="font-size:12px;color:var(--muted)"><label><input type="checkbox" id="a_fullded" checked> TRUE cost assumes the full deductible is met that year</label></div><div></div></div>
+        </div>
+        <div class="vsbadge"><span>VS</span><div class="ribbon" id="ribbon"></div></div>
+        <!-- PACKAGE -->
+        <div class="panel pop">
+          <div class="ptitle">Package of Protection<small>Pick a plan from the dropdown or type a custom one — edit prices from your ARC quote</small></div>
+          <div id="prodlist"></div>
+          <button class="addbtn hidein-client" id="addProd">+ Add product</button>
+          <button class="addbtn hidein-client" id="resetTab" style="background:#efe9db">↻ Reset to default</button>
+          <div class="row lbblock"><div class="lab">Living Benefits — Life<small id="lb_desc">Pays the client cash on critical / chronic / terminal illness</small></div><input class="num" id="p_lb" type="number" step="0.01"></div>
+          <div class="row"><div class="lab">Medications (per month, net)<small>After SingleCare/RXedo + AFC reimbursement</small></div><input class="num" id="p_med" type="number" step="0.01"></div>
+          <div class="row hi sum"><div class="lab">Package monthly (incl. meds)</div><div class="val" id="o_p_mo">—</div></div>
+          <div class="row sum"><div class="lab">Package annual</div><div class="val" id="o_p_yr">—</div></div>
+          <div class="note" style="padding:8px 15px">Limited-benefit indemnity plan — not major medical. First-dollar, fixed-benefit design.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card pad">
+    <div class="band-navy">
+      <div class="savegrid">
+        <div class="h l">YOUR SAVINGS vs ACA</div><div class="h">Monthly</div><div class="h">Annual</div>
+        <div class="c l">ACTUAL — premium vs premium</div><div class="c a" id="o_sav_amo">—</div><div class="c a" id="o_sav_ayr">—</div>
+        <div class="c l tt">TRUE — with the ACA deductible counted</div><div class="c t" id="o_sav_tmo">—</div><div class="c t" id="o_sav_tyr">—</div>
+      </div>
+      <div class="note">ACTUAL = premium vs premium. TRUE = once the ACA deductible &amp; co-pays are counted — the real gap.</div>
+    </div>
+  </div>
+
+  <div class="card pad">
+    <div class="sectitle" style="margin-bottom:8px">Personal Pension <span style="font-family:-apple-system,sans-serif;font-weight:400;font-size:12px;color:var(--muted)">— optional retirement savings, not an insurance cost</span></div>
+    <div class="row hidein-client" style="border:1px solid var(--line);border-radius:8px">
+      <div class="lab">Personal Pension — monthly contribution<small>Set 0 to hide it from the comparison.</small></div>
+      <input class="num" id="p_pension" type="number" step="0.01">
+    </div>
+    <div class="row" style="border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px"><div class="lab">Personal Pension — note</div><input id="p_pnote" style="flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;background:#fff" placeholder="e.g., IUL / annuity for tax-free retirement"></div>
+    <div class="greenband" style="margin-top:14px">TOTAL INCLUDING ADDITIONAL PROGRAMS</div>
+    <div class="savegrid green">
+      <div class="h l">&nbsp;</div><div class="h">Monthly</div><div class="h">Annual</div>
+      <div class="c l">Your total (package + pension)</div><div class="c" style="text-align:center;font-weight:700;font-family:var(--serif)" id="o_tot_mo">—</div><div class="c" style="text-align:center;font-weight:700;font-family:var(--serif)" id="o_tot_yr">—</div>
+      <div class="c l">Still ahead vs ACA</div><div class="c money" id="o_tot_net_mo">—</div><div class="c money" id="o_tot_net_yr">—</div>
+    </div>
+    <div class="note">Even after funding the pension, this shows whether the client still spends less than the ACA plan.</div>
+  </div>
+
+  <div class="card pad">
+    <div class="plainband">If a major event happens <span class="desc" id="o_big_desc_h"></span></div>
+    <div class="claim">
+      <div class="row hidein-client"><div class="lab">Description</div><input id="b_desc" style="flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;background:#fff"></div>
+      <div class="row hidein-client"><div class="lab">Total billed charges</div><input class="num" id="b_charge" type="number" step="0.01"></div>
+      <div class="row hidein-client"><div class="lab">Network discount / adjustment</div><input class="num" id="b_disc" type="number" step="0.01"></div>
+      <div class="row hi sum"><div class="lab">Balance after discount</div><div class="val" id="o_b_bal">—</div></div>
+      <div class="row hidein-client"><div class="lab">Hospital days</div><input class="num" id="b_days" type="number"></div>
+      <div class="row hidein-client"><div class="lab">— AFC daily inpatient benefit × days</div><input class="num" id="b_daily" type="number"></div>
+      <div class="row hidein-client"><div class="lab">— AFC hospital admission benefit (one-time)</div><input class="num" id="b_adm" type="number"></div>
+      <div class="row hidein-client"><div class="lab">— HI Select payout</div><input class="num" id="b_his" type="number"></div>
+      <div class="row hidein-client"><div class="lab">— Other rider payouts (cancer / accident / etc.)</div><input class="num" id="b_other" type="number"></div>
+      <div class="row hi sum"><div class="lab">Manhattan total paid to client</div><div class="val" id="o_b_cash">—</div></div>
+      <div class="moneypair">
+        <div class="mp"><div class="cap">Money you don't pay</div><div class="big" id="o_b_aca">—</div><div class="sub">ACA out-of-pocket the Package covers instead</div></div>
+        <div class="mp"><div class="cap">Money paid directly to you</div><div class="big" id="o_b_net">—</div><div class="sub">Cash beyond the bill, from Manhattan</div></div>
+      </div>
+    </div>
+    <div class="bottomline">BOTTOM LINE if a MAJOR event happens this year: <b id="o_b_bottom">—</b></div>
+    <div class="note" id="o_b_cap" style="text-align:center"></div>
+  </div>
+
+  <div class="card pad">
+    <div class="plainband">On an everyday event <span class="desc" id="o_reg_desc_h"></span></div>
+    <div class="claim">
+      <div class="row hidein-client"><div class="lab">Description</div><input id="r_desc" style="flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;background:#fff"></div>
+      <div class="row hidein-client"><div class="lab">Billed charge (after discount)</div><input class="num" id="r_charge" type="number" step="0.01"></div>
+      <div class="row hidein-client"><div class="lab">Manhattan pays (sum of benefits)<small>e.g., $600 preventive + $3,000 ambulatory</small></div><input class="num" id="r_pay" type="number" step="0.01"></div>
+      <div class="row hidein-client"><div class="lab">What the client would've owed on ACA</div><input class="num" id="r_aca" type="number" step="0.01"></div>
+      <div class="moneypair">
+        <div class="mp"><div class="cap">Money you don't pay</div><div class="big" id="o_r_aca">—</div><div class="sub">What the client would've owed on ACA</div></div>
+        <div class="mp"><div class="cap">Money paid directly to you</div><div class="big" id="o_r_net">—</div><div class="sub">Cash beyond the charge</div></div>
+      </div>
+    </div>
+    <div class="bottomline">BOTTOM LINE in a ROUTINE year: <b id="o_r_bottom">—</b></div>
+    <div class="note" id="o_r_cap" style="text-align:center"></div>
+  </div>
+
+  <div class="discl">For agent use. Figures are estimates from your inputs; confirm exact benefits in the policy / ARC. ManhattanLife plans are limited-benefit, not major medical.</div>
+</div>
+
+<!-- PLAN LIBRARY MODAL -->
+<div class="modal-backdrop" id="planModal">
+  <div class="modal">
+    <div class="modal-head"><b>Plan Library</b><span>Manage the plans that feed the product dropdowns</span><button class="btn-gold" id="closePlans">Done</button></div>
+    <div class="modal-body">
+      <div id="masterStatus" class="note" style="padding-top:0;font-style:normal;color:var(--navy);font-weight:600"></div>
+      <button class="addbtn" id="refreshMaster" style="margin:0 0 10px">↻ Refresh plans from master sheet</button>
+      <div class="note" style="padding-top:0">Add each product — and each benefit level as its own row (e.g., HI Select $5K, HI Select $10K). Prices are starting points; edit to match your ARC quote for the client's age/family. This list feeds every "pick a plan" dropdown and saves with your quotes.</div>
+      <div class="libhead"><div class="a">Plan name</div><div class="b">Monthly $</div><div class="c"></div></div>
+      <div id="libList"></div>
+      <button class="addbtn" id="addLib" style="margin-left:0">+ Add plan</button>
+      <div style="border-top:1px solid var(--line);margin:16px 0 6px"></div>
+      <div class="sectitle" style="font-size:14px">Default bundles <span style="font-family:-apple-system,sans-serif;font-weight:400;font-size:12px;color:var(--muted)">— what loads on each tab for a new quote</span></div>
+      <div class="note" style="padding-top:2px">Edit each tab's starting bundle, or click "Use current … tab" to capture what you've built live. New quotes and "Reset to default" use these. Saved with your quotes.</div>
+      <div id="defWrap"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var esc=function(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');};
+var fmt=function(n){var neg=n<0;n=Math.abs(Math.round(n));return (neg?'-':'')+'$'+n.toLocaleString();};
+var fmt2=function(n){var neg=n<0;n=Math.abs(n);return (neg?'-':'')+'$'+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});};
+var saves=function(v,per){return (v>=0?'SAVES ':'COSTS ')+fmt(Math.abs(v))+(v>=0?per:per+' MORE');};
+var copyArr=function(a){return (a||[]).map(function(x){return {name:x.name,monthly:x.monthly};});};
+
+/* ========== MASTER PLAN LIST (optional shared source) ==========
+   To share ONE plan list + Good/Better/Best defaults across everyone:
+   1) Make a Google Sheet with a header row: Name, Price, Good, Better, Best
+      (put an "x" in Good/Better/Best to mark which plans load by default on each tab)
+   2) Share it so anyone with the link can VIEW, then copy its ID from the URL and use:
+      https://docs.google.com/spreadsheets/d/SHEET_ID/gviz/tq?tqx=out:csv
+   3) Paste that link between the quotes below. Leave blank to use the built-in list.
+   Row order in the sheet = order in the dropdowns and default bundles. */
+var MASTER_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1O9lQcrAvKYE6Uww3tTvZkhwEyAMZls0IhIwscdUSsvM/gviz/tq?tqx=out:csv&gid=1809100986';
+var masterConnected = false;
+
+function parseCSV(t){
+  var rows=[],cur=[],field='',inQ=false;
+  for(var i=0;i<t.length;i++){var c=t[i];
+    if(inQ){ if(c==='"'){ if(t[i+1]==='"'){field+='"';i++;} else inQ=false; } else field+=c; }
+    else { if(c==='"') inQ=true; else if(c===','){cur.push(field);field='';} else if(c==='\n'){cur.push(field);rows.push(cur);cur=[];field='';} else if(c!=='\r') field+=c; }
+  }
+  if(field.length||cur.length){cur.push(field);rows.push(cur);}
+  return rows;
+}
+function applyMaster(text){
+  var rows=parseCSV(text); if(rows.length<2) return false;
+  var hdr=rows[0].map(function(h){return h.trim().toLowerCase();});
+  var find=function(){for(var a=0;a<arguments.length;a++){var k=hdr.indexOf(arguments[a]);if(k>=0)return k;}return -1;};
+  var iName=find('name','plan name','plan'); if(iName<0)iName=0;
+  var iPrice=find('price','monthly','monthly $','cost');
+  var iG=find('good'), iB=find('better'), iX=find('best');
+  var flag=function(row,i){return i>=0 && /^(x|yes|true|1|y|✓)$/i.test(String(row[i]||'').trim());};
+  var lib=[], defs={good:[],better:[],best:[]};
+  for(var r=1;r<rows.length;r++){
+    var row=rows[r]; var name=(row[iName]||'').trim(); if(!name) continue;
+    var price=iPrice>=0? (parseFloat(String(row[iPrice]).replace(/[^0-9.\-]/g,''))||0):0;
+    lib.push({name:name,price:price});
+    if(flag(row,iG)) defs.good.push({name:name,monthly:price});
+    if(flag(row,iB)) defs.better.push({name:name,monthly:price});
+    if(flag(row,iX)) defs.best.push({name:name,monthly:price});
+  }
+  if(!lib.length) return false;
+  S.library=lib;
+  if(defs.good.length||defs.better.length||defs.best.length) S.defaults=defs;
+  masterConnected=true; return true;
+}
+function loadMaster(cb){
+  if(!MASTER_SHEET_CSV_URL){ updateMasterStatus(); if(cb)cb(false); return; }
+  var url=MASTER_SHEET_CSV_URL+(MASTER_SHEET_CSV_URL.indexOf('?')>=0?'&':'?')+'t='+Date.now();
+  fetch(url).then(function(r){return r.text();}).then(function(txt){
+    var ok=applyMaster(txt); renderProducts(); compute(); updateMasterStatus(); if(cb)cb(ok);
+  }).catch(function(){ updateMasterStatus(); if(cb)cb(false); });
+}
+function updateMasterStatus(){
+  var el=$('masterStatus'); if(!el) return;
+  if(!MASTER_SHEET_CSV_URL) el.textContent='Not connected to a master sheet — using the built-in list. (An admin can paste a published Google Sheet link into the tool to connect it.)';
+  else if(masterConnected) el.textContent='Connected to the master sheet ✓  The plan list and Good/Better/Best defaults come from the sheet. Any edits below are local to this device until the next Refresh.';
+  else el.textContent='Master sheet is set, but it could not be loaded right now (offline or link issue) — using the last-known / built-in list.';
+}
+
+function defLibrary(){
+  return [
+    {name:'AFC — Elite Plus',price:278.76},
+    {name:'AFC — Elite',price:197.87},
+    {name:'AFC — Classic Plus',price:150.06},
+    {name:'AFC — Classic',price:114.46},
+    {name:'Cancer Lump Sum — Aetna Cancer $30K',price:62.50},
+    {name:'Cancer Lump Sum — Aetna Cancer $15K',price:0},
+    {name:'Heart Attack & Stroke — Aetna $10K',price:19.17},
+    {name:'24-Hr Accident — MLAC (2 Unit)',price:35.31},
+    {name:'24-Hr Accident — MLAC (1 Unit)',price:0},
+    {name:'Hospital Indemnity — MLAC HI Select $10K',price:62.31},
+    {name:'Hospital Indemnity — MLAC HI Select $5K',price:0},
+    {name:'Home Health Care — MLAC HHC Deluxe',price:32.80},
+    {name:'Out-of-Pocket / Gap — MLAC Omni Flex',price:96.00},
+    {name:'Dental • Vision • Hearing — MLAC DVH $3K',price:59.58},
+    {name:'Dental • Vision • Hearing — MLAC DVH $1.5K',price:0},
+    {name:'Final Expense Life — MLAC $10K',price:27.90},
+    {name:'Living Benefit Life — Americo HMS 125',price:45.00},
+    {name:'Specified Disease Rider — 250K / 50K deductible',price:0}
+  ];
+}
+function defProducts(tier){
+  var L={
+    afcElitePlus:{name:'Core Health Plan — AFC Elite Plus',monthly:278.76},
+    afcElite:{name:'Core Health Plan — AFC Elite',monthly:197.87},
+    cancer:{name:'Cancer Lump Sum — Aetna Cancer $30K',monthly:62.50},
+    has:{name:'Heart Attack & Stroke — Aetna $10K',monthly:19.17},
+    accident:{name:'Accident Cash — MLAC 24-Hr Accident (2 Unit)',monthly:35.31},
+    hi:{name:'Hospital Indemnity — MLAC HI Select $10K',monthly:62.31},
+    hhc:{name:'Home Health Care — MLAC HHC Deluxe',monthly:32.80},
+    gap:{name:'Out-of-Pocket / Gap — MLAC Omni Flex',monthly:96.00},
+    dvh:{name:'Dental • Vision • Hearing — MLAC DVH $3K',monthly:59.58},
+    fe:{name:'Final Expense Life — MLAC $10K',monthly:27.90}
+  };
+  var pick=function(keys){return keys.map(function(k){return {name:L[k].name,monthly:L[k].monthly};});};
+  if(tier==='best') return pick(['afcElitePlus','cancer','has','accident','hi','hhc','gap','dvh','fe']);
+  if(tier==='better') return pick(['afcElitePlus','hi','gap','dvh','accident','hhc']);
+  return pick(['afcElite','gap','dvh']);
+}
+
+function blankState(){
+  return {
+    client:{pname:'',sname:'',date:'',agent:'',state:'TX',zip:'78163',page:'49',sage:'45'},
+    docs:{docs:'',meds:'',net:false,rx:false},
+    tabLabels:{good:'Affordable core',better:'Solid package',best:'Full package of protection'},
+    aca:{prem:1082.90,ded:10600,oop:10600,med:0,visits:0,copay:0,fullded:true},
+    activeTab:'best',
+    library:defLibrary(),
+    defaults:{good:defProducts('good'),better:defProducts('better'),best:defProducts('best')},
+    packages:{
+      good:{products:defProducts('good'),lb:0,med:0},
+      better:{products:defProducts('better'),lb:0,med:0},
+      best:{products:defProducts('best'),lb:45,med:0}
+    },
+    pension:{monthly:100,note:'e.g., IUL / annuity for tax-free retirement'},
+    big:{desc:'Hospital stay – 7 days',charge:41660.41,disc:18747.18,days:7,daily:4000,adm:2000,his:10000,other:0},
+    reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800}
+  };
+}
+var S=blankState();
+var view='agent';
+
+function libOptions(){
+  var s='<option value="">— pick a plan —</option>';
+  S.library.forEach(function(p,i){ s+='<option value="'+i+'">'+esc(p.name)+(p.price?(' — $'+p.price):'')+'</option>'; });
+  s+='<option value="custom">Custom (type below)</option>';
+  return s;
+}
+function renderProducts(){
+  var pk=S.packages[S.activeTab];
+  var host=$('prodlist'); host.innerHTML='';
+  pk.products.forEach(function(p,i){
+    var row=document.createElement('div'); row.className='row prodrow';
+    var lab=document.createElement('div'); lab.className='lab';
+    var sel=document.createElement('select'); sel.className='pick hidein-client'; sel.innerHTML=libOptions();
+    var name=document.createElement('input'); name.className='pname'; name.value=p.name;
+    name.oninput=function(){pk.products[i].name=name.value;};
+    lab.appendChild(sel); lab.appendChild(name);
+    var val=document.createElement('input'); val.className='num'; val.type='number'; val.step='0.01'; val.value=p.monthly;
+    val.oninput=function(){pk.products[i].monthly=parseFloat(val.value)||0;compute();};
+    var del=document.createElement('button'); del.className='del'; del.title='remove'; del.textContent='×';
+    del.onclick=function(){pk.products.splice(i,1);renderProducts();compute();};
+    sel.onchange=function(){
+      var v=sel.value;
+      if(v==='custom'){ name.focus(); }
+      else if(v!==''){ var lp=S.library[+v]; if(lp){ pk.products[i].name=lp.name; pk.products[i].monthly=lp.price; name.value=lp.name; val.value=lp.price; compute(); } }
+    };
+    row.appendChild(lab); row.appendChild(val); row.appendChild(del);
+    host.appendChild(row);
+  });
+}
+
+function renderLib(){
+  var host=$('libList'); host.innerHTML='';
+  S.library.forEach(function(p,i){
+    var row=document.createElement('div'); row.className='librow';
+    var nm=document.createElement('input'); nm.className='lname'; nm.value=p.name; nm.oninput=function(){S.library[i].name=nm.value;};
+    var pr=document.createElement('input'); pr.className='lprice'; pr.type='number'; pr.step='0.01'; pr.value=p.price; pr.oninput=function(){S.library[i].price=parseFloat(pr.value)||0;};
+    var del=document.createElement('button'); del.textContent='×'; del.title='remove'; del.onclick=function(){S.library.splice(i,1);renderLib();};
+    row.appendChild(nm); row.appendChild(pr); row.appendChild(del); host.appendChild(row);
+  });
+}
+
+function renderDefaults(){
+  var host=$('defWrap'); host.innerHTML='';
+  [['good','GOOD'],['better','BETTER'],['best','BEST']].forEach(function(tp){
+    var t=tp[0];
+    var box=document.createElement('div'); box.style.margin='12px 0';
+    var head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between'; head.style.alignItems='center'; head.style.marginBottom='4px';
+    var h=document.createElement('b'); h.textContent=tp[1]; h.style.fontFamily='var(--serif)'; h.style.color='var(--navy)';
+    var use=document.createElement('button'); use.textContent='Use current '+tp[1]+' tab'; use.style.cssText='border:1px solid #c9c0a8;background:#f3efe3;color:#26324a;border-radius:8px;padding:5px 10px;font-weight:600;font-size:12px;cursor:pointer';
+    use.onclick=function(){ read(); S.defaults[t]=copyArr(S.packages[t].products); renderDefaults(); };
+    head.appendChild(h); head.appendChild(use); box.appendChild(head);
+    S.defaults[t].forEach(function(p,i){
+      var row=document.createElement('div'); row.className='librow';
+      var nm=document.createElement('input'); nm.className='lname'; nm.value=p.name; nm.oninput=function(){S.defaults[t][i].name=nm.value;};
+      var pr=document.createElement('input'); pr.className='lprice'; pr.type='number'; pr.step='0.01'; pr.value=p.monthly; pr.oninput=function(){S.defaults[t][i].monthly=parseFloat(pr.value)||0;};
+      var del=document.createElement('button'); del.textContent='×'; del.title='remove'; del.onclick=function(){S.defaults[t].splice(i,1);renderDefaults();};
+      row.appendChild(nm); row.appendChild(pr); row.appendChild(del); box.appendChild(row);
+    });
+    var add=document.createElement('button'); add.className='addbtn'; add.style.margin='6px 0 0'; add.textContent='+ Add to '+tp[1]+' default';
+    add.onclick=function(){ S.defaults[t].push({name:'New product',monthly:0}); renderDefaults(); };
+    box.appendChild(add);
+    host.appendChild(box);
+  });
+}
+
+function normClient(){
+  var c=S.client||{};
+  if(c.pname===undefined && c.name!==undefined) c.pname=c.name;
+  if(c.page===undefined && c.ages){ var a=String(c.ages).split('/'); c.page=(a[0]||'').trim(); if(c.sage===undefined)c.sage=(a[1]||'').trim(); }
+  if(c.state===undefined && c.zip!==undefined && String(c.zip).indexOf('/')>=0){ var z=String(c.zip).split('/'); c.state=(z[0]||'').trim(); c.zip=(z[1]||'').trim(); }
+  S.client=Object.assign({pname:'',sname:'',date:'',agent:'',state:'',zip:'',page:'',sage:''},c);
+}
+function fill(){
+  normClient();
+  $('c_pname').value=S.client.pname;$('c_sname').value=S.client.sname;$('c_date').value=S.client.date;$('c_agent').value=S.client.agent;$('c_state').value=S.client.state;$('c_zip').value=S.client.zip;$('c_page').value=S.client.page;$('c_sage').value=S.client.sage;
+  $('d_docs').value=S.docs.docs;$('d_meds').value=S.docs.meds;$('d_net').checked=S.docs.net;$('d_rx').checked=S.docs.rx;
+  $('a_prem').value=S.aca.prem;$('a_ded').value=S.aca.ded;$('a_oop').value=S.aca.oop;$('a_med').value=S.aca.med;$('a_visits').value=S.aca.visits;$('a_copay').value=S.aca.copay;$('a_fullded').checked=S.aca.fullded;
+  var pk=S.packages[S.activeTab];
+  $('p_lb').value=pk.lb;$('p_med').value=pk.med;
+  $('p_pension').value=S.pension.monthly;$('p_pnote').value=S.pension.note;
+  $('b_desc').value=S.big.desc;$('b_charge').value=S.big.charge;$('b_disc').value=S.big.disc;$('b_days').value=S.big.days;$('b_daily').value=S.big.daily;$('b_adm').value=S.big.adm;$('b_his').value=S.big.his;$('b_other').value=S.big.other;
+  $('r_desc').value=S.reg.desc;$('r_charge').value=S.reg.charge;$('r_pay').value=S.reg.pay;$('r_aca').value=S.reg.aca;
+  $('tl_good').textContent=S.tabLabels.good;$('tl_better').textContent=S.tabLabels.better;$('tl_best').textContent=S.tabLabels.best;
+  document.querySelectorAll('#tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===S.activeTab);});
+  renderProducts();
+}
+
+function read(){
+  S.client={pname:$('c_pname').value,sname:$('c_sname').value,date:$('c_date').value,agent:$('c_agent').value,state:$('c_state').value,zip:$('c_zip').value,page:$('c_page').value,sage:$('c_sage').value};
+  S.docs={docs:$('d_docs').value,meds:$('d_meds').value,net:$('d_net').checked,rx:$('d_rx').checked};
+  S.aca={prem:+$('a_prem').value||0,ded:+$('a_ded').value||0,oop:+$('a_oop').value||0,med:+$('a_med').value||0,visits:+$('a_visits').value||0,copay:+$('a_copay').value||0,fullded:$('a_fullded').checked};
+  var pk=S.packages[S.activeTab]; pk.lb=+$('p_lb').value||0; pk.med=+$('p_med').value||0;
+  S.pension={monthly:+$('p_pension').value||0,note:$('p_pnote').value};
+  S.big={desc:$('b_desc').value,charge:+$('b_charge').value||0,disc:+$('b_disc').value||0,days:+$('b_days').value||0,daily:+$('b_daily').value||0,adm:+$('b_adm').value||0,his:+$('b_his').value||0,other:+$('b_other').value||0};
+  S.reg={desc:$('r_desc').value,charge:+$('r_charge').value||0,pay:+$('r_pay').value||0,aca:+$('r_aca').value||0};
+}
+
+function compute(){
+  read();
+  var a=S.aca;
+  var annPrem=a.prem*12;
+  var dedMo=a.ded/12;
+  var copayYr=(a.visits||0)*(a.copay||0);
+  var copayMo=copayYr/12;
+  var trueMo=(a.fullded? (a.prem+dedMo+a.med) : (a.prem+a.med))+copayMo;
+  var trueYr=(a.fullded? (annPrem+a.ded+a.med*12) : (annPrem+a.med*12))+copayYr;
+  $('o_a_annprem').textContent=fmt2(annPrem);
+  $('o_a_dedmo').textContent=fmt2(dedMo);
+  $('o_a_copaymo').textContent=fmt2(copayMo);
+  $('o_a_truemo').textContent=fmt2(trueMo);
+  $('o_a_trueyr').textContent=fmt2(trueYr);
+
+  var pk=S.packages[S.activeTab];
+  var prod=pk.products.reduce(function(s,p){return s+(+p.monthly||0);},0)+(+pk.lb||0);
+  var pMo=prod+(+pk.med||0);
+  var pYr=pMo*12;
+  $('o_p_mo').textContent=fmt2(pMo);
+  $('o_p_yr').textContent=fmt2(pYr);
+
+  var aMo=(a.prem+a.med)-pMo, aYr=(annPrem+a.med*12)-pYr;
+  var tMo=trueMo-pMo, tYr=trueYr-pYr;
+  $('o_sav_amo').textContent=saves(aMo,'/mo');$('o_sav_ayr').textContent=saves(aYr,'/yr');
+  $('o_sav_tmo').textContent=saves(tMo,'/mo');$('o_sav_tyr').textContent=saves(tYr,'/yr');
+  $('ribbon').textContent=fmt(tYr)+' SAVED / YR (TRUE)';
+
+  var pen=S.pension.monthly;
+  var totMo=pMo+pen, totYr=pYr+pen*12;
+  $('o_tot_mo').textContent=fmt2(totMo);$('o_tot_yr').textContent=fmt2(totYr);
+  $('o_tot_net_mo').textContent=saves(trueMo-totMo,'/mo');
+  $('o_tot_net_yr').textContent=saves(trueYr-totYr,'/yr');
+
+  var b=S.big;
+  var bal=b.charge-b.disc;
+  var acaOwe=Math.min(bal,a.oop);
+  var afcPays=b.days*b.daily+b.adm;
+  var mTot=afcPays+b.his+b.other;
+  var netGain=mTot-bal;
+  $('o_b_bal').textContent=fmt2(bal);
+  $('o_b_cash').textContent=fmt2(mTot);
+  $('o_b_aca').textContent=fmt2(acaOwe);
+  $('o_b_net').textContent=fmt2(netGain);
+  $('o_big_desc_h').textContent=b.desc;
+  var bigBottom=aYr+acaOwe+netGain;
+  $('o_b_bottom').textContent=fmt(bigBottom);
+  $('o_b_cap').textContent='= '+fmt(aYr)+' premium savings  +  '+fmt(acaOwe)+" you don't pay  +  "+fmt(netGain)+' cash to you';
+
+  var r=S.reg;
+  var rNet=r.pay-r.charge;
+  $('o_r_aca').textContent=fmt2(r.aca);
+  $('o_r_net').textContent=fmt2(rNet);
+  $('o_reg_desc_h').textContent=r.desc;
+  var regBottom=aYr+r.aca+rNet;
+  $('o_r_bottom').textContent=fmt(regBottom);
+  $('o_r_cap').textContent='= '+fmt(aYr)+' premium savings  +  '+fmt(r.aca)+" you don't pay  +  "+fmt(rNet)+' cash to you';
+
+  autosave();
+}
+
+function setView(v){
+  view=v; document.body.classList.toggle('client',v==='client');
+  document.querySelectorAll('#viewseg button').forEach(function(b){b.classList.toggle('on',b.dataset.view===v);});
+}
+
+function currentQuote(){read();return JSON.parse(JSON.stringify(S));}
+function fileName(){
+  var base=(S.client.pname||'').trim(); if(S.client.sname) base+=' '+S.client.sname; if(!base) base='quote';
+  var n=base.replace(/[^a-z0-9]+/gi,'_').replace(/^_|_$/g,'');
+  var d=new Date().toISOString().slice(0,10);
+  return 'HealthFirst_'+n+'_'+d+'.json';
+}
+function saveQuote(){
+  var data=currentQuote();
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download=fileName(); document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url);},1500);
+}
+function loadFile(file){
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{ var obj=JSON.parse(rd.result); S=Object.assign(blankState(),obj);
+      if(!S.library) S.library=defLibrary();
+      if(!S.defaults) S.defaults=blankState().defaults;
+      if(!S.packages||!S.packages[S.activeTab]) S.packages=blankState().packages;
+      if(!S.aca) S.aca=blankState().aca;
+      fill(); compute(); loadMaster();
+      alert('Quote loaded'+(S.client&&S.client.pname?': '+S.client.pname:'')+'. Edit and Save again to keep a new version.');
+    }catch(e){ alert('Could not read that file — is it a HealthFirst quote (.json)?'); }
+  };
+  rd.readAsText(file);
+}
+function autosave(){ try{ localStorage.setItem('hf_pop_last',JSON.stringify(S)); }catch(e){} }
+function restore(){ try{ var s=localStorage.getItem('hf_pop_last'); if(s){ S=Object.assign(blankState(),JSON.parse(s)); if(!S.library)S.library=defLibrary(); if(!S.defaults)S.defaults=blankState().defaults; if(!S.aca)S.aca=blankState().aca; } }catch(e){} }
+
+function bindInputs(){
+  ['c_pname','c_sname','c_date','c_agent','c_state','c_zip','c_page','c_sage','d_docs','d_meds','a_prem','a_ded','a_oop','a_med','a_visits','a_copay','p_lb','p_med','p_pension','p_pnote',
+   'b_desc','b_charge','b_disc','b_days','b_daily','b_adm','b_his','b_other','r_desc','r_charge','r_pay','r_aca']
+   .forEach(function(id){ $(id).addEventListener('input',compute); });
+  ['d_net','d_rx','a_fullded'].forEach(function(id){ $(id).addEventListener('change',compute); });
+  document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ read(); S.activeTab=b.dataset.tab; fill(); compute(); }; });
+  document.querySelectorAll('#viewseg button').forEach(function(b){ b.onclick=function(){ setView(b.dataset.view); }; });
+  $('addProd').onclick=function(){ S.packages[S.activeTab].products.push({name:'New product',monthly:0}); renderProducts(); compute(); };
+  $('saveBtn').onclick=saveQuote;
+  $('printBtn').onclick=function(){ window.print(); };
+  $('loadBtn').onclick=function(){ $('fileInput').click(); };
+  $('fileInput').onchange=function(e){ if(e.target.files[0]) loadFile(e.target.files[0]); e.target.value=''; };
+  $('newBtn').onclick=function(){ if(confirm('Start a new blank quote? Unsaved changes will be lost.')){ var lib=S.library, defs=S.defaults; S=blankState(); S.library=lib; S.defaults=defs; S.packages={good:{products:copyArr(defs.good),lb:0,med:0},better:{products:copyArr(defs.better),lb:0,med:0},best:{products:copyArr(defs.best),lb:45,med:0}}; fill(); compute(); } };
+  $('resetTab').onclick=function(){ read(); S.packages[S.activeTab].products=copyArr(S.defaults[S.activeTab]); renderProducts(); compute(); };
+  $('managePlansBtn').onclick=function(){ renderLib(); renderDefaults(); updateMasterStatus(); $('planModal').classList.add('open'); };
+  $('refreshMaster').onclick=function(){ $('masterStatus').textContent='Refreshing…'; loadMaster(function(){ renderLib(); renderDefaults(); }); };
+  $('closePlans').onclick=function(){ $('planModal').classList.remove('open'); renderProducts(); compute(); autosave(); };
+  $('addLib').onclick=function(){ S.library.push({name:'New plan',price:0}); renderLib(); };
+  $('planModal').addEventListener('click',function(e){ if(e.target===$('planModal')){ $('planModal').classList.remove('open'); renderProducts(); compute(); } });
+}
+
+restore();
+fill();
+bindInputs();
+compute();
+loadMaster();
+</script>
+</body>
+</html>
