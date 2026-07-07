@@ -21,8 +21,12 @@
   .pad{padding:18px}
   h1,h2,h3{margin:0}
   .brandbar{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff;border-radius:14px 14px 0 0;padding:16px 20px;gap:12px;flex-wrap:wrap}
-  .brand{display:flex;align-items:baseline;gap:12px}
-  .brand b{font-family:var(--serif);color:var(--gold-brand);font-size:23px;letter-spacing:.3px;font-weight:700}
+  .brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;max-width:100%}
+  .brand b{font-family:var(--serif);color:var(--gold-brand);font-size:23px;letter-spacing:.3px;font-weight:700;max-width:100%;word-break:break-word;outline:none}
+  body:not(.client) .brand b{cursor:text;border-bottom:1px dashed rgba(201,154,63,.55);padding-bottom:1px}
+  body:not(.client) .brand b:hover{border-bottom-color:var(--gold-brand)}
+  body:not(.client) .brand b:focus{border-bottom-style:solid}
+  @media print{.brand b{border-bottom:none!important}}
   .brand span{color:#b9c2d4;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid transparent;padding:8px 12px}
@@ -41,8 +45,8 @@
   .clientbar .fld label{color:#b7c3da}
   .clientbar .fld input{background:#22406b;border-color:#38578a;color:#fff}
   .clientbar .fld input::placeholder{color:#8fa1c2}
-  .tabs{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:2px solid var(--line)}
-  .tabs button{background:transparent;border:none;padding:14px 8px;text-align:center;border-bottom:3px solid transparent;color:#8a8f99}
+  .tabs{display:flex;border-bottom:2px solid var(--line)}
+  .tabs button{flex:1;background:transparent;border:none;padding:14px 8px;text-align:center;border-bottom:3px solid transparent;color:#8a8f99}
   .tabs button .t{font-family:var(--serif);font-weight:700;letter-spacing:.06em;font-size:17px;display:block;color:#2a3346}
   .tabs button .s{font-size:12px;color:#8a8f99}
   .tabs button.on{border-bottom-color:var(--gold)}
@@ -128,11 +132,78 @@
   .money-disp{display:none;min-width:100px;text-align:right;font:inherit;color:var(--ink);font-variant-numeric:tabular-nums}
   body.client input.money-in{display:none!important}
   body.client .money-disp{display:inline-block}
+  /* ===== dedicated printout (Good/Better/Best comparison) ===== */
+  #printout{display:none}
+  #printout *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #printout .po-head{background:var(--navy);color:#fff;padding:18px 22px;border-radius:10px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  #printout .po-head b{font-family:var(--serif);color:var(--gold-brand);font-size:24px;letter-spacing:.3px;word-break:break-word;max-width:100%}
+  #printout .po-head span{color:#b9c2d4;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+  #printout .po-meta{margin:11px 2px 0;color:#3a4358;font-size:12.5px}
+  #printout .po-meta b{color:var(--navy)}
+  #printout .po-aca{margin-top:14px;border:1px solid var(--line);border-top:4px solid var(--maroon);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  #printout .po-aca .t{font-family:var(--serif);font-weight:700;color:var(--maroon);font-size:16px}
+  #printout .po-aca .t small{display:block;font-family:-apple-system,sans-serif;font-weight:400;color:var(--muted);font-size:11px}
+  #printout .po-aca .m{font-family:var(--serif);font-variant-numeric:tabular-nums;font-size:14px;color:#2a3346}
+  #printout .po-aca .m b{color:var(--maroon);font-size:16px}
+  #printout .po-cmp{display:grid;gap:12px;margin-top:14px}
+  #printout .po-col{border:1px solid var(--line);border-top:5px solid var(--green);border-radius:10px;overflow:hidden;background:#fff;break-inside:avoid}
+  #printout .po-col h3{font-family:var(--serif);color:var(--green);font-size:18px;padding:12px 15px 3px;margin:0}
+  #printout .po-col h3 small{display:block;font-family:-apple-system,sans-serif;font-weight:400;color:var(--muted);font-size:11.5px;margin-top:1px}
+  #printout .po-li{display:flex;justify-content:space-between;gap:10px;padding:6px 15px;border-top:1px solid var(--line2);font-size:12px}
+  #printout .po-li span:last-child{font-variant-numeric:tabular-nums;font-family:var(--serif);white-space:nowrap}
+  #printout .po-sum{display:flex;justify-content:space-between;padding:9px 15px;border-top:1px solid var(--line);background:#f6f3ea;font-family:var(--serif);font-weight:700;font-variant-numeric:tabular-nums}
+  #printout .po-save{background:var(--green);color:#fff;padding:10px 15px;text-align:center;font-family:var(--serif);font-weight:700;font-size:12px;line-height:1.5}
+  #printout .po-save b{font-size:16px;font-variant-numeric:tabular-nums}
+  #printout .po-foot{color:var(--muted);font-size:10.5px;margin-top:16px;line-height:1.5}
+  #printout .po-metabox{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:13px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:11px 18px;background:#faf7ef}
+  #printout .po-metabox .k{color:var(--muted);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:1px}
+  #printout .po-metabox .v{font-family:var(--serif);font-weight:700;color:var(--navy);font-size:13.5px;word-break:break-word}
+  #printout .po-acabox{margin-top:14px;border:1px solid var(--line);border-top:4px solid var(--maroon);border-radius:10px;overflow:hidden;break-inside:avoid}
+  #printout .po-acabox .t{font-family:var(--serif);font-weight:700;color:var(--maroon);font-size:16px;padding:11px 15px 2px}
+  #printout .po-acabox .t small{display:block;font-family:-apple-system,sans-serif;font-weight:400;color:var(--muted);font-size:11px;margin-top:1px}
+  #printout .po-acabox .li{display:flex;justify-content:space-between;gap:10px;padding:8px 15px;border-top:1px solid var(--line2);font-size:12.5px}
+  #printout .po-acabox .li .lab small{display:block;color:var(--muted);font-size:10.5px}
+  #printout .po-acabox .li .amt{font-variant-numeric:tabular-nums;font-family:var(--serif);text-align:right;white-space:nowrap}
+  #printout .po-acabox .li.tot{background:var(--tan-row);font-weight:700}
+  #printout .po-acabox .li.tot .amt{color:var(--maroon)}
+  #printout .po-navy{background:var(--navy-band);border-radius:10px;padding:4px 4px 6px;margin-top:14px;break-inside:avoid}
+  #printout .po-navy .cap{padding:9px 14px 3px;font-family:var(--serif);font-weight:700;color:#fff}
+  #printout .po-navy .cap small{display:block;color:#9fb0cc;font-weight:400;font-family:-apple-system,sans-serif;font-size:11px}
+  #printout .po-navy .g{display:grid;grid-template-columns:1.9fr 1fr 1fr}
+  #printout .po-navy .g .h{padding:7px 14px;color:var(--gold-lt);font-family:var(--serif);font-weight:700;text-align:center;font-size:12px}
+  #printout .po-navy .g .h.l{text-align:left;letter-spacing:.04em}
+  #printout .po-navy .g .c{padding:9px 14px;border-top:1px solid #24375b;font-variant-numeric:tabular-nums;font-size:12.5px}
+  #printout .po-navy .g .c.l{color:#cdd7e7;font-weight:600}
+  #printout .po-navy .g .c.l.tt{color:#fff;font-weight:700}
+  #printout .po-navy .g .c.a{color:#eef2f9;text-align:center;font-weight:800;font-family:var(--serif)}
+  #printout .po-navy .g .c.t{color:var(--gold-lt);text-align:center;font-weight:800;font-family:var(--serif)}
+  #printout .po-green{margin-top:14px;break-inside:avoid}
+  #printout .po-green .band{background:var(--green);color:#fff;font-family:var(--serif);font-weight:700;padding:10px 14px;border-radius:10px 10px 0 0;letter-spacing:.02em}
+  #printout .po-green .g{display:grid;grid-template-columns:1.9fr 1fr 1fr;border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+  #printout .po-green .g .h{padding:8px 14px;background:#f6f3ea;font-family:var(--serif);font-weight:700;text-align:center;font-size:12px}
+  #printout .po-green .g .h.l{text-align:left}
+  #printout .po-green .g .c{padding:9px 14px;border-top:1px solid var(--line2);font-variant-numeric:tabular-nums;font-size:12.5px}
+  #printout .po-green .g .c.l{font-weight:600}
+  #printout .po-green .g .c.v{text-align:center;font-family:var(--serif);font-weight:800;color:var(--green)}
+  #printout .po-event{margin-top:14px;break-inside:avoid;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  #printout .po-event .band{background:var(--navy);color:#fff;font-family:var(--serif);font-weight:700;padding:10px 14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;align-items:center}
+  #printout .po-event .band .d{background:#22406b;border:1px solid #38578a;border-radius:8px;padding:3px 10px;font-family:-apple-system,sans-serif;font-weight:400;font-size:12px}
+  #printout .po-event .pair{display:grid;grid-template-columns:1fr 1fr}
+  #printout .po-event .mp{padding:11px 15px}
+  #printout .po-event .mp+.mp{border-left:1px solid var(--line2)}
+  #printout .po-event .mp .cap{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  #printout .po-event .mp .big{font-family:var(--serif);font-weight:700;font-size:20px;color:var(--green);margin:2px 0}
+  #printout .po-event .mp .sub{font-size:10.5px;color:var(--muted)}
+  #printout .po-event .bottom{background:var(--green-soft);border-top:1px solid #cfe4cf;padding:10px 14px;text-align:center;font-family:var(--serif);font-weight:700;color:var(--navy)}
+  #printout .po-event .bottom b{color:var(--green);font-size:17px}
+  #printout .po-illus{color:var(--muted);font-size:10.5px;margin-top:9px;font-style:italic;line-height:1.5}
   @media print{
     body{background:#fff}.noprint{display:none!important}.wrap{max-width:none;padding:0}
     .card{box-shadow:none;border:1px solid #ddd;margin:8px 0}
     .band-navy,.greenband,.plainband,.row.hi,.bottomline,.mp .big{-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .cols{grid-template-columns:1fr 34px 1fr}.prodrow select.pick{display:none!important}
+    .wrap{display:none!important}
+    #printout{display:block!important;padding:0 4px}
   }
   @media(max-width:860px){.grid5{grid-template-columns:1fr 1fr}.grid8{grid-template-columns:1fr 1fr}.cols{grid-template-columns:1fr;gap:14px}.vsbadge{display:none}.moneypair{grid-template-columns:1fr}.moneypair .mp+.mp{border-left:none;border-top:1px solid var(--line2)}.prodrow select.pick{max-width:120px}}
 </style>
@@ -141,7 +212,7 @@
 <div class="wrap">
 
   <div class="brandbar">
-    <div class="brand"><b>HealthFirst</b><span>Package of Protection · Comparison Tool</span></div>
+    <div class="brand"><b id="brandName" contenteditable="true" spellcheck="false" title="Click to edit your agency name">HealthFirst</b><span>Package of Protection · Comparison Tool</span></div>
     <div class="toolbar noprint">
       <div class="seg" id="viewseg">
         <button data-view="agent" class="on">Agent Setup</button>
@@ -244,7 +315,7 @@
       <input class="num" id="p_pension" type="number" step="0.01">
     </div>
     <div class="row" style="border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px"><div class="lab">Personal Pension — note</div><input id="p_pnote" style="flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;background:#fff" placeholder="e.g., IUL / annuity for tax-free retirement"></div>
-    <div class="greenband" style="margin-top:14px">TOTAL INCLUDING ADDITIONAL PROGRAMS</div>
+    <div class="greenband" style="margin-top:14px">INCLUDING ADDITIONAL PROGRAMS</div>
     <div class="savegrid green">
       <div class="h l">&nbsp;</div><div class="h">Monthly</div><div class="h">Annual</div>
       <div class="c l">Your total (package + pension)</div><div class="c" style="text-align:center;font-weight:700;font-family:var(--serif)" id="o_tot_mo">—</div><div class="c" style="text-align:center;font-weight:700;font-family:var(--serif)" id="o_tot_yr">—</div>
@@ -293,6 +364,9 @@
 
   <div class="discl">For agent use. Figures are estimates from your inputs; confirm exact benefits in the policy / ARC. ManhattanLife plans are limited-benefit, not major medical.</div>
 </div>
+
+<!-- DEDICATED PRINTOUT (Good/Better/Best comparison — built on Print) -->
+<div id="printout"></div>
 
 <!-- PLAN LIBRARY MODAL -->
 <div class="modal-backdrop" id="planModal">
@@ -421,6 +495,7 @@ function defProducts(tier){
 
 function blankState(){
   return {
+    agency:'HealthFirst',
     client:{pname:'',sname:'',date:'',agent:'',state:'TX',zip:'78163',page:'49',sage:'45'},
     docs:{docs:'',meds:'',net:false,rx:false,famcancer:false},
     tabLabels:{good:'Affordable core',better:'Solid package',best:'Full package of protection'},
@@ -516,6 +591,7 @@ function normClient(){
 }
 function fill(){
   normClient();
+  $('brandName').textContent=S.agency||'HealthFirst';
   $('c_pname').value=S.client.pname;$('c_sname').value=S.client.sname;$('c_date').value=S.client.date;$('c_agent').value=S.client.agent;$('c_state').value=S.client.state;$('c_zip').value=S.client.zip;$('c_page').value=S.client.page;$('c_sage').value=S.client.sage;
   $('d_docs').value=S.docs.docs;$('d_meds').value=S.docs.meds;$('d_net').checked=S.docs.net;$('d_rx').checked=S.docs.rx;$('d_famcancer').checked=!!S.docs.famcancer;
   $('a_prem').value=S.aca.prem;$('a_ded').value=S.aca.ded;$('a_oop').value=S.aca.oop;$('a_med').value=S.aca.med;$('a_visits').value=S.aca.visits;$('a_copay').value=S.aca.copay;$('a_fullded').checked=S.aca.fullded;
@@ -530,6 +606,7 @@ function fill(){
 }
 
 function read(){
+  S.agency=($('brandName').textContent||'').replace(/\s+/g,' ').trim()||'HealthFirst';
   S.client={pname:$('c_pname').value,sname:$('c_sname').value,date:$('c_date').value,agent:$('c_agent').value,state:$('c_state').value,zip:$('c_zip').value,page:$('c_page').value,sage:$('c_sage').value};
   S.docs={docs:$('d_docs').value,meds:$('d_meds').value,net:$('d_net').checked,rx:$('d_rx').checked,famcancer:$('d_famcancer').checked};
   S.aca={prem:+$('a_prem').value||0,ded:+$('a_ded').value||0,oop:+$('a_oop').value||0,med:+$('a_med').value||0,visits:+$('a_visits').value||0,copay:+$('a_copay').value||0,fullded:$('a_fullded').checked};
@@ -610,8 +687,130 @@ function refreshClientDisp(){
 
 function setView(v){
   view=v; document.body.classList.toggle('client',v==='client');
+  $('brandName').setAttribute('contenteditable', v==='client'?'false':'true');
   document.querySelectorAll('#viewseg button').forEach(function(b){b.classList.toggle('on',b.dataset.view===v);});
+  updateTabVisibility();
   compute();
+}
+
+function tierTotals(t){
+  var pk=S.packages[t]||{products:[],lb:0,med:0};
+  var prod=(pk.products||[]).reduce(function(s,p){return s+(+p.monthly||0);},0)+(+pk.lb||0);
+  var mo=prod+(+pk.med||0);
+  return {mo:mo,yr:mo*12,pk:pk};
+}
+function acaTrue(){
+  var a=S.aca; var annPrem=a.prem*12; var dedMo=a.ded/12; var copayYr=(a.visits||0)*(a.copay||0);
+  var trueMo=(a.fullded?(a.prem+dedMo+a.med):(a.prem+a.med))+copayYr/12;
+  var trueYr=(a.fullded?(annPrem+a.ded+a.med*12):(annPrem+a.med*12))+copayYr;
+  return {mo:trueMo,yr:trueYr};
+}
+function tierHasCosts(t){ return tierTotals(t).mo>0; }
+function updateTabVisibility(){
+  var btns=document.querySelectorAll('#tabs button');
+  if(view!=='client'){ btns.forEach(function(b){ b.style.display=''; }); return; }
+  var firstVis=null, activeVis=false;
+  btns.forEach(function(b){
+    var has=tierHasCosts(b.dataset.tab);
+    b.style.display=has?'':'none';
+    if(has){ if(!firstVis) firstVis=b.dataset.tab; if(b.dataset.tab===S.activeTab) activeVis=true; }
+  });
+  if(!activeVis && firstVis){ S.activeTab=firstVis; fill(); }
+}
+function printDocName(){
+  var base=(S.client.pname||'').trim(); if(S.client.sname) base+=' & '+S.client.sname; if(!base) base='Quote';
+  var d=(S.client.date||'').trim() || new Date().toISOString().slice(0,10);
+  var agency=(S.agency||'HealthFirst').trim();
+  return agency+' — '+base+' — POP Quote ('+d+')';
+}
+
+function buildPrintout(){
+  read();
+  var a=S.aca, agency=S.agency||'HealthFirst', c=S.client;
+  var labels={good:['GOOD',S.tabLabels.good],better:['BETTER',S.tabLabels.better],best:['BEST',S.tabLabels.best]};
+  var tiers=['good','better','best'].map(function(t){var x=tierTotals(t);x.t=t;return x;}).filter(function(x){return x.mo>0;});
+  var aca=acaTrue();
+  var annPrem=a.prem*12;
+
+  /* ---- header + client meta ---- */
+  var html='<div class="po-head"><b>'+esc(agency)+'</b><span>Package of Protection · Personalized Quote</span></div>';
+  var cell=function(k,v){ v=(v!=null&&String(v).trim())?esc(String(v).trim()):'—'; return '<div><span class="k">'+k+'</span><span class="v">'+v+'</span></div>'; };
+  html+='<div class="po-metabox">'
+      +cell('Primary name',c.pname)+cell('Spouse name',c.sname)+cell('Date',c.date)+cell('Agent',c.agent)
+      +cell('State',c.state)+cell('ZIP',c.zip)+cell('Primary age',c.page)+cell('Spouse age',c.sage)
+      +'</div>';
+
+  /* ---- current plan (premium, then true cost, then annual total) ---- */
+  html+='<div class="po-acabox"><div class="t">Your current / marketplace plan<small>What the exchange plan really costs once the deductible &amp; co-pays are counted</small></div>'
+      +'<div class="li"><div class="lab">Monthly premium<small>What you pay the carrier each month</small></div><div class="amt">'+fmt2(a.prem)+' /mo</div></div>'
+      +'<div class="li"><div class="lab">True monthly cost<small>Premium + deductible &amp; co-pays spread across the year</small></div><div class="amt">'+fmt2(aca.mo)+' /mo</div></div>'
+      +'<div class="li tot"><div class="lab">True annual cost</div><div class="amt">'+fmt2(aca.yr)+' /yr</div></div></div>';
+
+  /* ---- Good / Better / Best comparison ---- */
+  if(tiers.length){
+    html+='<div class="po-cmp" style="grid-template-columns:repeat('+tiers.length+',1fr)">';
+    tiers.forEach(function(x){
+      var lab=labels[x.t];
+      html+='<div class="po-col"><h3>'+lab[0]+'<small>'+esc(lab[1])+'</small></h3>';
+      (x.pk.products||[]).forEach(function(p){ if(!(+p.monthly)) return;
+        html+='<div class="po-li"><span>'+esc(p.name)+'</span><span>'+fmt2(+p.monthly||0)+'</span></div>'; });
+      if(+x.pk.lb>0) html+='<div class="po-li"><span>Living Benefits'+(x.pk.lbCarrier?' — '+esc(x.pk.lbCarrier):'')+'</span><span>'+fmt2(+x.pk.lb)+'</span></div>';
+      if(+x.pk.med>0) html+='<div class="po-li"><span>Medications (net)</span><span>'+fmt2(+x.pk.med)+'</span></div>';
+      html+='<div class="po-sum"><span>Monthly</span><span>'+fmt2(x.mo)+'</span></div>';
+      html+='<div class="po-sum" style="background:#fbf9f2"><span>Annual</span><span>'+fmt2(x.yr)+'</span></div>';
+      var sMo=aca.mo-x.mo, sYr=aca.yr-x.yr;
+      html+='<div class="po-save">'+(sMo>=0?'You save vs your plan':'Costs more than your plan')
+          +'<br><b>'+fmt2(Math.abs(sMo))+'/mo · '+fmt2(Math.abs(sYr))+'/yr</b></div></div>';
+    });
+    html+='</div>';
+  }
+
+  /* ---- detail sections for the selected package ---- */
+  var at=S.activeTab, atLab=labels[at][0], pk=S.packages[at]||{products:[],lb:0,med:0};
+  var pMo=tierTotals(at).mo, pYr=pMo*12;
+  var aMo=(a.prem+a.med)-pMo, aYr=(annPrem+a.med*12)-pYr;
+  var tMo=aca.mo-pMo, tYr=aca.yr-pYr;
+
+  html+='<div class="po-navy"><div class="cap">Your savings vs ACA<small>Based on your '+atLab+' package</small></div>'
+      +'<div class="g"><div class="h l">&nbsp;</div><div class="h">Monthly</div><div class="h">Annual</div>'
+      +'<div class="c l">ACTUAL — premium vs premium</div><div class="c a">'+saves(aMo,'/mo')+'</div><div class="c a">'+saves(aYr,'/yr')+'</div>'
+      +'<div class="c l tt">TRUE — with the ACA deductible counted</div><div class="c t">'+saves(tMo,'/mo')+'</div><div class="c t">'+saves(tYr,'/yr')+'</div></div></div>';
+
+  /* ---- additional programs (pension) — only if funded ---- */
+  var pen=+S.pension.monthly||0;
+  if(pen>0){
+    var totMo=pMo+pen, totYr=pYr+pen*12;
+    html+='<div class="po-green"><div class="band">INCLUDING ADDITIONAL PROGRAMS'+(S.pension.note?' <span style="font-weight:400;font-family:-apple-system,sans-serif;font-size:12px;color:#dff0e2">— '+esc(S.pension.note)+'</span>':'')+'</div>'
+        +'<div class="g"><div class="h l">&nbsp;</div><div class="h">Monthly</div><div class="h">Annual</div>'
+        +'<div class="c l">Your total (package + pension)</div><div class="c" style="text-align:center;font-family:var(--serif);font-weight:700">'+fmt2(totMo)+'</div><div class="c" style="text-align:center;font-family:var(--serif);font-weight:700">'+fmt2(totYr)+'</div>'
+        +'<div class="c l">Still ahead vs ACA</div><div class="c v">'+saves(aca.mo-totMo,'/mo')+'</div><div class="c v">'+saves(aca.yr-totYr,'/yr')+'</div></div></div>';
+  }
+
+  /* ---- event illustrations ---- */
+  var showEvents=false;
+  var b=S.big;
+  if((+b.charge||0)>0){
+    showEvents=true;
+    var bal=b.charge-b.disc, acaOwe=Math.min(bal,a.oop), mTot=(b.days*b.daily+b.adm)+b.his+b.other, netGain=mTot-bal;
+    var bigBottom=aYr+acaOwe+netGain;
+    html+='<div class="po-event"><div class="band">If a major event happens'+(b.desc?' <span class="d">'+esc(b.desc)+'</span>':'')+'</div>'
+        +'<div class="pair"><div class="mp"><div class="cap">Money you don\'t pay</div><div class="big">'+fmt2(acaOwe)+'</div><div class="sub">ACA out-of-pocket the Package covers instead</div></div>'
+        +'<div class="mp"><div class="cap">Money paid directly to you</div><div class="big">'+fmt2(netGain)+'</div><div class="sub">Cash beyond the bill, from Manhattan</div></div></div>'
+        +'<div class="bottom">BOTTOM LINE if a major event happens this year: <b>'+fmt(bigBottom)+'</b></div></div>';
+  }
+  var r=S.reg;
+  if((+r.charge||0)>0 || (+r.pay||0)>0){
+    showEvents=true;
+    var rNet=r.pay-r.charge, regBottom=aYr+r.aca+rNet;
+    html+='<div class="po-event"><div class="band">On an everyday event'+(r.desc?' <span class="d">'+esc(r.desc)+'</span>':'')+'</div>'
+        +'<div class="pair"><div class="mp"><div class="cap">Money you don\'t pay</div><div class="big">'+fmt2(r.aca)+'</div><div class="sub">What you would\'ve owed on ACA</div></div>'
+        +'<div class="mp"><div class="cap">Money paid directly to you</div><div class="big">'+fmt2(rNet)+'</div><div class="sub">Cash beyond the charge</div></div></div>'
+        +'<div class="bottom">BOTTOM LINE in a routine year: <b>'+fmt(regBottom)+'</b></div></div>';
+  }
+  if(showEvents) html+='<div class="po-illus">The examples above are for illustrative purposes only, shown to demonstrate how the coverage responds. The actual event, length of stay, and benefits paid vary by person and policy.</div>';
+
+  html+='<div class="po-foot">'+esc(agency)+' — Package of Protection. Figures are estimates from the inputs provided; confirm exact benefits in the policy / ARC. ManhattanLife plans are limited-benefit indemnity coverage, not major medical.</div>';
+  $('printout').innerHTML=html;
 }
 
 function currentQuote(){read();return JSON.parse(JSON.stringify(S));}
@@ -650,11 +849,19 @@ function bindInputs(){
    'b_desc','b_charge','b_disc','b_days','b_daily','b_adm','b_his','b_other','r_desc','r_charge','r_pay','r_aca']
    .forEach(function(id){ $(id).addEventListener('input',compute); });
   ['d_net','d_rx','d_famcancer','a_fullded'].forEach(function(id){ $(id).addEventListener('change',compute); });
+  $('brandName').addEventListener('input',function(){ read(); autosave(); });
+  $('brandName').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); $('brandName').blur(); } });
+  $('brandName').addEventListener('blur',function(){ if(!($('brandName').textContent||'').trim()){ $('brandName').textContent='HealthFirst'; } read(); autosave(); });
   document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ read(); S.activeTab=b.dataset.tab; fill(); compute(); }; });
   document.querySelectorAll('#viewseg button').forEach(function(b){ b.onclick=function(){ setView(b.dataset.view); }; });
   $('addProd').onclick=function(){ S.packages[S.activeTab].products.push({name:'New product',monthly:0}); renderProducts(); compute(); };
   $('saveBtn').onclick=saveQuote;
-  $('printBtn').onclick=function(){ window.print(); };
+  $('printBtn').onclick=function(){
+    buildPrintout();
+    var prev=document.title; document.title=printDocName();
+    window.print();
+    setTimeout(function(){ document.title=prev; },800);
+  };
   $('loadBtn').onclick=function(){ $('fileInput').click(); };
   $('fileInput').onchange=function(e){ if(e.target.files[0]) loadFile(e.target.files[0]); e.target.value=''; };
   $('newBtn').onclick=function(){ if(confirm('Start a new blank quote? Unsaved changes will be lost.')){ var lib=S.library, defs=S.defaults; S=blankState(); S.library=lib; S.defaults=defs; S.packages={good:{products:copyArr(defs.good),lb:0,med:0},better:{products:copyArr(defs.better),lb:0,med:0},best:{products:copyArr(defs.best),lb:45,med:0}}; fill(); compute(); } };
