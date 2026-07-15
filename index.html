@@ -206,6 +206,39 @@
     #printout{display:block!important;padding:0 4px}
   }
   @media(max-width:860px){.grid5{grid-template-columns:1fr 1fr}.grid8{grid-template-columns:1fr 1fr}.cols{grid-template-columns:1fr;gap:14px}.vsbadge{display:none}.moneypair{grid-template-columns:1fr}.moneypair .mp+.mp{border-left:none;border-top:1px solid var(--line2)}.prodrow select.pick{max-width:120px}}
+  /* ===== 3-step flow, intake, enroll, estimate ===== */
+  .stepper{display:flex;gap:8px;margin:0 0 16px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}
+  .stepper button{flex:1;background:transparent;border:1px solid transparent;border-radius:9px;padding:10px 8px;color:#8a8f99;font-weight:700;letter-spacing:.03em;display:flex;align-items:center;justify-content:center;gap:8px}
+  .stepper button .n{width:22px;height:22px;border-radius:50%;background:#e7e2d4;color:#6b7280;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+  .stepper button.on{background:var(--navy);color:#fff}
+  .stepper button.on .n{background:var(--gold-pill);color:#26324a}
+  .stepper button:not(.on):hover{background:#f3efe3}
+  .step{display:none}.step.on{display:block}
+  body.client #stepper{display:none}
+  .intakegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .intake-sec{font-family:var(--serif);font-weight:700;color:var(--navy);font-size:15px;margin:16px 0 8px;border-bottom:1px solid var(--line);padding-bottom:5px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:#fbfaf6;cursor:pointer;font-weight:600;color:#3a4358}
+  .chip input{margin:0}
+  .chip.on{background:var(--green-soft);border-color:#bcd8bf;color:var(--green)}
+  .qnote{display:flex;gap:8px;align-items:center}
+  .qnote>input{flex:1;min-width:0;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:#fbfaf6;font:inherit}
+  .recbadge{display:inline-block;background:var(--gold-pill);color:#26324a;font-size:10px;font-weight:800;letter-spacing:.08em;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle}
+  .tabs button.rec .t::after{content:' \2605';color:var(--gold)}
+  .flagbox{background:#fbeee9;border:1px solid #e6b7ad;color:#8a2b1c;border-radius:10px;padding:10px 14px;font-size:13px;margin:0 0 14px}
+  .enroll-card{border:1px solid var(--line);border-radius:12px;padding:18px;background:#fff}
+  .portalbtn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;border:1px solid var(--navy);border-radius:10px;padding:12px 18px;font-weight:700;text-decoration:none;margin:6px 8px 6px 0}
+  .portalbtn:hover{filter:brightness(1.08)}
+  .portalbtn.gold{background:var(--gold-pill);color:#26324a;border-color:#b0872f}
+  .portalbtn.green{background:var(--green);border-color:var(--green)}
+  .estcard{background:#fff;border:1px dashed #cdbf9c;border-radius:12px;padding:14px 16px;margin:16px 0}
+  .estrow{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;padding:8px 0;border-top:1px solid var(--line2)}
+  .estrow .lab{font-weight:700;font-family:var(--serif);color:var(--navy)}
+  .estrange{font-family:var(--serif);font-weight:800;text-align:right;color:var(--navy);font-variant-numeric:tabular-nums}
+  .ageseg{display:inline-flex;background:#f0ece0;border-radius:999px;padding:3px}
+  .ageseg button{background:transparent;border:none;border-radius:999px;padding:5px 12px;font-weight:700;color:#6b7280}
+  .ageseg button.on{background:var(--navy);color:#fff}
+  @media(max-width:860px){.intakegrid{grid-template-columns:1fr}.estrow{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -227,7 +260,7 @@
     </div>
   </div>
 
-  <div class="clientbar">
+  <div class="clientbar" id="clientStrip">
     <div class="grid8">
       <div class="fld"><label>Primary name</label><input id="c_pname" placeholder="Primary"></div>
       <div class="fld"><label>Spouse name</label><input id="c_sname" placeholder="Spouse (optional)"></div>
@@ -238,6 +271,96 @@
       <div class="fld"><label>Primary age</label><input id="c_page" placeholder="49"></div>
       <div class="fld"><label>Spouse age</label><input id="c_sage" placeholder="45"></div>
     </div>
+  </div>
+
+  <div class="stepper noprint" id="stepper">
+    <button data-step="intake"><span class="n">1</span> Intake</button>
+    <button data-step="quote" class="on"><span class="n">2</span> Quote</button>
+    <button data-step="enroll"><span class="n">3</span> Enroll</button>
+  </div>
+
+  <div id="step-intake" class="step">
+   <div class="card pad">
+    <div class="sectitle"><span class="dot">●</span> Client Intake</div>
+    <div class="note" style="padding-top:2px">Fill what the client gives you, then hit Build Quote. It pre-fills the comparison and recommends Good / Better / Best from your answers.</div>
+
+    <div class="intake-sec">Who needs coverage</div>
+    <div class="chips">
+      <label class="chip on"><input type="checkbox" id="in_who_app" checked> Applicant</label>
+      <label class="chip"><input type="checkbox" id="in_who_spouse"> Spouse</label>
+      <label class="chip"><input type="checkbox" id="in_who_kids"> Children</label>
+    </div>
+
+    <div class="intake-sec">Contact &amp; basics</div>
+    <div class="intakegrid">
+      <div class="fld"><label>Primary name</label><input id="in_pname" placeholder="First Last"></div>
+      <div class="fld"><label>Spouse name</label><input id="in_sname" placeholder="(optional)"></div>
+      <div class="fld"><label>Agent</label><input id="in_agent" placeholder="Your name"></div>
+      <div class="fld"><label>Phone</label><input id="in_phone" placeholder="(000) 000-0000"></div>
+      <div class="fld"><label>Email</label><input id="in_email" placeholder="name@example.com"></div>
+      <div class="fld"><label>Date</label><input id="in_date" placeholder="MM/DD/YYYY"></div>
+      <div class="fld"><label>State</label><input id="in_state" placeholder="TX"></div>
+      <div class="fld"><label>ZIP</label><input id="in_zip" placeholder="78163"></div>
+      <div class="fld"><label>Primary age</label><input id="in_page" placeholder="49"></div>
+      <div class="fld"><label>Spouse age</label><input id="in_sage" placeholder="45"></div>
+    </div>
+
+    <div class="intake-sec">Health &amp; routing</div>
+    <div class="chips">
+      <label class="chip"><input type="checkbox" id="in_famcancer"> Family history of cancer / heart attack / stroke?</label>
+      <label class="chip"><input type="checkbox" id="in_tobacco"> Tobacco use?</label>
+      <label class="chip"><input type="checkbox" id="in_maternity"> Needs maternity?</label>
+      <label class="chip"><input type="checkbox" id="in_dv"> Wants dental / vision?</label>
+      <label class="chip"><input type="checkbox" id="in_mental"> Mental health coverage?</label>
+      <label class="chip"><input type="checkbox" id="in_surg2yr"> Surgeries / hospitalizations (past 2 yrs)?</label>
+    </div>
+    <div class="intakegrid" style="margin-top:12px">
+      <div class="fld"><label>Major health conditions?</label>
+        <div class="qnote"><label class="chip"><input type="checkbox" id="in_majorcond"> Yes</label><input id="in_majorcond_note" placeholder="which condition(s) — details"></div>
+      </div>
+      <div class="fld"><label>Diabetic?</label>
+        <div class="qnote"><label class="chip"><input type="checkbox" id="in_diabetic"> Yes</label><input id="in_diabetic_note" placeholder="type · insulin? · # oral meds"></div>
+        <div class="note" style="padding:4px 0 0;font-size:10.5px">Decline: insulin (last 5 yrs) or juvenile-onset · &gt;2 oral meds · diabetic complications</div>
+      </div>
+      <div class="fld"><label>Medications</label><input id="in_meds" placeholder="e.g., Lisinopril"></div>
+      <div class="fld"><label>Preferred doctors / facilities</label><input id="in_docs" placeholder="Dr. Ramirez (cardiology)"></div>
+    </div>
+
+    <div class="intake-sec">Current insurance <span style="font-family:-apple-system,sans-serif;font-weight:400;font-size:12px;color:var(--muted)">— fills the ACA side of the quote</span></div>
+    <div class="intakegrid">
+      <div class="fld"><label>Carrier</label><input id="in_carrier" placeholder="BCBS"></div>
+      <div class="fld"><label>Plan name</label><input id="in_plan" placeholder="Bronze"></div>
+      <div class="fld"><label>Monthly premium</label><input id="in_prem" type="number" step="0.01" placeholder="1082"></div>
+      <div class="fld"><label>Annual deductible</label><input id="in_ded" type="number" placeholder="10600"></div>
+      <div class="fld"><label>Out-of-pocket max</label><input id="in_oop" type="number" placeholder="10600"></div>
+      <div class="fld"><label>Monthly meds cost</label><input id="in_medcost" type="number" step="0.01" placeholder="0"></div>
+      <div class="fld"><label>Doctor visits / year</label><input id="in_visits" type="number" placeholder="0"></div>
+      <div class="fld"><label>Avg co-pay / visit</label><input id="in_copay" type="number" step="0.01" placeholder="0"></div>
+    </div>
+
+    <div class="intake-sec">Budget &amp; notes</div>
+    <div class="intakegrid">
+      <div class="fld"><label>Max comfortable monthly</label><input id="in_budget" type="number" step="0.01" placeholder="e.g., 1000"></div>
+      <div class="fld"><label>Priority</label><select id="in_priority" style="width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:#fbfaf6;font:inherit"><option value="coverage">Coverage / peace of mind</option><option value="price">Lowest price</option></select></div>
+      <div class="fld"><label>Notes</label><input id="in_notes" placeholder="anything else"></div>
+    </div>
+
+    <div style="margin-top:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <button class="btn-gold" id="buildQuoteBtn" style="font-size:15px;padding:12px 22px">Build Quote &rarr;</button>
+      <span class="note" style="padding:0">Recommends the fullest tier that still beats their current cost.</span>
+    </div>
+   </div>
+  </div>
+
+  <div id="step-quote" class="step on">
+
+  <div id="recFlags" class="hidein-client"></div>
+
+  <div class="estcard hidein-client">
+    <div class="sectitle" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><span><span class="dot">●</span> Ballpark estimate <span class="note" style="display:inline;padding:0;font-style:normal">— full package per tier; AFC from the rate guide; not the final quote</span></span>
+      <span class="ageseg" id="ageseg"><button data-band="0">18–29</button><button data-band="1">30–39</button><button data-band="2">40–49</button><button data-band="3">50–64</button></span>
+    </div>
+    <div id="estBody" style="margin-top:8px"></div>
   </div>
 
   <div class="card">
@@ -362,6 +485,28 @@
     <div class="note" id="o_r_cap" style="text-align:center"></div>
   </div>
 
+  </div><!-- /step-quote -->
+
+  <div id="step-enroll" class="step">
+   <div class="card pad">
+    <div class="sectitle"><span class="dot">●</span> Enroll</div>
+    <div class="note" style="padding-top:2px">Confirm the recommended plan, then open the carrier portals to apply.</div>
+    <div id="enrollSummary" style="margin:14px 0"></div>
+    <div class="enroll-card">
+      <div style="font-family:var(--serif);font-weight:700;color:var(--navy);margin-bottom:10px">Apply</div>
+      <a class="portalbtn" id="lnkManhattan" href="#" target="_blank" rel="noopener">Manhattan Life Agent Portal &#8599;</a>
+      <a class="portalbtn green" id="lnkLife" href="#" target="_blank" rel="noopener">Living Benefits &#8599;</a>
+      <a class="portalbtn gold" id="emailBtn" href="#">&#9993; Email to client</a>
+      <button class="btn-gold" id="printBtn2" style="padding:12px 18px">Print Quote</button>
+      <div class="hidein-client" style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fld"><label>Manhattan portal URL</label><input id="en_murl" placeholder="https://..."></div>
+        <div class="fld"><label>Living Benefits carrier</label><input id="en_lcarrier" placeholder="Mutual of Omaha TLE"></div>
+        <div class="fld"><label>Living Benefits URL</label><input id="en_lurl" placeholder="https://..."></div>
+      </div>
+    </div>
+   </div>
+  </div>
+
   <div class="discl">For agent use. Figures are estimates from your inputs; confirm exact benefits in the policy / ARC. ManhattanLife plans are limited-benefit, not major medical.</div>
 </div>
 
@@ -395,6 +540,16 @@ var fmt=function(n){var neg=n<0;n=Math.abs(n);if(view==='client'){return (neg?'-
 var fmt2=function(n){var neg=n<0;n=Math.abs(n);return (neg?'-':'')+'$'+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});};
 var saves=function(v,per){return (v>=0?'SAVES ':'COSTS ')+fmt(Math.abs(v))+(v>=0?per:per+' MORE');};
 var copyArr=function(a){return (a||[]).map(function(x){return {name:x.name,monthly:x.monthly};});};
+
+/* ===== Real AFC rates from the ManhattanLife AFC Rate Guide (AFC-RATES 0626) =====
+   Age bands 18-29 / 30-39 / 40-49 / 50-64; tiers [Elite Plus, Elite, Classic Plus, Classic].
+   Individual monthly. Covers 37 states (grouped as in the guide). Used only for the ballpark estimate. */
+var AFC_BANDS=["18-29","30-39","40-49","50-64"];
+var AFC_RATES=[[[174.43,132.06,103.92,77.67],[219.88,166.28,128.02,96.83],[261.43,197.87,150.06,114.46],[369.21,280.76,207.02,160.46]],[[174.36,132.01,103.88,77.64],[219.79,166.22,127.97,96.79],[261.33,197.79,150.0,114.42],[369.07,280.65,206.94,160.4]],[[171.55,130.71,101.05,77.8],[215.62,164.11,123.88,96.78],[256.07,195.09,144.86,114.31],[361.67,276.96,199.6,160.41]],[[158.88,116.63,92.52,66.5],[198.62,145.24,112.43,81.63],[235.17,171.9,130.8,95.71],[330.41,242.48,178.57,132.83]],[[157.69,119.55,94.23,70.6],[198.59,150.35,115.92,87.85],[235.98,178.78,135.76,103.71],[332.99,253.39,187.02,145.12]],[[174.61,132.24,104.11,77.82],[219.76,166.18,128.02,96.78],[261.17,197.64,149.96,114.31],[369.16,280.71,207.09,160.41]],[[164.4,124.56,98.23,73.48],[207.46,157.05,121.2,91.72],[246.6,186.78,142.0,108.34],[347.93,264.66,195.63,151.56]],[[182.93,137.16,107.32,80.22],[231.28,173.12,132.58,100.25],[275.63,206.39,155.74,118.72],[390.01,293.24,215.34,166.7]],[[167.41,127.68,98.17,76.64],[210.36,160.34,120.23,95.43],[249.75,190.58,140.48,112.75],[351.96,270.0,192.91,157.92]],[[164.35,124.62,98.96,77.43],[206.22,156.2,121.3,96.5],[244.65,185.48,141.8,114.07],[344.47,262.51,194.85,159.86]],[[157.3,115.49,91.63,65.89],[196.65,143.81,111.34,80.85],[232.8,170.19,129.5,94.77],[327.19,240.13,176.84,131.57]],[[164.4,124.56,98.23,73.48],[207.46,157.05,121.2,91.72],[246.6,186.78,142.0,108.34],[347.93,264.66,195.63,151.56]],[[182.64,136.3,109.11,80.49],[225.66,167.13,131.98,98.08],[264.56,195.11,152.78,114.09],[360.55,263.97,203.9,153.37]]];
+var AFC_STATE={"AK":1,"AL":0,"AR":0,"AZ":0,"CA":2,"DE":0,"GA":0,"HI":0,"IA":3,"IL":0,"IN":0,"KY":4,"LA":0,"MD":5,"ME":0,"MI":0,"MN":6,"MO":0,"MS":0,"MT":7,"NC":0,"ND":8,"NE":0,"NV":0,"OH":9,"OK":0,"PA":0,"RI":10,"SC":0,"SD":11,"TN":0,"TX":0,"UT":0,"VA":12,"WI":0,"WV":0,"WY":0};
+function afcBandIdx(age){ age=+age||0; if(age<30)return 0; if(age<40)return 1; if(age<50)return 2; return 3; }
+function afcLevelIdx(name){ var n=(name||'').toLowerCase(); if(n.indexOf('elite plus')>=0)return 0; if(n.indexOf('elite')>=0)return 1; if(n.indexOf('classic plus')>=0)return 2; if(n.indexOf('classic')>=0)return 3; return -1; }
+function afcRate(state,bandIdx,levelIdx){ var gi=AFC_STATE[(state||'').toUpperCase().trim()]; if(gi===undefined||levelIdx<0)return null; return AFC_RATES[gi][bandIdx][levelIdx]; }
 
 /* ========== MASTER PLAN LIST (optional shared source) ==========
    To share ONE plan list + Good/Better/Best defaults across everyone:
@@ -510,7 +665,13 @@ function blankState(){
     },
     pension:{monthly:100,note:'e.g., IUL / annuity for tax-free retirement'},
     big:{desc:'Hospital stay – 7 days',charge:41660.41,disc:18747.18,days:7,daily:4000,adm:2000,his:10000,other:0},
-    reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800}
+    reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
+    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobacco:false,maternity:false,dv:false,famcancer:false,mental:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',budget:0,priority:'coverage',notes:'',carrier:'',plan:''},
+    recommended:'best',
+    recFlags:[],
+    step:'intake',
+    estBand:null,
+    enroll:{murl:'https://agents.manhattanlife.com',lcarrier:'Mutual of Omaha TLE',lurl:'https://www.mutualofomaha.com/'}
   };
 }
 var S=blankState();
@@ -601,7 +762,7 @@ function fill(){
   $('b_desc').value=S.big.desc;$('b_charge').value=S.big.charge;$('b_disc').value=S.big.disc;$('b_days').value=S.big.days;$('b_daily').value=S.big.daily;$('b_adm').value=S.big.adm;$('b_his').value=S.big.his;$('b_other').value=S.big.other;
   $('r_desc').value=S.reg.desc;$('r_charge').value=S.reg.charge;$('r_pay').value=S.reg.pay;$('r_aca').value=S.reg.aca;
   $('tl_good').textContent=S.tabLabels.good;$('tl_better').textContent=S.tabLabels.better;$('tl_best').textContent=S.tabLabels.best;
-  document.querySelectorAll('#tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===S.activeTab);});
+  document.querySelectorAll('#tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===S.activeTab);b.classList.toggle('rec',b.dataset.tab===S.recommended);});
   renderProducts();
 }
 
@@ -675,6 +836,9 @@ function compute(){
   $('o_r_cap').textContent='= '+fmt(aYr)+' premium savings  +  '+fmt(r.aca)+" you don't pay  +  "+fmt(rNet)+' cash to you';
 
   refreshClientDisp();
+  if($('estBody')) renderEstimate();
+  if($('recFlags')) renderFlags();
+  if(S.step==='enroll') renderEnroll();
   autosave();
 }
 
@@ -689,6 +853,7 @@ function setView(v){
   view=v; document.body.classList.toggle('client',v==='client');
   $('brandName').setAttribute('contenteditable', v==='client'?'false':'true');
   document.querySelectorAll('#viewseg button').forEach(function(b){b.classList.toggle('on',b.dataset.view===v);});
+  if(v==='client' && S.step!=='quote') goStep('quote');
   updateTabVisibility();
   compute();
 }
@@ -835,7 +1000,7 @@ function loadFile(file){
       if(!S.defaults) S.defaults=blankState().defaults;
       if(!S.packages||!S.packages[S.activeTab]) S.packages=blankState().packages;
       if(!S.aca) S.aca=blankState().aca;
-      fill(); compute(); loadMaster();
+      fill(); compute(); loadMaster(); goStep('quote');
       alert('Quote loaded'+(S.client&&S.client.pname?': '+S.client.pname:'')+'. Edit and Save again to keep a new version.');
     }catch(e){ alert('Could not read that file — is it a HealthFirst quote (.json)?'); }
   };
@@ -843,6 +1008,154 @@ function loadFile(file){
 }
 function autosave(){ try{ localStorage.setItem('hf_pop_last',JSON.stringify(S)); }catch(e){} }
 function restore(){ try{ var s=localStorage.getItem('hf_pop_last'); if(s){ S=Object.assign(blankState(),JSON.parse(s)); if(!S.library)S.library=defLibrary(); if(!S.defaults)S.defaults=blankState().defaults; if(!S.aca)S.aca=blankState().aca; } }catch(e){} }
+
+/* ========== INTAKE + RECOMMENDATION ENGINE ========== */
+function readIntake(){
+  S.intake=S.intake||{};
+  S.intake.who={app:$('in_who_app').checked,spouse:$('in_who_spouse').checked,kids:$('in_who_kids').checked};
+  S.intake.phone=$('in_phone').value; S.intake.email=$('in_email').value;
+  S.intake.tobacco=$('in_tobacco').checked; S.intake.maternity=$('in_maternity').checked;
+  S.intake.dv=$('in_dv').checked; S.intake.famcancer=$('in_famcancer').checked;
+  S.intake.mental=$('in_mental').checked; S.intake.surg2yr=$('in_surg2yr').checked;
+  S.intake.majorcond=$('in_majorcond').checked; S.intake.majorcondNote=$('in_majorcond_note').value;
+  S.intake.diabetic=$('in_diabetic').checked; S.intake.diabeticNote=$('in_diabetic_note').value;
+  S.intake.budget=+$('in_budget').value||0;
+  S.intake.priority=$('in_priority').value; S.intake.notes=$('in_notes').value;
+  S.intake.carrier=$('in_carrier').value; S.intake.plan=$('in_plan').value;
+}
+function captureIntake(){
+  readIntake();
+  S.client.pname=$('in_pname').value; S.client.sname=$('in_sname').value; S.client.agent=$('in_agent').value;
+  S.client.state=$('in_state').value; S.client.zip=$('in_zip').value; S.client.page=$('in_page').value; S.client.sage=$('in_sage').value; S.client.date=$('in_date').value;
+  S.aca.prem=+$('in_prem').value||0; S.aca.ded=+$('in_ded').value||0; S.aca.oop=+$('in_oop').value||0; S.aca.med=+$('in_medcost').value||0; S.aca.visits=+$('in_visits').value||0; S.aca.copay=+$('in_copay').value||0;
+  S.docs.meds=$('in_meds').value; S.docs.docs=$('in_docs').value; S.docs.famcancer=$('in_famcancer').checked;
+  autosave();
+}
+function fillIntake(){
+  var I=S.intake||{}; var w=I.who||{app:true};
+  $('in_who_app').checked=w.app!==false; $('in_who_spouse').checked=!!w.spouse; $('in_who_kids').checked=!!w.kids;
+  $('in_pname').value=S.client.pname||''; $('in_sname').value=S.client.sname||''; $('in_agent').value=S.client.agent||'';
+  $('in_state').value=S.client.state||''; $('in_zip').value=S.client.zip||''; $('in_page').value=S.client.page||''; $('in_sage').value=S.client.sage||''; $('in_date').value=S.client.date||'';
+  $('in_phone').value=I.phone||''; $('in_email').value=I.email||'';
+  $('in_tobacco').checked=!!I.tobacco; $('in_maternity').checked=!!I.maternity; $('in_dv').checked=!!I.dv;
+  $('in_famcancer').checked=!!(I.famcancer||S.docs.famcancer);
+  $('in_mental').checked=!!I.mental; $('in_surg2yr').checked=!!I.surg2yr;
+  $('in_majorcond').checked=!!I.majorcond; $('in_majorcond_note').value=I.majorcondNote||'';
+  $('in_diabetic').checked=!!I.diabetic; $('in_diabetic_note').value=I.diabeticNote||'';
+  $('in_meds').value=S.docs.meds||''; $('in_docs').value=S.docs.docs||'';
+  $('in_carrier').value=I.carrier||''; $('in_plan').value=I.plan||'';
+  $('in_prem').value=S.aca.prem||''; $('in_ded').value=S.aca.ded||''; $('in_oop').value=S.aca.oop||''; $('in_medcost').value=S.aca.med||''; $('in_visits').value=S.aca.visits||''; $('in_copay').value=S.aca.copay||'';
+  $('in_budget').value=I.budget||''; $('in_priority').value=I.priority||'coverage'; $('in_notes').value=I.notes||'';
+  syncChips();
+}
+function syncChips(){ document.querySelectorAll('#step-intake .chip').forEach(function(l){var cb=l.querySelector('input');if(cb)l.classList.toggle('on',cb.checked);}); }
+
+function pkMonthly(pk){ return (pk.products||[]).reduce(function(s,p){return s+(+p.monthly||0);},0)+(+pk.lb||0)+(+pk.med||0); }
+
+function recommendBundles(){
+  var I=S.intake||{};
+  var P={
+    afcEP:{name:'Core Health Plan — AFC Elite Plus',monthly:278.76},
+    afcE :{name:'Core Health Plan — AFC Elite',monthly:197.87},
+    acc2 :{name:'24-Hr Accident — MLAC (2 Unit)',monthly:35.31},
+    acc1 :{name:'24-Hr Accident — MLAC (1 Unit)',monthly:20.48},
+    hi   :{name:'Hospital Indemnity — MLAC HI Select $10K',monthly:62.31},
+    gap2 :{name:'Out-of-Pocket / Gap — MLAC Omni Flex ($200/day)',monthly:96.00},
+    gap1 :{name:'Out-of-Pocket / Gap — MLAC Omni Flex ($100/day)',monthly:76.00},
+    dvh3 :{name:'Dental • Vision • Hearing — DVH Select $3K',monthly:59.58},
+    dvh15:{name:'Dental • Vision • Hearing — DVH Select $1.5K',monthly:44.00},
+    chas :{name:'Cancer / Heart Attack & Stroke — Lump Sum',monthly:74.00}
+  };
+  var cp=function(o){return {name:o.name,monthly:o.monthly};};
+  var best  =[cp(P.afcEP),cp(P.acc2),cp(P.hi),cp(P.gap2),cp(P.dvh3)];
+  var better=[cp(P.afcE ),cp(P.acc2),cp(P.hi),cp(P.gap2),cp(P.dvh15)];
+  var good  =[cp(P.afcE ),cp(P.acc1),cp(P.hi),cp(P.gap1),cp(P.dvh15)];
+  if(I.famcancer){ best.push(cp(P.chas)); better.push(cp(P.chas)); }
+  var med=+S.aca.med||0, life=45;
+  S.packages={
+    good:{products:good,lb:0,lbCarrier:'',lbCov:'',med:med},
+    better:{products:better,lb:life,lbCarrier:'Mutual of Omaha TLE',lbCov:'$50,000',med:med},
+    best:{products:best,lb:life,lbCarrier:'Mutual of Omaha TLE',lbCov:'$50,000',med:med}
+  };
+  var cap=Infinity;
+  if(I.budget>0) cap=Math.min(cap,I.budget);
+  if(S.aca.prem>0) cap=Math.min(cap,S.aca.prem);
+  var tier='best';
+  if(cap!==Infinity){
+    if(pkMonthly(S.packages.best)<=cap) tier='best';
+    else if(pkMonthly(S.packages.better)<=cap) tier='better';
+    else tier='good';
+  }
+  if(I.priority==='price' && tier==='best') tier='better';
+  S.recommended=tier;
+  var flags=[]; var age=+S.client.page||0;
+  if(age>=65) flags.push('Client is 65+ — POP is designed for under-65; look at Medicare options.');
+  if(I.surg2yr||I.majorcond) flags.push('Surgery/hospitalization or major condition noted — verify insurability (see Uninsurable Health Conditions) before quoting the POP.');
+  if(I.diabetic) flags.push('Diabetes: decline if insulin in last 5 yrs or juvenile-onset, more than 2 oral meds, or complications. Confirm details.');
+  if(I.maternity) flags.push('Maternity needed — POP does not cover maternity; ACA may be the better fit here.');
+  if(I.mental) flags.push('Mental health coverage requested — AFC is limited-benefit; confirm what is actually covered.');
+  if(cap!==Infinity && pkMonthly(S.packages.good)>cap) flags.push('Even Good is above their budget / current premium — trim coverage or reset expectations.');
+  S.recFlags=flags;
+}
+function buildQuote(){
+  captureIntake();
+  recommendBundles();
+  S.activeTab=S.recommended;
+  goStep('quote');
+  fill(); compute();
+}
+function renderFlags(){
+  var el=$('recFlags'); if(!el) return;
+  var f=S.recFlags||[];
+  el.innerHTML=f.length? f.map(function(t){return '<div class="flagbox">⚠ '+esc(t)+'</div>';}).join('') : '';
+}
+function renderEnroll(){
+  var pk=S.packages[S.activeTab]||{products:[]};
+  var mo=pkMonthly(pk);
+  var name=S.client.pname||'Client'; if(S.client.sname) name+=' & '+S.client.sname;
+  var isRec=(S.activeTab===S.recommended);
+  $('enrollSummary').innerHTML='<div class="enroll-card"><div style="font-family:var(--serif);font-size:18px;color:var(--navy);font-weight:700">'+esc(name)+' — '+S.activeTab.toUpperCase()+(isRec?' <span class="recbadge">BEST FIT</span>':'')+'</div><div style="margin-top:6px;color:#3a4358">Package of Protection: <b>'+fmt2(mo)+' / mo</b></div></div>';
+  $('en_murl').value=S.enroll.murl||''; $('en_lcarrier').value=S.enroll.lcarrier||''; $('en_lurl').value=S.enroll.lurl||'';
+  $('lnkManhattan').href=S.enroll.murl||'#';
+  $('lnkLife').href=S.enroll.lurl||'#'; $('lnkLife').innerHTML='Living Benefits — '+esc(S.enroll.lcarrier||'carrier')+' &#8599;';
+}
+function estTierMonthly(tier,bandIdx,state){
+  var pk=S.packages[tier]; if(!pk) return null;
+  var total=(+pk.lb||0)+(+pk.med||0); var afcApplied=false, grounded=false;
+  (pk.products||[]).forEach(function(p){
+    var lvl=afcLevelIdx(p.name);
+    if(lvl>=0 && !afcApplied){ var r=afcRate(state,bandIdx,lvl); if(r!=null){ total+=r; grounded=true; } else { total+=(+p.monthly||0); } afcApplied=true; }
+    else { total+=(+p.monthly||0); }
+  });
+  return {mo:total,grounded:grounded};
+}
+function renderEstimate(){
+  var host=$('estBody'); if(!host) return;
+  var state=(S.client.state||'').toUpperCase().trim();
+  var haveState=AFC_STATE[state]!==undefined;
+  var bandIdx=(S.estBand!=null)?S.estBand:afcBandIdx(S.client.page);
+  document.querySelectorAll('#ageseg button').forEach(function(b){ b.classList.toggle('on',+b.dataset.band===bandIdx); });
+  var rows='';
+  [['best','BEST'],['better','BETTER'],['good','GOOD']].forEach(function(t){
+    var r=estTierMonthly(t[0],bandIdx,state); if(!r) return;
+    var lo=Math.round(r.mo*0.94), hi=Math.round(r.mo*1.06);
+    rows+='<div class="estrow"><div class="lab">'+t[1]+(t[0]===S.recommended?' <span class="recbadge">REC</span>':'')+'</div><div class="estrange">$'+lo.toLocaleString()+' – $'+hi.toLocaleString()+' / mo</div></div>';
+  });
+  var src=haveState
+    ? ('Full-package total for each tier (all layers). Only the AFC core is real — from the ManhattanLife AFC rate guide for '+state+', age band '+AFC_BANDS[bandIdx]+' (individual). The other layers (accident, HI, gap, DVH, cancer, living) are included at their loaded price and don’t move with the age band (their rate sheets are FL-only). Enter ARC prices for the exact quote.')
+    : ('Full-package total per tier. No AFC rate-guide table for "'+(state||'—')+'" in your files — showing loaded prices only. Enter exact ARC prices for the real quote.');
+  host.innerHTML=rows+'<div class="note" style="padding-top:8px">'+esc(src)+'</div>';
+}
+function goStep(s){
+  S.step=s;
+  document.querySelectorAll('.step').forEach(function(el){el.classList.toggle('on',el.id==='step-'+s);});
+  document.querySelectorAll('#stepper button').forEach(function(b){b.classList.toggle('on',b.dataset.step===s);});
+  var cs=$('clientStrip'); if(cs) cs.style.display=(s==='intake')?'none':'';
+  if(s==='intake') fillIntake();
+  if(s==='enroll') renderEnroll();
+  if(s==='quote') renderEstimate();
+  autosave(); window.scrollTo(0,0);
+}
 
 function bindInputs(){
   ['c_pname','c_sname','c_date','c_agent','c_state','c_zip','c_page','c_sage','d_docs','d_meds','a_prem','a_ded','a_oop','a_med','a_visits','a_copay','p_lb','p_lb_carrier','p_lb_cov','p_med','p_pension','p_pnote',
@@ -854,6 +1167,16 @@ function bindInputs(){
   $('brandName').addEventListener('blur',function(){ if(!($('brandName').textContent||'').trim()){ $('brandName').textContent='HealthFirst'; } read(); autosave(); });
   document.querySelectorAll('#tabs button').forEach(function(b){ b.onclick=function(){ read(); S.activeTab=b.dataset.tab; fill(); compute(); }; });
   document.querySelectorAll('#viewseg button').forEach(function(b){ b.onclick=function(){ setView(b.dataset.view); }; });
+  document.querySelectorAll('#stepper button').forEach(function(b){ b.onclick=function(){ if(S.step==='intake' && b.dataset.step!=='intake') captureIntake(); goStep(b.dataset.step); }; });
+  $('buildQuoteBtn').onclick=buildQuote;
+  document.querySelectorAll('#step-intake .chip input').forEach(function(cb){ cb.addEventListener('change',function(){ syncChips(); readIntake(); autosave(); }); });
+  ['in_pname','in_sname','in_agent','in_phone','in_email','in_date','in_state','in_zip','in_page','in_sage','in_majorcond_note','in_diabetic_note','in_meds','in_docs','in_carrier','in_plan','in_prem','in_ded','in_oop','in_medcost','in_visits','in_copay','in_budget','in_notes']
+    .forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',function(){ captureIntake(); }); });
+  $('in_priority').addEventListener('change',function(){ readIntake(); autosave(); });
+  document.querySelectorAll('#ageseg button').forEach(function(b){ b.onclick=function(){ S.estBand=+b.dataset.band; renderEstimate(); autosave(); }; });
+  ['en_murl','en_lcarrier','en_lurl'].forEach(function(id){ $(id).addEventListener('input',function(){ S.enroll={murl:$('en_murl').value,lcarrier:$('en_lcarrier').value,lurl:$('en_lurl').value}; $('lnkManhattan').href=S.enroll.murl||'#'; $('lnkLife').href=S.enroll.lurl||'#'; $('lnkLife').innerHTML='Living Benefits — '+esc(S.enroll.lcarrier||'carrier')+' &#8599;'; autosave(); }); });
+  $('emailBtn').onclick=function(e){ e.preventDefault(); var to=(S.intake&&S.intake.email)||''; var subj=encodeURIComponent((S.agency||'HealthFirst')+' — your Package of Protection quote'); var body=encodeURIComponent('Hi '+(S.client.pname||'')+',\n\nHere is your Package of Protection comparison. I\'ll attach the PDF — print/save it from the tool and attach here.\n\nThanks,\n'+(S.client.agent||'')); window.location.href='mailto:'+to+'?subject='+subj+'&body='+body; };
+  $('printBtn2').onclick=function(){ buildPrintout(); var prev=document.title; document.title=printDocName(); window.print(); setTimeout(function(){ document.title=prev; },800); };
   $('addProd').onclick=function(){ S.packages[S.activeTab].products.push({name:'New product',monthly:0}); renderProducts(); compute(); };
   $('saveBtn').onclick=saveQuote;
   $('printBtn').onclick=function(){
@@ -864,7 +1187,7 @@ function bindInputs(){
   };
   $('loadBtn').onclick=function(){ $('fileInput').click(); };
   $('fileInput').onchange=function(e){ if(e.target.files[0]) loadFile(e.target.files[0]); e.target.value=''; };
-  $('newBtn').onclick=function(){ if(confirm('Start a new blank quote? Unsaved changes will be lost.')){ var lib=S.library, defs=S.defaults; S=blankState(); S.library=lib; S.defaults=defs; S.packages={good:{products:copyArr(defs.good),lb:0,med:0},better:{products:copyArr(defs.better),lb:0,med:0},best:{products:copyArr(defs.best),lb:45,med:0}}; fill(); compute(); } };
+  $('newBtn').onclick=function(){ if(confirm('Start a new blank quote? Unsaved changes will be lost.')){ var lib=S.library, defs=S.defaults; S=blankState(); S.library=lib; S.defaults=defs; S.packages={good:{products:copyArr(defs.good),lb:0,lbCarrier:'',lbCov:'',med:0},better:{products:copyArr(defs.better),lb:0,lbCarrier:'',lbCov:'',med:0},best:{products:copyArr(defs.best),lb:45,lbCarrier:'Mutual of Omaha TLE',lbCov:'$50,000',med:0}}; fill(); compute(); goStep('intake'); } };
   $('resetTab').onclick=function(){ read(); S.packages[S.activeTab].products=copyArr(S.defaults[S.activeTab]); renderProducts(); compute(); };
   $('managePlansBtn').onclick=function(){ renderLib(); renderDefaults(); updateMasterStatus(); $('planModal').classList.add('open'); };
   $('refreshMaster').onclick=function(){ $('masterStatus').textContent='Refreshing…'; loadMaster(function(){ renderLib(); renderDefaults(); }); };
@@ -877,6 +1200,7 @@ restore();
 fill();
 bindInputs();
 compute();
+goStep(S.step||'intake');
 loadMaster();
 </script>
 </body>
