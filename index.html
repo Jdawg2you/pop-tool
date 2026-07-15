@@ -232,6 +232,8 @@
   .portalbtn.gold{background:var(--gold-pill);color:#26324a;border-color:#b0872f}
   .portalbtn.green{background:var(--green);border-color:var(--green)}
   .portalbtn.maroon{background:var(--maroon);border-color:var(--maroon)}
+  .portalbtn.mailalt{background:#fff;color:#26324a;border:1px solid #c9c0a8}
+  .portalbtn.mailalt:hover{background:#f3efe3;filter:none}
   .estcard{background:#fff;border:1px dashed #cdbf9c;border-radius:12px;padding:14px 16px;margin:16px 0}
   .estrow{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;padding:8px 0;border-top:1px solid var(--line2)}
   .estrow .lab{font-weight:700;font-family:var(--serif);color:var(--navy)}
@@ -499,8 +501,10 @@
       <a class="portalbtn green" id="lnkMutual" href="#" target="_blank" rel="noopener">Living Benefits — Mutual of Omaha &#8599;</a>
       <a class="portalbtn maroon" id="lnkAmerico" href="#" target="_blank" rel="noopener">Living Benefits — Americo &#8599;</a>
       <a class="portalbtn gold" id="emailBtn" href="#">&#9993; Email to client</a>
+      <a class="portalbtn mailalt" id="gmailBtn" href="#" target="_blank" rel="noopener">Open in Gmail</a>
+      <a class="portalbtn mailalt" id="outlookBtn" href="#" target="_blank" rel="noopener">Open in Outlook</a>
       <button class="btn-gold" id="printBtn2" style="padding:12px 18px">Print Quote</button>
-      <div class="note hidein-client" style="padding-top:10px">“Email to client” opens your email app with the client’s address, subject, and letter filled in. Then click “Print Quote,” save it as a PDF, and attach that to the email. (If your mail app doesn’t open, the letter is copied to your clipboard to paste in.)</div>
+      <div class="note hidein-client" style="padding-top:10px">“Email to client” uses your computer’s default mail app; “Gmail” / “Outlook” open the web compose window with everything filled in (no setup needed). Then click “Print Quote,” save the PDF, and attach it. (Email to client also copies the letter to your clipboard as a backup.)</div>
     </div>
    </div>
   </div>
@@ -1159,6 +1163,27 @@ function goStep(s){
   autosave(); window.scrollTo(0,0);
 }
 
+function buildEmail(){
+  read();
+  var to=(S.intake&&S.intake.email)||'';
+  var first=((S.client.pname||'').trim().split(/\s+/)[0])||'there';
+  var agent=(S.client.agent||'').trim();
+  var agency=(S.agency||'HealthFirst').trim();
+  var tier=S.activeTab.charAt(0).toUpperCase()+S.activeTab.slice(1);
+  var mo=pkMonthly(S.packages[S.activeTab]||{products:[]});
+  var today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  var subj='Your Healthcare Package of Protection by '+agency+(agent?(', '+agent):'');
+  var sign='Best,\n'+(agent||agency)+(agent&&agency?('\n'+agency):'')+'\n'+today;
+  var body='Hi '+first+',\n\n'
+    +'Thank you for your time today. Attached is your Healthcare Package of Protection — a side-by-side of your current plan and the '+tier+' package we put together for you.\n\n'
+    +'Quick recap:\n'
+    +'• Recommended plan: '+tier+' Package of Protection\n'
+    +'• Estimated monthly: '+fmt2(mo)+'/mo\n\n'
+    +'The attached PDF has the full breakdown, including your out-of-pocket savings vs. your current coverage. Reply here or give me a call with any questions — happy to walk through it.\n\n'
+    +sign;
+  return {to:to,subject:subj,body:body};
+}
+
 function bindInputs(){
   ['c_pname','c_sname','c_date','c_agent','c_state','c_zip','c_page','c_sage','d_docs','d_meds','a_prem','a_ded','a_oop','a_med','a_visits','a_copay','p_lb','p_lb_carrier','p_lb_cov','p_med','p_pension','p_pnote',
    'b_desc','b_charge','b_disc','b_days','b_daily','b_adm','b_his','b_other','r_desc','r_charge','r_pay','r_aca']
@@ -1176,27 +1201,15 @@ function bindInputs(){
     .forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',function(){ captureIntake(); }); });
   $('in_priority').addEventListener('change',function(){ readIntake(); autosave(); });
   document.querySelectorAll('#ageseg button').forEach(function(b){ b.onclick=function(){ S.estBand=+b.dataset.band; renderEstimate(); autosave(); }; });
-  $('emailBtn').onclick=function(e){ e.preventDefault();
-    read();
-    var to=(S.intake&&S.intake.email)||'';
-    var first=((S.client.pname||'').trim().split(/\s+/)[0])||'there';
-    var agent=(S.client.agent||'').trim();
-    var agency=(S.agency||'HealthFirst').trim();
-    var tier=S.activeTab.charAt(0).toUpperCase()+S.activeTab.slice(1);
-    var mo=pkMonthly(S.packages[S.activeTab]||{products:[]});
-    var today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-    var subj='Your Healthcare Package of Protection by '+agency+(agent?(', '+agent):'');
-    var sign='Best,\n'+(agent||agency)+(agent&&agency?('\n'+agency):'')+'\n'+today;
-    var body='Hi '+first+',\n\n'
-      +'Thank you for your time today. Attached is your Healthcare Package of Protection — a side-by-side of your current plan and the '+tier+' package we put together for you.\n\n'
-      +'Quick recap:\n'
-      +'• Recommended plan: '+tier+' Package of Protection\n'
-      +'• Estimated monthly: '+fmt2(mo)+'/mo\n\n'
-      +'The attached PDF has the full breakdown, including your out-of-pocket savings vs. your current coverage. Reply here or give me a call with any questions — happy to walk through it.\n\n'
-      +sign;
-    var mailto='mailto:'+to+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
-    try{ if(navigator.clipboard) navigator.clipboard.writeText('To: '+to+'\nSubject: '+subj+'\n\n'+body); }catch(err){}
-    window.location.href=mailto;
+  $('emailBtn').onclick=function(e){ e.preventDefault(); var m=buildEmail();
+    try{ if(navigator.clipboard) navigator.clipboard.writeText('To: '+m.to+'\nSubject: '+m.subject+'\n\n'+m.body); }catch(err){}
+    window.location.href='mailto:'+m.to+'?subject='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body);
+  };
+  $('gmailBtn').onclick=function(e){ e.preventDefault(); var m=buildEmail();
+    window.open('https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(m.to)+'&su='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body),'_blank','noopener');
+  };
+  $('outlookBtn').onclick=function(e){ e.preventDefault(); var m=buildEmail();
+    window.open('https://outlook.office.com/mail/deeplink/compose?to='+encodeURIComponent(m.to)+'&subject='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body),'_blank','noopener');
   };
   $('printBtn2').onclick=function(){ buildPrintout(); var prev=document.title; document.title=printDocName(); window.print(); setTimeout(function(){ document.title=prev; },800); };
   $('addProd').onclick=function(){ S.packages[S.activeTab].products.push({name:'New product',monthly:0}); renderProducts(); compute(); };
