@@ -140,6 +140,32 @@
   .pcol .prow .plab{font-weight:600}
   .pcol .pnote{color:var(--muted);font-size:11px;font-style:italic;padding:6px 14px 10px}
   @media(max-width:860px){.pdetail{grid-template-columns:1fr}}
+  .tfra-ad{background:#f7edd3;border:1px solid var(--line);border-top:4px solid var(--green);border-radius:12px;overflow:hidden;margin-top:4px}
+  .tfra-ad .tfra-eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;padding:16px 20px 0}
+  .tfra-ad .tfra-head{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--green);margin-top:4px;line-height:1.25;padding:0 20px}
+  .tfra-ad .tfra-body{font-size:14px;color:var(--ink);line-height:1.6;margin:10px 0 4px;padding:0 20px}
+  .tfra-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:8px 20px 4px}
+  .tfra-tile{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .tfra-tile .tl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .tfra-tile .tv{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--navy)}
+  .tfra-tile:first-child .tv{color:var(--green)}
+  .tfra-hl{background:var(--green-soft);border:1px solid #cfe4cf;border-radius:10px;padding:11px 14px;font-family:var(--serif);font-weight:700;color:var(--navy);font-size:14px;margin:8px 20px 4px}
+  .tfra-hl span{color:var(--green)}
+  .tfra-cta-row{padding:12px 20px 16px}
+  .tfra-cta{font-family:var(--serif);font-weight:700;color:var(--navy);font-size:15px;line-height:1.4}
+  .tfra-cta::before{content:'\2192  ';color:var(--gold)}
+  .tfra-fine{font-size:11px;font-style:italic;color:var(--muted);margin-top:6px}
+  @media(max-width:860px){.tfra-tiles{grid-template-columns:1fr}}
+  #printout .po-ad{margin-top:14px;border:1px solid var(--line);border-top:4px solid var(--green);border-radius:10px;overflow:hidden;break-inside:avoid;background:#f7edd3}
+  #printout .po-ad .eb{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#b0872f;font-weight:700;padding:12px 16px 0}
+  #printout .po-ad h4{font-family:var(--serif);color:var(--green);font-size:19px;margin:2px 0 0;padding:0 16px}
+  #printout .po-ad p{font-size:12px;color:#2a3346;line-height:1.5;padding:6px 16px 0;margin:0}
+  #printout .po-ad .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px 16px}
+  #printout .po-ad .tile{border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:#fff}
+  #printout .po-ad .tile .l{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  #printout .po-ad .tile .v{font-family:var(--serif);font-weight:700;font-size:18px;color:var(--navy)}
+  #printout .po-ad .hl{background:var(--green-soft);border-top:1px solid #cfe4cf;padding:9px 16px;font-family:var(--serif);font-weight:700;color:var(--navy);font-size:12.5px}
+  #printout .po-ad .fine{font-size:9.5px;font-style:italic;color:var(--muted);padding:4px 16px 12px}
   /* ===== dedicated printout (Good/Better/Best comparison) ===== */
   #printout{display:none}
   #printout *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -455,6 +481,7 @@
       <div class="lab">TFRA — monthly contribution<small>Set 0 to hide it from the comparison.</small></div>
       <input class="num" id="p_pension" type="number" step="0.01">
     </div>
+    <div id="tfraFunded">
     <div class="row" style="border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px"><div class="lab">TFRA — note</div><input id="p_pnote" style="flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;background:#fff" placeholder="e.g., IUL / tax-free retirement savings for your future"></div>
     <div class="pdetail" id="pensionDetail">
       <div class="pcol">
@@ -478,6 +505,19 @@
       <div class="c l">Still ahead vs ACA</div><div class="c money" id="o_tot_net_mo">—</div><div class="c money" id="o_tot_net_yr">—</div>
     </div>
     <div class="note">Even after funding the TFRA, this shows whether the client still spends less than the ACA plan.</div>
+    </div>
+    <div id="tfraAd" class="tfra-ad">
+      <div class="tfra-eyebrow">Your next step</div>
+      <div class="tfra-head">Put your savings toward your future — <span>TAX-FREE</span></div>
+      <p class="tfra-body">You’re already saving <b id="ad_bmo">$—</b>/mo versus your current marketplace plan. Redirected into a Tax-Free Retirement Account (TFRA), those same dollars can grow with compound interest — tax-free — building real savings for your future.</p>
+      <div class="tfra-tiles">
+        <div class="tfra-tile"><div class="tl">You save now</div><div class="tv" id="ad_mo">$—</div></div>
+        <div class="tfra-tile"><div class="tl">That’s a year</div><div class="tv" id="ad_yr">$—</div></div>
+        <div class="tfra-tile"><div class="tl">Over 20 years</div><div class="tv" id="ad_20">$—</div></div>
+      </div>
+      <div class="tfra-hl">Redirected into a TFRA, those dollars grow with <b>compound interest</b> — <span>tax-free</span> — for your future.</div>
+      <div class="tfra-cta-row"><div class="tfra-cta">Ask me how to use your savings to build your future — tax-free</div><div class="tfra-fine">Illustration based on your current savings redirected monthly — not a projection of investment returns.</div></div>
+    </div>
   </div>
 
   <div class="card pad">
@@ -848,6 +888,11 @@ function compute(){
   $('o_tot_net_mo').textContent=saves(trueMo-totMo,'/mo');
   $('o_tot_net_yr').textContent=saves(trueYr-totYr,'/yr');
   if($('pensionDetail')) $('pensionDetail').style.display=(pen>0)?'':'none';
+  var showAd=(pen<=0 && tMo>0);
+  if($('tfraFunded')) $('tfraFunded').style.display=showAd?'none':'';
+  if($('tfraAd')){ $('tfraAd').style.display=showAd?'':'none';
+    if(showAd){ $('ad_mo').textContent=fmt(tMo); $('ad_bmo').textContent=fmt(tMo); $('ad_yr').textContent=fmt(tMo*12); $('ad_20').textContent=fmt(tMo*240); }
+  }
 
   var b=S.big;
   var bal=b.charge-b.disc;
@@ -1001,6 +1046,17 @@ function buildPrintout(){
           +'<div class="n">Amount paid to their family.</div></div>'
         +'</div>';
     }
+  } else if(tMo>0){
+    html+='<div class="po-ad"><div class="eb">Your next step</div>'
+      +'<h4>Put your savings toward your future — TAX-FREE</h4>'
+      +'<p>You are already saving '+fmt2(tMo)+'/mo versus your current marketplace plan. Redirected into a Tax-Free Retirement Account (TFRA), those same dollars can grow with compound interest — tax-free — building real savings for your future.</p>'
+      +'<div class="tiles">'
+        +'<div class="tile"><div class="l">You save now</div><div class="v">'+fmt2(tMo)+'</div></div>'
+        +'<div class="tile"><div class="l">That\'s a year</div><div class="v">'+fmt2(tMo*12)+'</div></div>'
+        +'<div class="tile"><div class="l">Over 20 years</div><div class="v">'+fmt2(tMo*240)+'</div></div>'
+      +'</div>'
+      +'<div class="hl">Redirected into a TFRA, those dollars grow with compound interest — tax-free — for your future.</div>'
+      +'<div class="fine"><b style="color:#12213b">→ Ask me how to use your savings to build your future — tax-free.</b>  Illustration based on your current savings redirected monthly — not a projection of investment returns.</div></div>';
   }
 
   /* ---- event illustrations ---- */
