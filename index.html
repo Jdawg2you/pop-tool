@@ -231,6 +231,7 @@
   .portalbtn:hover{filter:brightness(1.08)}
   .portalbtn.gold{background:var(--gold-pill);color:#26324a;border-color:#b0872f}
   .portalbtn.green{background:var(--green);border-color:var(--green)}
+  .portalbtn.maroon{background:var(--maroon);border-color:var(--maroon)}
   .estcard{background:#fff;border:1px dashed #cdbf9c;border-radius:12px;padding:14px 16px;margin:16px 0}
   .estrow{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;padding:8px 0;border-top:1px solid var(--line2)}
   .estrow .lab{font-weight:700;font-family:var(--serif);color:var(--navy)}
@@ -494,15 +495,11 @@
     <div id="enrollSummary" style="margin:14px 0"></div>
     <div class="enroll-card">
       <div style="font-family:var(--serif);font-weight:700;color:var(--navy);margin-bottom:10px">Apply</div>
-      <a class="portalbtn" id="lnkManhattan" href="#" target="_blank" rel="noopener">Manhattan Life Agent Portal &#8599;</a>
-      <a class="portalbtn green" id="lnkLife" href="#" target="_blank" rel="noopener">Living Benefits &#8599;</a>
+      <a class="portalbtn" id="lnkManhattan" href="#" target="_blank" rel="noopener">Manhattan Life Producer Portal &#8599;</a>
+      <a class="portalbtn green" id="lnkMutual" href="#" target="_blank" rel="noopener">Living Benefits — Mutual of Omaha &#8599;</a>
+      <a class="portalbtn maroon" id="lnkAmerico" href="#" target="_blank" rel="noopener">Living Benefits — Americo &#8599;</a>
       <a class="portalbtn gold" id="emailBtn" href="#">&#9993; Email to client</a>
       <button class="btn-gold" id="printBtn2" style="padding:12px 18px">Print Quote</button>
-      <div class="hidein-client" style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="fld"><label>Manhattan portal URL</label><input id="en_murl" placeholder="https://..."></div>
-        <div class="fld"><label>Living Benefits carrier</label><input id="en_lcarrier" placeholder="Mutual of Omaha TLE"></div>
-        <div class="fld"><label>Living Benefits URL</label><input id="en_lurl" placeholder="https://..."></div>
-      </div>
     </div>
    </div>
   </div>
@@ -540,6 +537,11 @@ var fmt=function(n){var neg=n<0;n=Math.abs(n);if(view==='client'){return (neg?'-
 var fmt2=function(n){var neg=n<0;n=Math.abs(n);return (neg?'-':'')+'$'+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});};
 var saves=function(v,per){return (v>=0?'SAVES ':'COSTS ')+fmt(Math.abs(v))+(v>=0?per:per+' MORE');};
 var copyArr=function(a){return (a||[]).map(function(x){return {name:x.name,monthly:x.monthly};});};
+
+/* Carrier producer portals (enroll step) */
+var MANHATTAN_URL='https://producer.manhattanlife.com/life/account/login.aspx?AsAgent';
+var MUTUAL_URL='https://login.mutualofomaha.com/oauth2/ausf54nluEW16RGQm4h6/v1/authorize?response_type=code&redirect_uri=https%3A%2F%2Fproducer.mutualofomaha.com%2Fenterprise%2Fmyportal%2Flogin-callback&state=aHR0cHM6Ly9wcm9kdWNlci5tdXR1YWxvZm9tYWhhLmNvbS9lbnRlcnByaXNlL215cG9ydGFs&client_id=0oavclbvcTNHu4Bpz4h6&response_mode=form_post&scope=openid%20email%20profile%20user-type%20entitlements';
+var AMERICO_URL='https://account.americoagent.com/Identity/Account/Login/?returnUrl=https%3a%2f%2fportal.americoagent.com%2f';
 
 /* ===== Real AFC rates from the ManhattanLife AFC Rate Guide (AFC-RATES 0626) =====
    Age bands 18-29 / 30-39 / 40-49 / 50-64; tiers [Elite Plus, Elite, Classic Plus, Classic].
@@ -670,8 +672,7 @@ function blankState(){
     recommended:'best',
     recFlags:[],
     step:'intake',
-    estBand:null,
-    enroll:{murl:'https://agents.manhattanlife.com',lcarrier:'Mutual of Omaha TLE',lurl:'https://www.mutualofomaha.com/'}
+    estBand:null
   };
 }
 var S=blankState();
@@ -1115,9 +1116,9 @@ function renderEnroll(){
   var name=S.client.pname||'Client'; if(S.client.sname) name+=' & '+S.client.sname;
   var isRec=(S.activeTab===S.recommended);
   $('enrollSummary').innerHTML='<div class="enroll-card"><div style="font-family:var(--serif);font-size:18px;color:var(--navy);font-weight:700">'+esc(name)+' — '+S.activeTab.toUpperCase()+(isRec?' <span class="recbadge">BEST FIT</span>':'')+'</div><div style="margin-top:6px;color:#3a4358">Package of Protection: <b>'+fmt2(mo)+' / mo</b></div></div>';
-  $('en_murl').value=S.enroll.murl||''; $('en_lcarrier').value=S.enroll.lcarrier||''; $('en_lurl').value=S.enroll.lurl||'';
-  $('lnkManhattan').href=S.enroll.murl||'#';
-  $('lnkLife').href=S.enroll.lurl||'#'; $('lnkLife').innerHTML='Living Benefits — '+esc(S.enroll.lcarrier||'carrier')+' &#8599;';
+  $('lnkManhattan').href=MANHATTAN_URL;
+  $('lnkMutual').href=MUTUAL_URL;
+  $('lnkAmerico').href=AMERICO_URL;
 }
 function estTierMonthly(tier,bandIdx,state){
   var pk=S.packages[tier]; if(!pk) return null;
@@ -1174,7 +1175,6 @@ function bindInputs(){
     .forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',function(){ captureIntake(); }); });
   $('in_priority').addEventListener('change',function(){ readIntake(); autosave(); });
   document.querySelectorAll('#ageseg button').forEach(function(b){ b.onclick=function(){ S.estBand=+b.dataset.band; renderEstimate(); autosave(); }; });
-  ['en_murl','en_lcarrier','en_lurl'].forEach(function(id){ $(id).addEventListener('input',function(){ S.enroll={murl:$('en_murl').value,lcarrier:$('en_lcarrier').value,lurl:$('en_lurl').value}; $('lnkManhattan').href=S.enroll.murl||'#'; $('lnkLife').href=S.enroll.lurl||'#'; $('lnkLife').innerHTML='Living Benefits — '+esc(S.enroll.lcarrier||'carrier')+' &#8599;'; autosave(); }); });
   $('emailBtn').onclick=function(e){ e.preventDefault(); var to=(S.intake&&S.intake.email)||''; var subj=encodeURIComponent((S.agency||'HealthFirst')+' — your Package of Protection quote'); var body=encodeURIComponent('Hi '+(S.client.pname||'')+',\n\nHere is your Package of Protection comparison. I\'ll attach the PDF — print/save it from the tool and attach here.\n\nThanks,\n'+(S.client.agent||'')); window.location.href='mailto:'+to+'?subject='+subj+'&body='+body; };
   $('printBtn2').onclick=function(){ buildPrintout(); var prev=document.title; document.title=printDocName(); window.print(); setTimeout(function(){ document.title=prev; },800); };
   $('addProd').onclick=function(){ S.packages[S.activeTab].products.push({name:'New product',monthly:0}); renderProducts(); compute(); };
