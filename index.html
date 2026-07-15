@@ -1169,17 +1169,12 @@ function buildEmail(){
   var first=((S.client.pname||'').trim().split(/\s+/)[0])||'there';
   var agent=(S.client.agent||'').trim();
   var agency=(S.agency||'HealthFirst').trim();
-  var tier=S.activeTab.charAt(0).toUpperCase()+S.activeTab.slice(1);
-  var mo=pkMonthly(S.packages[S.activeTab]||{products:[]});
   var today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   var subj='Your Healthcare Package of Protection by '+agency+(agent?(', '+agent):'');
   var sign='Best,\n'+(agent||agency)+(agent&&agency?('\n'+agency):'')+'\n'+today;
   var body='Hi '+first+',\n\n'
-    +'Thank you for your time today. Attached is your Healthcare Package of Protection — a side-by-side of your current plan and the '+tier+' package we put together for you.\n\n'
-    +'Quick recap:\n'
-    +'• Recommended plan: '+tier+' Package of Protection\n'
-    +'• Estimated monthly: '+fmt2(mo)+'/mo\n\n'
-    +'The attached PDF has the full breakdown, including your out-of-pocket savings vs. your current coverage. Reply here or give me a call with any questions — happy to walk through it.\n\n'
+    +'Thank you for your time today. Attached is your Healthcare Package of Protection — a side-by-side comparison of the current marketplace option that would best suit your needs and the options we recommend and spoke about previously.\n\n'
+    +'The attached PDF has the full breakdown, including your out-of-pocket savings versus the current marketplace option available to you. Reply here or give me a call with any questions — I\'m happy to walk through it.\n\n'
     +sign;
   return {to:to,subject:subj,body:body};
 }
