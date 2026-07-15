@@ -500,7 +500,7 @@
       <a class="portalbtn maroon" id="lnkAmerico" href="#" target="_blank" rel="noopener">Living Benefits — Americo &#8599;</a>
       <a class="portalbtn gold" id="emailBtn" href="#">&#9993; Email to client</a>
       <button class="btn-gold" id="printBtn2" style="padding:12px 18px">Print Quote</button>
-      <div class="note hidein-client" style="padding-top:10px">“Email to client” opens your mail app with the letter filled in and pops up the PDF to save — then drag that PDF into the email (mail apps can’t attach it automatically).</div>
+      <div class="note hidein-client" style="padding-top:10px">“Email to client” opens your email app with the client’s address, subject, and letter filled in. Then click “Print Quote,” save it as a PDF, and attach that to the email. (If your mail app doesn’t open, the letter is copied to your clipboard to paste in.)</div>
     </div>
    </div>
   </div>
@@ -1155,7 +1155,7 @@ function goStep(s){
   var cs=$('clientStrip'); if(cs) cs.style.display=(s==='intake')?'none':'';
   if(s==='intake') fillIntake();
   if(s==='enroll') renderEnroll();
-  if(s==='quote') renderEstimate();
+  if(s==='quote'){ fill(); compute(); }
   autosave(); window.scrollTo(0,0);
 }
 
@@ -1177,20 +1177,26 @@ function bindInputs(){
   $('in_priority').addEventListener('change',function(){ readIntake(); autosave(); });
   document.querySelectorAll('#ageseg button').forEach(function(b){ b.onclick=function(){ S.estBand=+b.dataset.band; renderEstimate(); autosave(); }; });
   $('emailBtn').onclick=function(e){ e.preventDefault();
+    read();
     var to=(S.intake&&S.intake.email)||'';
     var first=((S.client.pname||'').trim().split(/\s+/)[0])||'there';
     var agent=(S.client.agent||'').trim();
     var agency=(S.agency||'HealthFirst').trim();
-    var tier=S.activeTab.toUpperCase();
+    var tier=S.activeTab.charAt(0).toUpperCase()+S.activeTab.slice(1);
     var mo=pkMonthly(S.packages[S.activeTab]||{products:[]});
-    var subj=agency+' — Your Package of Protection quote';
-    var sign=agent?(agent+(agency?('\n'+agency):'')):agency;
+    var today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    var subj='Your Healthcare Package of Protection by '+agency+(agent?(', '+agent):'');
+    var sign='Best,\n'+(agent||agency)+(agent&&agency?('\n'+agency):'')+'\n'+today;
     var body='Hi '+first+',\n\n'
-      +'Thank you for taking the time to go over your coverage with me. Attached is a side-by-side comparison of your current plan and the Package of Protection we discussed — it shows the monthly cost and the real out-of-pocket savings, side by side.\n\n'
-      +'The recommended '+tier+' package comes to '+fmt2(mo)+' per month. Take a look when you get a chance, and reply here or give me a call with any questions — I\'m happy to walk through it.\n\n'
-      +'Best,\n'+sign;
-    window.location.href='mailto:'+to+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
-    setTimeout(function(){ buildPrintout(); var prev=document.title; document.title=printDocName(); window.print(); setTimeout(function(){ document.title=prev; },800); },700);
+      +'Thank you for your time today. Attached is your Healthcare Package of Protection — a side-by-side of your current plan and the '+tier+' package we put together for you.\n\n'
+      +'Quick recap:\n'
+      +'• Recommended plan: '+tier+' Package of Protection\n'
+      +'• Estimated monthly: '+fmt2(mo)+'/mo\n\n'
+      +'The attached PDF has the full breakdown, including your out-of-pocket savings vs. your current coverage. Reply here or give me a call with any questions — happy to walk through it.\n\n'
+      +sign;
+    var mailto='mailto:'+to+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+    try{ if(navigator.clipboard) navigator.clipboard.writeText('To: '+to+'\nSubject: '+subj+'\n\n'+body); }catch(err){}
+    window.location.href=mailto;
   };
   $('printBtn2').onclick=function(){ buildPrintout(); var prev=document.title; document.title=printDocName(); window.print(); setTimeout(function(){ document.title=prev; },800); };
   $('addProd').onclick=function(){ S.packages[S.activeTab].products.push({name:'New product',monthly:0}); renderProducts(); compute(); };
