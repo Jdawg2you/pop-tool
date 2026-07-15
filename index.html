@@ -132,6 +132,14 @@
   .money-disp{display:none;min-width:100px;text-align:right;font:inherit;color:var(--ink);font-variant-numeric:tabular-nums}
   body.client input.money-in{display:none!important}
   body.client .money-disp{display:inline-block}
+  .pdetail{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .pcol{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .pcol .phdr{background:#f6f3ea;font-family:var(--serif);font-weight:700;color:var(--navy);padding:9px 14px}
+  .pcol.legacy .phdr{background:var(--green-soft);color:var(--green)}
+  .pcol .prow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 14px;border-top:1px solid var(--line2)}
+  .pcol .prow .plab{font-weight:600}
+  .pcol .pnote{color:var(--muted);font-size:11px;font-style:italic;padding:6px 14px 10px}
+  @media(max-width:860px){.pdetail{grid-template-columns:1fr}}
   /* ===== dedicated printout (Good/Better/Best comparison) ===== */
   #printout{display:none}
   #printout *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -196,6 +204,13 @@
   #printout .po-event .mp .sub{font-size:10.5px;color:var(--muted)}
   #printout .po-event .bottom{background:var(--green-soft);border-top:1px solid #cfe4cf;padding:10px 14px;text-align:center;font-family:var(--serif);font-weight:700;color:var(--navy)}
   #printout .po-event .bottom b{color:var(--green);font-size:17px}
+  #printout .po-pension{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;break-inside:avoid}
+  #printout .po-pcol{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  #printout .po-pcol .h{background:#f6f3ea;font-family:var(--serif);font-weight:700;color:var(--navy);padding:8px 13px}
+  #printout .po-pcol.leg .h{background:var(--green-soft);color:var(--green)}
+  #printout .po-pcol .r{display:flex;justify-content:space-between;padding:7px 13px;border-top:1px solid var(--line2)}
+  #printout .po-pcol .r .v{font-family:var(--serif);font-weight:700;font-variant-numeric:tabular-nums}
+  #printout .po-pcol .n{color:var(--muted);font-size:10px;font-style:italic;padding:5px 13px 8px}
   #printout .po-illus{color:var(--muted);font-size:10.5px;margin-top:9px;font-style:italic;line-height:1.5}
   @media print{
     body{background:#fff}.noprint{display:none!important}.wrap{max-width:none;padding:0}
@@ -441,6 +456,21 @@
       <input class="num" id="p_pension" type="number" step="0.01">
     </div>
     <div class="row" style="border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px"><div class="lab">Personal Pension — note</div><input id="p_pnote" style="flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;background:#fff" placeholder="e.g., IUL / annuity for tax-free retirement"></div>
+    <div class="pdetail" id="pensionDetail">
+      <div class="pcol">
+        <div class="phdr">Approximate cash value</div>
+        <div class="prow"><span class="plab">10 years</span><span><input class="num money-in" id="pp_cv10" type="number" step="0.01"><span class="money-disp" data-for="pp_cv10"></span></span></div>
+        <div class="prow"><span class="plab">20 years</span><span><input class="num money-in" id="pp_cv20" type="number" step="0.01"><span class="money-disp" data-for="pp_cv20"></span></span></div>
+        <div class="prow"><span class="plab">30 years</span><span><input class="num money-in" id="pp_cv30" type="number" step="0.01"><span class="money-disp" data-for="pp_cv30"></span></span></div>
+        <div class="pnote">These numbers are approximate based on market returns.</div>
+      </div>
+      <div class="pcol legacy">
+        <div class="phdr">Legacy protection</div>
+        <div class="prow"><span class="plab">Day one</span><span><input class="num money-in" id="pp_leg1" type="number" step="0.01"><span class="money-disp" data-for="pp_leg1"></span></span></div>
+        <div class="prow"><span class="plab">25 years</span><span><input class="num money-in" id="pp_leg25" type="number" step="0.01"><span class="money-disp" data-for="pp_leg25"></span></span></div>
+        <div class="pnote">Amount paid to their family.</div>
+      </div>
+    </div>
     <div class="greenband" style="margin-top:14px">INCLUDING ADDITIONAL PROGRAMS</div>
     <div class="savegrid green">
       <div class="h l">&nbsp;</div><div class="h">Monthly</div><div class="h">Annual</div>
@@ -670,7 +700,7 @@ function blankState(){
       better:{products:defProducts('better'),lb:0,lbCarrier:'',lbCov:'',med:0},
       best:{products:defProducts('best'),lb:45,lbCarrier:'',lbCov:'',med:0}
     },
-    pension:{monthly:100,note:'e.g., IUL / annuity for tax-free retirement'},
+    pension:{monthly:100,note:'e.g., IUL / annuity for tax-free retirement',cv10:0,cv20:0,cv30:0,leg1:0,leg25:0},
     big:{desc:'Hospital stay – 7 days',charge:41660.41,disc:18747.18,days:7,daily:4000,adm:2000,his:10000,other:0},
     reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
     intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobacco:false,maternity:false,dv:false,famcancer:false,mental:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',budget:0,priority:'coverage',notes:'',carrier:'',plan:''},
@@ -765,6 +795,7 @@ function fill(){
   var pk=S.packages[S.activeTab];
   $('p_lb').value=pk.lb;$('p_med').value=pk.med;$('p_lb_carrier').value=pk.lbCarrier||'';$('p_lb_cov').value=pk.lbCov||'';
   $('p_pension').value=S.pension.monthly;$('p_pnote').value=S.pension.note;
+  $('pp_cv10').value=S.pension.cv10||'';$('pp_cv20').value=S.pension.cv20||'';$('pp_cv30').value=S.pension.cv30||'';$('pp_leg1').value=S.pension.leg1||'';$('pp_leg25').value=S.pension.leg25||'';
   $('b_desc').value=S.big.desc;$('b_charge').value=S.big.charge;$('b_disc').value=S.big.disc;$('b_days').value=S.big.days;$('b_daily').value=S.big.daily;$('b_adm').value=S.big.adm;$('b_his').value=S.big.his;$('b_other').value=S.big.other;
   $('r_desc').value=S.reg.desc;$('r_charge').value=S.reg.charge;$('r_pay').value=S.reg.pay;$('r_aca').value=S.reg.aca;
   $('tl_good').textContent=S.tabLabels.good;$('tl_better').textContent=S.tabLabels.better;$('tl_best').textContent=S.tabLabels.best;
@@ -778,7 +809,7 @@ function read(){
   S.docs={docs:$('d_docs').value,meds:$('d_meds').value,net:$('d_net').checked,rx:$('d_rx').checked,famcancer:$('d_famcancer').checked};
   S.aca={prem:+$('a_prem').value||0,ded:+$('a_ded').value||0,oop:+$('a_oop').value||0,med:+$('a_med').value||0,visits:+$('a_visits').value||0,copay:+$('a_copay').value||0,fullded:$('a_fullded').checked};
   var pk=S.packages[S.activeTab]; pk.lb=+$('p_lb').value||0; pk.med=+$('p_med').value||0; pk.lbCarrier=$('p_lb_carrier').value; pk.lbCov=$('p_lb_cov').value;
-  S.pension={monthly:+$('p_pension').value||0,note:$('p_pnote').value};
+  S.pension={monthly:+$('p_pension').value||0,note:$('p_pnote').value,cv10:+$('pp_cv10').value||0,cv20:+$('pp_cv20').value||0,cv30:+$('pp_cv30').value||0,leg1:+$('pp_leg1').value||0,leg25:+$('pp_leg25').value||0};
   S.big={desc:$('b_desc').value,charge:+$('b_charge').value||0,disc:+$('b_disc').value||0,days:+$('b_days').value||0,daily:+$('b_daily').value||0,adm:+$('b_adm').value||0,his:+$('b_his').value||0,other:+$('b_other').value||0};
   S.reg={desc:$('r_desc').value,charge:+$('r_charge').value||0,pay:+$('r_pay').value||0,aca:+$('r_aca').value||0};
 }
@@ -816,6 +847,7 @@ function compute(){
   $('o_tot_mo').textContent=fmt2(totMo);$('o_tot_yr').textContent=fmt2(totYr);
   $('o_tot_net_mo').textContent=saves(trueMo-totMo,'/mo');
   $('o_tot_net_yr').textContent=saves(trueYr-totYr,'/yr');
+  if($('pensionDetail')) $('pensionDetail').style.display=(pen>0)?'':'none';
 
   var b=S.big;
   var bal=b.charge-b.disc;
@@ -955,6 +987,20 @@ function buildPrintout(){
         +'<div class="g"><div class="h l">&nbsp;</div><div class="h">Monthly</div><div class="h">Annual</div>'
         +'<div class="c l">Your total (package + pension)</div><div class="c" style="text-align:center;font-family:var(--serif);font-weight:700">'+fmt2(totMo)+'</div><div class="c" style="text-align:center;font-family:var(--serif);font-weight:700">'+fmt2(totYr)+'</div>'
         +'<div class="c l">Still ahead vs ACA</div><div class="c v">'+saves(aca.mo-totMo,'/mo')+'</div><div class="c v">'+saves(aca.yr-totYr,'/yr')+'</div></div></div>';
+    var PP=S.pension;
+    if((+PP.cv10||0)+(+PP.cv20||0)+(+PP.cv30||0)+(+PP.leg1||0)+(+PP.leg25||0)>0){
+      html+='<div class="po-pension">'
+        +'<div class="po-pcol"><div class="h">Approximate cash value</div>'
+          +'<div class="r"><span>10 years</span><span class="v">'+fmt2(+PP.cv10||0)+'</span></div>'
+          +'<div class="r"><span>20 years</span><span class="v">'+fmt2(+PP.cv20||0)+'</span></div>'
+          +'<div class="r"><span>30 years</span><span class="v">'+fmt2(+PP.cv30||0)+'</span></div>'
+          +'<div class="n">These numbers are approximate based on market returns.</div></div>'
+        +'<div class="po-pcol leg"><div class="h">Legacy protection</div>'
+          +'<div class="r"><span>Day one</span><span class="v">'+fmt2(+PP.leg1||0)+'</span></div>'
+          +'<div class="r"><span>25 years</span><span class="v">'+fmt2(+PP.leg25||0)+'</span></div>'
+          +'<div class="n">Amount paid to their family.</div></div>'
+        +'</div>';
+    }
   }
 
   /* ---- event illustrations ---- */
@@ -1180,7 +1226,7 @@ function buildEmail(){
 }
 
 function bindInputs(){
-  ['c_pname','c_sname','c_date','c_agent','c_state','c_zip','c_page','c_sage','d_docs','d_meds','a_prem','a_ded','a_oop','a_med','a_visits','a_copay','p_lb','p_lb_carrier','p_lb_cov','p_med','p_pension','p_pnote',
+  ['c_pname','c_sname','c_date','c_agent','c_state','c_zip','c_page','c_sage','d_docs','d_meds','a_prem','a_ded','a_oop','a_med','a_visits','a_copay','p_lb','p_lb_carrier','p_lb_cov','p_med','p_pension','p_pnote','pp_cv10','pp_cv20','pp_cv30','pp_leg1','pp_leg25',
    'b_desc','b_charge','b_disc','b_days','b_daily','b_adm','b_his','b_other','r_desc','r_charge','r_pay','r_aca']
    .forEach(function(id){ $(id).addEventListener('input',compute); });
   ['d_net','d_rx','d_famcancer','a_fullded'].forEach(function(id){ $(id).addEventListener('change',compute); });
