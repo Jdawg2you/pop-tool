@@ -888,10 +888,10 @@ function compute(){
   $('o_tot_net_mo').textContent=saves(trueMo-totMo,'/mo');
   $('o_tot_net_yr').textContent=saves(trueYr-totYr,'/yr');
   if($('pensionDetail')) $('pensionDetail').style.display=(pen>0)?'':'none';
-  var showAd=(pen<=0 && tMo>0);
+  var showAd=(pen<=0 && aMo>0);
   if($('tfraFunded')) $('tfraFunded').style.display=showAd?'none':'';
   if($('tfraAd')){ $('tfraAd').style.display=showAd?'':'none';
-    if(showAd){ $('ad_mo').textContent=fmt(tMo); $('ad_bmo').textContent=fmt(tMo); $('ad_yr').textContent=fmt(tMo*12); $('ad_20').textContent=fmt(tMo*240); }
+    if(showAd){ $('ad_mo').textContent=fmt(aMo); $('ad_bmo').textContent=fmt(aMo); $('ad_yr').textContent=fmt(aMo*12); $('ad_20').textContent=fmt(aMo*240); }
   }
 
   var b=S.big;
@@ -1046,14 +1046,14 @@ function buildPrintout(){
           +'<div class="n">Amount paid to their family.</div></div>'
         +'</div>';
     }
-  } else if(tMo>0){
+  } else if(aMo>0){
     html+='<div class="po-ad"><div class="eb">Your next step</div>'
       +'<h4>Put your savings toward your future — TAX-FREE</h4>'
-      +'<p>You are already saving '+fmt2(tMo)+'/mo versus your current marketplace plan. Redirected into a Tax-Free Retirement Account (TFRA), those same dollars can grow with compound interest — tax-free — building real savings for your future.</p>'
+      +'<p>You are already saving '+fmt2(aMo)+'/mo versus your current marketplace plan. Redirected into a Tax-Free Retirement Account (TFRA), those same dollars can grow with compound interest — tax-free — building real savings for your future.</p>'
       +'<div class="tiles">'
-        +'<div class="tile"><div class="l">You save now</div><div class="v">'+fmt2(tMo)+'</div></div>'
-        +'<div class="tile"><div class="l">That\'s a year</div><div class="v">'+fmt2(tMo*12)+'</div></div>'
-        +'<div class="tile"><div class="l">Over 20 years</div><div class="v">'+fmt2(tMo*240)+'</div></div>'
+        +'<div class="tile"><div class="l">You save now</div><div class="v">'+fmt2(aMo)+'</div></div>'
+        +'<div class="tile"><div class="l">That\'s a year</div><div class="v">'+fmt2(aMo*12)+'</div></div>'
+        +'<div class="tile"><div class="l">Over 20 years</div><div class="v">'+fmt2(aMo*240)+'</div></div>'
       +'</div>'
       +'<div class="hl">Redirected into a TFRA, those dollars grow with compound interest — tax-free — for your future.</div>'
       +'<div class="fine"><b style="color:#12213b">→ Ask me how to use your savings to build your future — tax-free.</b>  Illustration based on your current savings redirected monthly — not a projection of investment returns.</div></div>';
