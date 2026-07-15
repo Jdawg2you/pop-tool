@@ -416,9 +416,9 @@
           <div class="row sum"><div class="lab">Annual premium</div><div class="val" id="o_a_annprem">—</div></div>
           <div class="row"><div class="lab">Deductible impact / month<small>deductible ÷ 12</small></div><div class="val" id="o_a_dedmo">—</div></div>
           <div class="row"><div class="lab">Office-visit co-pays / month<small>(visits × co-pay) ÷ 12</small></div><div class="val" id="o_a_copaymo">—</div></div>
-          <div class="row hi sum"><div class="lab">TRUE monthly cost</div><div class="val" id="o_a_truemo">—</div></div>
-          <div class="row sum"><div class="lab">TRUE annual cost</div><div class="val" id="o_a_trueyr">—</div></div>
-          <div class="row hidein-client"><div class="lab" style="font-size:12px;color:var(--muted)"><label><input type="checkbox" id="a_fullded" checked> TRUE cost assumes the full deductible is met that year</label></div><div></div></div>
+          <div class="row hi sum"><div class="lab">TRUE COST — Monthly</div><div class="val" id="o_a_truemo">—</div></div>
+          <div class="row sum"><div class="lab">TRUE COST — Annual</div><div class="val" id="o_a_trueyr">—</div></div>
+          <div class="row hidein-client"><div class="lab" style="font-size:12px;color:var(--muted)"><label><input type="checkbox" id="a_fullded" checked> TRUE COST assumes the full deductible is met that year</label></div><div></div></div>
         </div>
         <div class="vsbadge"><span>VS</span><div class="ribbon" id="ribbon"></div></div>
         <!-- PACKAGE -->
@@ -443,19 +443,19 @@
       <div class="savegrid">
         <div class="h l">YOUR SAVINGS vs ACA</div><div class="h">Monthly</div><div class="h">Annual</div>
         <div class="c l">ACTUAL — premium vs premium</div><div class="c a" id="o_sav_amo">—</div><div class="c a" id="o_sav_ayr">—</div>
-        <div class="c l tt">TRUE — with the ACA deductible counted</div><div class="c t" id="o_sav_tmo">—</div><div class="c t" id="o_sav_tyr">—</div>
+        <div class="c l tt">TRUE COST — with ACA deductible included</div><div class="c t" id="o_sav_tmo">—</div><div class="c t" id="o_sav_tyr">—</div>
       </div>
-      <div class="note">ACTUAL = premium vs premium. TRUE = once the ACA deductible &amp; co-pays are counted — the real gap.</div>
+      <div class="note">ACTUAL = premium vs premium. TRUE COST = once the ACA deductible &amp; co-pays are included — the real gap.</div>
     </div>
   </div>
 
   <div class="card pad">
-    <div class="sectitle" style="margin-bottom:8px">Personal Pension <span style="font-family:-apple-system,sans-serif;font-weight:400;font-size:12px;color:var(--muted)">— optional retirement savings, not an insurance cost</span></div>
+    <div class="sectitle" style="margin-bottom:8px">TFRA <span style="font-family:-apple-system,sans-serif;font-weight:400;font-size:12px;color:var(--muted)">— Tax-Free Retirement Account · optional savings, not an insurance cost</span></div>
     <div class="row hidein-client" style="border:1px solid var(--line);border-radius:8px">
-      <div class="lab">Personal Pension — monthly contribution<small>Set 0 to hide it from the comparison.</small></div>
+      <div class="lab">TFRA — monthly contribution<small>Set 0 to hide it from the comparison.</small></div>
       <input class="num" id="p_pension" type="number" step="0.01">
     </div>
-    <div class="row" style="border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px"><div class="lab">Personal Pension — note</div><input id="p_pnote" style="flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;background:#fff" placeholder="e.g., IUL / annuity for tax-free retirement"></div>
+    <div class="row" style="border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px"><div class="lab">TFRA — note</div><input id="p_pnote" style="flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;background:#fff" placeholder="e.g., IUL / tax-free retirement savings for your future"></div>
     <div class="pdetail" id="pensionDetail">
       <div class="pcol">
         <div class="phdr">Approximate cash value</div>
@@ -474,10 +474,10 @@
     <div class="greenband" style="margin-top:14px">INCLUDING ADDITIONAL PROGRAMS</div>
     <div class="savegrid green">
       <div class="h l">&nbsp;</div><div class="h">Monthly</div><div class="h">Annual</div>
-      <div class="c l">Your total (package + pension)</div><div class="c" style="text-align:center;font-weight:700;font-family:var(--serif)" id="o_tot_mo">—</div><div class="c" style="text-align:center;font-weight:700;font-family:var(--serif)" id="o_tot_yr">—</div>
+      <div class="c l">P.O.P. + TFRA</div><div class="c" style="text-align:center;font-weight:700;font-family:var(--serif)" id="o_tot_mo">—</div><div class="c" style="text-align:center;font-weight:700;font-family:var(--serif)" id="o_tot_yr">—</div>
       <div class="c l">Still ahead vs ACA</div><div class="c money" id="o_tot_net_mo">—</div><div class="c money" id="o_tot_net_yr">—</div>
     </div>
-    <div class="note">Even after funding the pension, this shows whether the client still spends less than the ACA plan.</div>
+    <div class="note">Even after funding the TFRA, this shows whether the client still spends less than the ACA plan.</div>
   </div>
 
   <div class="card pad">
@@ -700,7 +700,7 @@ function blankState(){
       better:{products:defProducts('better'),lb:0,lbCarrier:'',lbCov:'',med:0},
       best:{products:defProducts('best'),lb:45,lbCarrier:'',lbCov:'',med:0}
     },
-    pension:{monthly:100,note:'e.g., IUL / annuity for tax-free retirement',cv10:0,cv20:0,cv30:0,leg1:0,leg25:0},
+    pension:{monthly:100,note:'e.g., IUL / tax-free retirement savings for your future',cv10:0,cv20:0,cv30:0,leg1:0,leg25:0},
     big:{desc:'Hospital stay – 7 days',charge:41660.41,disc:18747.18,days:7,daily:4000,adm:2000,his:10000,other:0},
     reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
     intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobacco:false,maternity:false,dv:false,famcancer:false,mental:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',budget:0,priority:'coverage',notes:'',carrier:'',plan:''},
@@ -840,7 +840,7 @@ function compute(){
   var tMo=trueMo-pMo, tYr=trueYr-pYr;
   $('o_sav_amo').textContent=saves(aMo,'/mo');$('o_sav_ayr').textContent=saves(aYr,'/yr');
   $('o_sav_tmo').textContent=saves(tMo,'/mo');$('o_sav_tyr').textContent=saves(tYr,'/yr');
-  $('ribbon').textContent=fmt(tYr)+' SAVED / YR (TRUE)';
+  $('ribbon').textContent=fmt(tYr)+' SAVED / YR (TRUE COST)';
 
   var pen=S.pension.monthly;
   var totMo=pMo+pen, totYr=pYr+pen*12;
@@ -946,8 +946,8 @@ function buildPrintout(){
   /* ---- current plan (premium, then true cost, then annual total) ---- */
   html+='<div class="po-acabox"><div class="t">Your current / marketplace plan<small>What the exchange plan really costs once the deductible &amp; co-pays are counted</small></div>'
       +'<div class="li"><div class="lab">Monthly premium<small>What you pay the carrier each month</small></div><div class="amt">'+fmt2(a.prem)+' /mo</div></div>'
-      +'<div class="li"><div class="lab">True monthly cost<small>Premium + deductible &amp; co-pays spread across the year</small></div><div class="amt">'+fmt2(aca.mo)+' /mo</div></div>'
-      +'<div class="li tot"><div class="lab">True annual cost</div><div class="amt">'+fmt2(aca.yr)+' /yr</div></div></div>';
+      +'<div class="li"><div class="lab">TRUE COST — Monthly<small>Premium + deductible &amp; co-pays spread across the year</small></div><div class="amt">'+fmt2(aca.mo)+' /mo</div></div>'
+      +'<div class="li tot"><div class="lab">TRUE COST — Annual</div><div class="amt">'+fmt2(aca.yr)+' /yr</div></div></div>';
 
   /* ---- Good / Better / Best comparison ---- */
   if(tiers.length){
@@ -977,7 +977,7 @@ function buildPrintout(){
   html+='<div class="po-navy"><div class="cap">Your savings vs ACA<small>Based on your '+atLab+' package</small></div>'
       +'<div class="g"><div class="h l">&nbsp;</div><div class="h">Monthly</div><div class="h">Annual</div>'
       +'<div class="c l">ACTUAL — premium vs premium</div><div class="c a">'+saves(aMo,'/mo')+'</div><div class="c a">'+saves(aYr,'/yr')+'</div>'
-      +'<div class="c l tt">TRUE — with the ACA deductible counted</div><div class="c t">'+saves(tMo,'/mo')+'</div><div class="c t">'+saves(tYr,'/yr')+'</div></div></div>';
+      +'<div class="c l tt">TRUE COST — with ACA deductible included</div><div class="c t">'+saves(tMo,'/mo')+'</div><div class="c t">'+saves(tYr,'/yr')+'</div></div></div>';
 
   /* ---- additional programs (pension) — only if funded ---- */
   var pen=+S.pension.monthly||0;
@@ -985,7 +985,7 @@ function buildPrintout(){
     var totMo=pMo+pen, totYr=pYr+pen*12;
     html+='<div class="po-green"><div class="band">INCLUDING ADDITIONAL PROGRAMS'+(S.pension.note?' <span style="font-weight:400;font-family:-apple-system,sans-serif;font-size:12px;color:#dff0e2">— '+esc(S.pension.note)+'</span>':'')+'</div>'
         +'<div class="g"><div class="h l">&nbsp;</div><div class="h">Monthly</div><div class="h">Annual</div>'
-        +'<div class="c l">Your total (package + pension)</div><div class="c" style="text-align:center;font-family:var(--serif);font-weight:700">'+fmt2(totMo)+'</div><div class="c" style="text-align:center;font-family:var(--serif);font-weight:700">'+fmt2(totYr)+'</div>'
+        +'<div class="c l">P.O.P. + TFRA</div><div class="c" style="text-align:center;font-family:var(--serif);font-weight:700">'+fmt2(totMo)+'</div><div class="c" style="text-align:center;font-family:var(--serif);font-weight:700">'+fmt2(totYr)+'</div>'
         +'<div class="c l">Still ahead vs ACA</div><div class="c v">'+saves(aca.mo-totMo,'/mo')+'</div><div class="c v">'+saves(aca.yr-totYr,'/yr')+'</div></div></div>';
     var PP=S.pension;
     if((+PP.cv10||0)+(+PP.cv20||0)+(+PP.cv30||0)+(+PP.leg1||0)+(+PP.leg25||0)>0){
