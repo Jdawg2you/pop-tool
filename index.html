@@ -753,6 +753,7 @@ var copyArr=function(a){return (a||[]).map(function(x){return {name:x.name,month
 /* input masking + validation */
 function fmtPhone(v){ var d=(v||'').replace(/\D/g,'').slice(0,10); if(d.length>6) return '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6); if(d.length>3) return '('+d.slice(0,3)+') '+d.slice(3); if(d.length>0) return '('+d; return ''; }
 function fmtDate(v){ var d=(v||'').replace(/\D/g,'').slice(0,8); if(d.length>=5) return d.slice(0,2)+'/'+d.slice(2,4)+'/'+d.slice(4); if(d.length>=3) return d.slice(0,2)+'/'+d.slice(2); return d; }
+function fmtMoneyStr(v){ var d=(v||'').replace(/[^0-9]/g,''); if(!d) return ''; return '$'+(+d).toLocaleString('en-US'); }
 function phoneOK(v){ return (v||'').replace(/\D/g,'').length===10; }
 function dateOK(v){ var d=(v||'').replace(/\D/g,''); if(d.length!==8) return false; var m=+d.slice(0,2), day=+d.slice(2,4), y=+d.slice(4,8); return m>=1&&m<=12&&day>=1&&day<=31&&y>=1900&&y<=2100; }
 function emailOK(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||''); }
@@ -783,29 +784,46 @@ function popStrengths(tier){
   var life = (pk.lb>0)?100:((has('living benefit')||has('final expense')||has(' life'))?70:0);
   return {everyday:everyday,preventive:preventive,cat:cat,accident:accident,critical:critical,dvh:dvh,life:life};
 }
+function overBuild(){
+  var I=S.intake||{}, sx=I.psex, h=+I.pheight||0, wt=+I.pweight||0;
+  if(!sx||!h||!wt) return false;
+  var row=(typeof BUILD_CHART!=='undefined')&&BUILD_CHART[sx]&&BUILD_CHART[sx][h];
+  return !!(row && wt>row[1]);
+}
 function popWeights(){
   var I=S.intake||{}, age=+S.client.page||0, band=age?(age<30?0:age<40?1:age<50?2:3):2;
   var w={everyday:12,preventive:7,cat:24,accident:9,critical:12,dvh:7,life:9};
-  if(band===2){w.cat+=5;w.critical+=4;}
-  if(band===3){w.cat+=12;w.critical+=9;w.everyday+=3;}
+  // Age gradient — younger = less weight on the big-ticket risks (gaps hurt less); older = more
+  if(band===0){w.cat-=7;w.critical-=6;}
+  else if(band===1){w.cat-=3;w.critical-=3;}
+  else if(band===2){w.cat+=5;w.critical+=4;}
+  else {w.cat+=12;w.critical+=9;w.everyday+=3;}
+  // BMI graded — healthy rewarded (less weight), heavier penalized (more)
+  var hi=+I.pheight||0,wt=+I.pweight||0,bmi=(hi&&wt)?(wt/(hi*hi))*703:0;
+  if(bmi>0){
+    if(bmi<18.5){w.cat+=3;}
+    else if(bmi<25){w.cat-=5;w.critical-=3;}
+    else if(bmi<30){}
+    else if(bmi<35){w.cat+=6;w.critical+=2;}
+    else {w.cat+=10;w.critical+=5;}
+  }
+  // ManhattanLife build chart — over-max is a real underwriting signal
+  if(overBuild()){w.cat+=6;w.critical+=2;}
+  // Health & family history
   if(I.famcancer){w.critical+=20;}
   if(I.famheart){w.critical+=10;w.cat+=8;}
   if(I.diabetic){w.cat+=8;w.everyday+=5;}
   if(I.majorcond){w.cat+=8;w.everyday+=4;}
   if(I.surg2yr){w.cat+=7;}
   if(I.tobaccoP||I.tobaccoS){w.critical+=6;w.cat+=5;}
-  var hi=+I.pheight||0,wt=+I.pweight||0,bmi=(hi&&wt)?(wt/(hi*hi))*703:0; if(bmi>=30){w.cat+=6;}
   if(I.who&&(I.who.spouse||I.who.kids)){w.life+=12;}
+  Object.keys(w).forEach(function(k){ if(w[k]<3) w[k]=3; }); // floor so nothing zeroes out
   return w;
 }
-function computePop(tier){
-  var s=popStrengths(tier), w=popWeights(), keys=['everyday','preventive','cat','accident','critical','dvh','life'];
-  var num=0,den=0; keys.forEach(function(k){ num+=w[k]*s[k]; den+=w[k]; });
-  var raw=den?num/den:0, score=Math.round(100*Math.pow(raw/100,0.8));
-  return {score:Math.max(0,Math.min(100,score)), s:s, w:w};
-}
-function popWhy(tier){
-  var r=computePop(tier), s=r.s, I=S.intake||{}, pos=[], neg=[];
+function popRaw(s,w){ var keys=['everyday','preventive','cat','accident','critical','dvh','life'],num=0,den=0; keys.forEach(function(k){ num+=w[k]*s[k]; den+=w[k]; }); var raw=den?num/den:0; return Math.max(0,Math.min(100,Math.round(100*Math.pow(raw/100,0.75)))); }
+function computePop(tier){ var s=popStrengths(tier), w=popWeights(); return {score:popRaw(s,w), s:s, w:w}; }
+function popPositives(tier){
+  var s=computePop(tier).s, pos=[];
   if(s.cat>=75) pos.push('Strong hospitalization &amp; catastrophic protection');
   if(s.critical>=90) pos.push('Cancer + heart/stroke lump sum in place');
   else if(s.critical>=40) pos.push('Partial critical-illness lump sum');
@@ -813,26 +831,42 @@ function popWhy(tier){
   if(s.everyday>=80) pos.push('Everyday doctor visits &amp; Rx stay first-dollar');
   if(s.accident>=90) pos.push('Full accident cash coverage');
   if(s.dvh>=90) pos.push('Dental, vision &amp; hearing covered');
-  if(I.famcancer && s.critical<60) neg.push('No cancer lump sum — you flagged family cancer history');
-  if(I.famheart && s.critical<100) neg.push('Light heart/stroke lump sum — family history flagged');
-  if((I.who&&(I.who.spouse||I.who.kids)) && s.life<50) neg.push('No living benefits — spouse/kids rely on your income');
-  if(s.cat<60) neg.push('Thin hospitalization/gap coverage for a big event');
-  if(s.accident<40) neg.push('Little or no accident coverage');
-  if(s.dvh<40) neg.push('No dental / vision / hearing');
-  if(s.critical<40 && !I.famcancer && !I.famheart) neg.push('No critical-illness lump sum (cancer / heart / stroke)');
-  return {pos:pos, neg:neg, score:r.score};
+  return pos;
+}
+// Ranked "how to raise it" — simulate bringing each weak pillar to full, show the point gain
+function popActions(tier){
+  var base=computePop(tier), s0=base.s, w=base.w, baseScore=base.score, I=S.intake||{};
+  var hasSpouseKids=(I.who&&(I.who.spouse||I.who.kids));
+  var label={
+    cat:'Strengthen hospitalization — add HI Select $10K + Gap',
+    accident:'Add or upgrade Accident coverage (2-unit)',
+    critical:'Add a Cancer / Heart-Stroke lump sum'+((I.famcancer||I.famheart)?' — matches your family history':''),
+    dvh:'Add Dental • Vision • Hearing (DVH Select)',
+    life:'Add Living Benefits'+(hasSpouseKids?' — protects your family’s income':''),
+    everyday:(s0.everyday===0)?'Add the AFC core health plan':'Upgrade AFC to Elite / Elite Plus'
+  };
+  var acts=[];
+  ['critical','life','cat','accident','dvh','everyday'].forEach(function(k){
+    if(s0[k]>=95) return;
+    var s1={}; Object.keys(s0).forEach(function(x){ s1[x]=s0[x]; });
+    s1[k]=100; if(k==='everyday'){ s1.preventive=100; s1.cat=Math.min(100,s1.cat+17); }
+    var delta=popRaw(s1,w)-baseScore;
+    if(delta>=1) acts.push({text:label[k],delta:delta});
+  });
+  acts.sort(function(a,b){ return b.delta-a.delta; });
+  return acts;
 }
 function renderPopScore(){
   var host=$('popScoreBody'); if(!host) return;
   var scores={good:computePop('good').score,better:computePop('better').score,best:computePop('best').score};
-  var at=S.activeTab, cur=popWhy(at), sc=cur.score;
+  var at=S.activeTab, pos=popPositives(at), acts=popActions(at), sc=scores[at];
   var colf=function(v){return v>=80?'#2f9e56':(v>=60?'#d8a23a':'#c85a5a');};
   var col=colf(sc), C=2*Math.PI*56, dash=(C*sc/100).toFixed(1);
   var ring='<div class="popgauge"><svg width="132" height="132" viewBox="0 0 132 132" style="transform:rotate(-90deg)"><circle cx="66" cy="66" r="56" fill="none" stroke="#ece4d3" stroke-width="12"/><circle cx="66" cy="66" r="56" fill="none" stroke="'+col+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+dash+' '+C.toFixed(1)+'"/></svg><div class="popnum"><b style="color:'+col+'">'+sc+'</b><span>POP Score</span></div></div>';
   var three='<div class="pop3">'+['good','better','best'].map(function(t){var v=scores[t];return '<div class="t'+(t===at?' on':'')+'" data-tier="'+t+'"><b style="color:'+colf(v)+'">'+v+'</b>'+t.toUpperCase()+'</div>';}).join('')+'</div>';
-  var posli=cur.pos.length?cur.pos.map(function(x){return '<li>✓ '+x+'</li>';}).join(''):'<li style="color:var(--muted)">—</li>';
-  var negli=cur.neg.length?cur.neg.map(function(x){return '<li>✗ '+x+'</li>';}).join(''):'<li style="color:#1c6b38">Nothing major missing — well protected</li>';
-  var why='<div class="popwhy"><div class="col pos"><b>What’s lifting it</b><ul>'+posli+'</ul></div><div class="col neg"><b>What’s dragging it</b><ul>'+negli+'</ul></div></div>';
+  var posli=pos.length?pos.map(function(x){return '<li>✓ '+x+'</li>';}).join(''):'<li style="color:var(--muted)">—</li>';
+  var negli=acts.length?acts.map(function(a){return '<li>✗ '+a.text+' <b style="color:#2f9e56">(+'+a.delta+')</b></li>';}).join(''):'<li style="color:#1c6b38">Nothing major missing — well protected</li>';
+  var why='<div class="popwhy"><div class="col pos"><b>What’s lifting it</b><ul>'+posli+'</ul></div><div class="col neg"><b>How to raise it</b><ul>'+negli+'</ul></div></div>';
   host.innerHTML='<div class="popwrap"><div style="text-align:center">'+ring+three+'</div>'+why+'</div>';
   host.querySelectorAll('.pop3 .t').forEach(function(el){ el.onclick=function(){ read(); S.activeTab=el.dataset.tier; fill(); compute(); }; });
 }
@@ -1777,6 +1811,7 @@ function bindInputs(){
   $('in_ded').addEventListener('input',function(){ var d=effDed(); if(d>0) $('in_oop').value=d; captureIntake(); });
   $('addMed').onclick=function(){ S.intake.medList=S.intake.medList||[]; S.intake.medList.push({name:'',cost:0,forP:true,forS:false}); renderMeds(); };
   document.querySelectorAll('.sayico').forEach(function(s){ s.onclick=function(){ openScript(s.dataset.set||'intake', +s.dataset.beat||0); }; });
+  $('p_lb_cov').addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); });
   ['in_tobacco_p','in_tobacco_s','in_famcancer_p','in_famcancer_s','in_famheart_p','in_famheart_s','in_maternity_p','in_maternity_s','in_mental_p','in_mental_s','in_surg2yr_p','in_surg2yr_s'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('change',function(){ syncChips(); captureIntake(); }); });
   document.querySelectorAll('textarea.autogrow').forEach(function(t){ t.addEventListener('input',function(){ autoGrow(t); }); });
   document.querySelectorAll('#ageseg button').forEach(function(b){ b.onclick=function(){ S.estBand=+b.dataset.band; renderEstimate(); autosave(); }; });
