@@ -266,9 +266,10 @@
   .keyrow{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:16px 0 4px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fbfaf6;font-size:12.5px}
   .keyrow .k{display:inline-flex;align-items:center;gap:7px}
   .keyrow .sw{width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.12)}
-  .qnote{display:flex;gap:8px;align-items:stretch}
-  .qnote>input{flex:1;min-width:0;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:#fbfaf6;font:inherit}
-  .qnote .chip{padding:0 13px;display:inline-flex;align-items:center;white-space:nowrap}
+  .qnote{display:flex;gap:8px;align-items:flex-start}
+  .qnote>input,.qnote>textarea{flex:1;min-width:0;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:#fbfaf6;font:inherit}
+  .qnote>textarea.autogrow{resize:none;overflow:hidden;min-height:36px;line-height:1.35}
+  .qnote .chip{padding:0 13px;display:inline-flex;align-items:center;white-space:nowrap;min-height:36px}
   .selfld{width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:#fbfaf6;font:inherit}
   .seclink{font-family:-apple-system,Segoe UI,sans-serif;font-weight:600;font-size:12px;color:var(--gold-brand);text-decoration:none;margin-left:6px}
   .seclink:hover{text-decoration:underline}
@@ -296,6 +297,10 @@
   .sayico{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:#fff;background:var(--navy);border-radius:20px;padding:2px 10px;margin-left:8px;cursor:pointer;vertical-align:middle;user-select:none;white-space:nowrap}
   .sayico:hover{filter:brightness(1.15)}
   .sec-flash{outline:3px solid #d8a23a;outline-offset:4px;border-radius:8px}
+  .ps-ctrl{display:inline-flex;align-items:center;gap:10px;border:1px solid #d8a23a;background:rgba(216,162,58,.08);border-radius:20px;padding:5px 13px;font-size:12.5px;font-weight:600}
+  .ps-ctrl.red{border-color:#c85a5a;background:rgba(200,90,90,.08)}
+  .ps-ctrl label.tob{display:inline-flex;align-items:center;gap:3px;font-weight:700;cursor:pointer}
+  .ps-ctrl input{margin:0}
   .recbadge{display:inline-block;background:var(--gold-pill);color:#26324a;font-size:10px;font-weight:800;letter-spacing:.08em;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle}
   .tabs button.rec .t::after{content:' \2605';color:var(--gold)}
   .flagbox{background:#fbeee9;border:1px solid #e6b7ad;color:#8a2b1c;border-radius:10px;padding:10px 14px;font-size:13px;margin:0 0 14px}
@@ -377,6 +382,7 @@
     </div>
 
     <div class="intake-sec" id="sec_client">Client Information <span class="sayico" data-beat="1" title="Say this — opens the script">🗣 Say this</span></div>
+    <div class="fld" style="margin-bottom:8px"><label>Why shopping / current-plan pain <small>what prompted them · what they dislike</small></label><input id="in_whyshop" placeholder="e.g. premium jumped, deductible too high, lost group plan"></div>
     <div class="intakegrid">
       <div class="fld"><label>Primary name</label><input id="in_pname" class="keyfield" placeholder="First Last"></div>
       <div class="fld"><label>Date of birth</label><input id="in_date" class="keyfield" placeholder="MM/DD/YYYY"></div>
@@ -393,7 +399,6 @@
       <div class="fld"><label>ZIP</label><input id="in_zip" class="keyfield" placeholder="78163"></div>
       <div class="fld"><label>Desired effective date <small>1st/15th · ≥15 days out</small></label><input id="in_effdate" placeholder="MM/DD/YYYY"></div>
     </div>
-    <div class="fld" style="margin-top:8px"><label>Why shopping / current-plan pain <small>what prompted them · what they dislike</small></label><input id="in_whyshop" placeholder="e.g. premium jumped, deductible too high, lost group plan"></div>
 
     <div class="intake-sec" id="sec_spouse">Spouse Information <span class="sayico" data-beat="5" title="Say this — opens the script">🗣 Say this</span> <span class="secnote" id="spouseHint">(to expand, select <b>Spouse</b> under “Who needs coverage” above)</span></div>
     <div class="intakegrid" id="spouseGrid" style="display:none">
@@ -414,20 +419,20 @@
 
     <div class="intake-sec" id="sec_health">Health &amp; Routing <span class="sayico" data-beat="6" title="Say this — opens the script">🗣 Say this</span></div>
     <div class="chips">
-      <label class="chip tone-orange"><input type="checkbox" id="in_famcancer"> Family history of cancer?</label>
-      <label class="chip tone-orange"><input type="checkbox" id="in_famheart"> Family history of heart attack / stroke?</label>
-      <label class="chip tone-orange"><input type="checkbox" id="in_tobacco"> Tobacco use?</label>
-      <label class="chip tone-red"><input type="checkbox" id="in_maternity"> Needs maternity?</label>
+      <span class="ps-ctrl">Family history of cancer? <label class="tob"><input type="checkbox" id="in_famcancer_p"> P</label><label class="tob"><input type="checkbox" id="in_famcancer_s"> S</label></span>
+      <span class="ps-ctrl">Family history of heart attack / stroke? <label class="tob"><input type="checkbox" id="in_famheart_p"> P</label><label class="tob"><input type="checkbox" id="in_famheart_s"> S</label></span>
+      <span class="ps-ctrl">Tobacco use? <label class="tob"><input type="checkbox" id="in_tobacco_p"> P</label><label class="tob"><input type="checkbox" id="in_tobacco_s"> S</label></span>
+      <span class="ps-ctrl red">Needs maternity? <label class="tob"><input type="checkbox" id="in_maternity_p"> P</label><label class="tob"><input type="checkbox" id="in_maternity_s"> S</label></span>
       <label class="chip tone-green"><input type="checkbox" id="in_dv"> Wants dental / vision?</label>
-      <label class="chip tone-red"><input type="checkbox" id="in_mental"> Mental health coverage needed?</label>
-      <label class="chip tone-orange"><input type="checkbox" id="in_surg2yr"> Surgeries / hospitalizations (past 2 yrs)?</label>
+      <span class="ps-ctrl red">Mental health coverage needed? <label class="tob"><input type="checkbox" id="in_mental_p"> P</label><label class="tob"><input type="checkbox" id="in_mental_s"> S</label></span>
+      <span class="ps-ctrl">Surgeries / hospitalizations (past 2 yrs)? <label class="tob"><input type="checkbox" id="in_surg2yr_p"> P</label><label class="tob"><input type="checkbox" id="in_surg2yr_s"> S</label></span>
     </div>
     <div class="intakegrid" style="margin-top:12px">
       <div class="fld"><label>Major health conditions?</label>
-        <div class="qnote"><label class="chip tone-orange"><input type="checkbox" id="in_majorcond"> Yes</label><input id="in_majorcond_note" placeholder="which condition(s) — details"></div>
+        <div class="qnote"><label class="chip tone-orange"><input type="checkbox" id="in_majorcond"> Yes</label><textarea id="in_majorcond_note" class="autogrow" rows="1" placeholder="which conditions · details · who"></textarea></div>
       </div>
       <div class="fld"><label>Diabetic?</label>
-        <div class="qnote"><label class="chip tone-orange"><input type="checkbox" id="in_diabetic"> Yes</label><input id="in_diabetic_note" placeholder="type · insulin? · # oral meds"></div>
+        <div class="qnote"><label class="chip tone-orange"><input type="checkbox" id="in_diabetic"> Yes</label><textarea id="in_diabetic_note" class="autogrow" rows="1" placeholder="type · insulin? · # oral meds · who"></textarea></div>
         <div class="note" style="padding:4px 0 0;font-size:10.5px">Decline: insulin (last 5 yrs) or juvenile-onset · &gt;2 oral meds · diabetic complications</div>
       </div>
       <div class="fld"><label>Overall health</label><select id="in_health" class="selfld"><option value="">—</option><option>Excellent</option><option>Good</option><option>Average</option><option>Complicated</option></select></div>
@@ -507,14 +512,14 @@
 
   <div id="recFlags" class="hidein-client"></div>
 
-  <div class="estcard hidein-client">
-    <div class="sectitle" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><span><span class="dot">●</span> Ballpark estimate <span class="note" style="display:inline;padding:0;font-style:normal">— full package per tier; AFC from the rate guide; not the final quote</span></span>
+  <div class="estcard hidein-client" id="sec_est">
+    <div class="sectitle" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><span><span class="dot">●</span> Ballpark estimate <span class="sayico" data-set="quote" data-beat="0" title="Presentation call script">🗣 Say this</span> <span class="sayico" data-set="obj" data-beat="0" title="Objection handling">💬 Objections</span> <span class="note" style="display:inline;padding:0;font-style:normal">— full package per tier; AFC from the rate guide; not the final quote</span></span>
       <span class="ageseg" id="ageseg"><button data-band="0">18–29</button><button data-band="1">30–39</button><button data-band="2">40–49</button><button data-band="3">50–64</button></span>
     </div>
     <div id="estBody" style="margin-top:8px"></div>
   </div>
 
-  <div class="card">
+  <div class="card" id="sec_pkg">
     <div class="tabs" id="tabs">
       <button data-tab="good"><span class="t">GOOD</span><span class="s" id="tl_good">Affordable core</span></button>
       <button data-tab="better"><span class="t">BETTER</span><span class="s" id="tl_better">Solid package</span></button>
@@ -522,6 +527,7 @@
     </div>
 
     <div class="pad hidein-client" style="border-bottom:1px solid var(--line)">
+      <div style="margin-bottom:6px"><span class="sayico" data-set="quote" data-beat="2" title="Presentation call script">🗣 Say this</span></div>
       <div class="note" id="drugsDocsReminder" style="padding-top:0">Before you present: confirm on the Intake that the client's doctors were checked against the First Health network and their medication prices were looked up. Don't present the savings below until both are done.</div>
     </div>
 
@@ -564,7 +570,8 @@
     </div>
   </div>
 
-  <div class="card pad">
+  <div class="card pad" id="sec_save">
+    <div class="hidein-client" style="margin-bottom:6px"><span class="sayico" data-set="quote" data-beat="6" title="Close + living benefits script">🗣 Say this — Close</span></div>
     <div class="band-navy">
       <div class="savegrid">
         <div class="h l">YOUR SAVINGS vs ACA</div><div class="h">Monthly</div><div class="h">Annual</div>
@@ -723,6 +730,7 @@ function markValid(el,ok){ if(el) el.classList.toggle('invalid', !!(el.value && 
 function ageFromDOB(v){ var d=(v||'').replace(/\D/g,''); if(d.length!==8) return ''; var mm=+d.slice(0,2), dd=+d.slice(2,4), yy=+d.slice(4,8); var t=new Date(); var age=t.getFullYear()-yy; if((t.getMonth()+1)<mm || ((t.getMonth()+1)===mm && t.getDate()<dd)) age--; return (age>=0&&age<130)?String(age):''; }
 function fillHeightOpts(sel){ if(!sel) return; var s=''; for(var i=48;i<=84;i++){ s+='<option value="'+i+'"'+(i===70?' selected':'')+'>'+Math.floor(i/12)+"'"+(i%12)+'"</option>'; } sel.innerHTML=s; }
 function bmiCat(b){ return b<18.5?'Underweight':(b<25?'Normal':(b<30?'Overweight':(b<35?'Obese':'Obese II+'))); }
+function autoGrow(t){ if(!t) return; t.style.height='auto'; t.style.height=(t.scrollHeight)+'px'; }
 function updateBMI(who){ var h=+$('in_'+who+'height').value||0, w=+$('in_'+who+'weight').value||0, el=$('in_'+who+'bmi'); if(!el) return; if(h>0&&w>0){ var b=(w/(h*h))*703; el.value=b.toFixed(1)+' ('+bmiCat(b)+')'; } else el.value=''; }
 // ManhattanLife Affordable Choice build chart (AGT-AFC7010). Keyed by height in inches -> [min,max] lbs.
 var BUILD_CHART={
@@ -877,7 +885,7 @@ function blankState(){
     pension:{monthly:100,note:'e.g., IUL / tax-free retirement savings for your future',cv10:0,cv20:0,cv30:0,leg1:0,leg25:0},
     big:{desc:'Hospital stay – 7 days',charge:41660.41,disc:18747.18,days:7,daily:4000,adm:2000,his:10000,other:0},
     reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
-    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobacco:false,maternity:false,dv:false,famcancer:false,famheart:false,mental:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'70',pweight:'',sheight:'70',sweight:'',psex:'',ssex:'',kidsNote:'',routeNote:'',docsNote:'',whyShop:'',effDate:''},
+    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobaccoP:false,tobaccoS:false,maternityP:false,maternityS:false,maternity:false,dv:false,famcancerP:false,famcancerS:false,famcancer:false,famheartP:false,famheartS:false,famheart:false,mentalP:false,mentalS:false,mental:false,surg2yrP:false,surg2yrS:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'70',pweight:'',sheight:'70',sweight:'',psex:'',ssex:'',kidsNote:'',routeNote:'',docsNote:'',whyShop:'',effDate:''},
     recommended:'best',
     recFlags:[],
     step:'intake',
@@ -1270,9 +1278,10 @@ function readIntake(){
   S.agency=($('in_agency').value||'').trim()||'HealthFirst'; S.agentPhone=$('in_aphone').value; S.agentEmail=$('in_aemail').value;
   S.intake.who={app:$('in_who_app').checked,spouse:$('in_who_spouse').checked,kids:$('in_who_kids').checked};
   S.intake.phone=$('in_phone').value; S.intake.email=$('in_email').value;
-  S.intake.tobacco=$('in_tobacco').checked; S.intake.maternity=$('in_maternity').checked;
-  S.intake.dv=$('in_dv').checked; S.intake.famcancer=$('in_famcancer').checked; S.intake.famheart=$('in_famheart').checked;
-  S.intake.mental=$('in_mental').checked; S.intake.surg2yr=$('in_surg2yr').checked;
+  S.intake.tobaccoP=$('in_tobacco_p').checked; S.intake.tobaccoS=$('in_tobacco_s').checked;
+  var ps=function(k){ var p=$('in_'+k+'_p').checked, s=$('in_'+k+'_s').checked; S.intake[k+'P']=p; S.intake[k+'S']=s; S.intake[k]=p||s; };
+  ps('famcancer'); ps('famheart'); ps('maternity'); ps('mental'); ps('surg2yr');
+  S.intake.dv=$('in_dv').checked;
   S.intake.majorcond=$('in_majorcond').checked; S.intake.majorcondNote=$('in_majorcond_note').value;
   S.intake.diabetic=$('in_diabetic').checked; S.intake.diabeticNote=$('in_diabetic_note').value;
   S.intake.budget=+$('in_budget').value||0;
@@ -1305,11 +1314,11 @@ function fillIntake(){
   $('in_pname').value=S.client.pname||''; $('in_sname').value=S.client.sname||''; $('in_agent').value=S.client.agent||'';
   $('in_state').value=S.client.state||''; $('in_zip').value=S.client.zip||''; $('in_page').value=S.client.page||''; $('in_sage').value=S.client.sage||''; $('in_date').value=S.client.date||''; $('in_sdob').value=S.client.sdob||''; $('in_address').value=S.client.address||'';
   $('in_phone').value=I.phone||''; $('in_email').value=I.email||'';
-  $('in_tobacco').checked=!!I.tobacco; $('in_maternity').checked=!!I.maternity; $('in_dv').checked=!!I.dv;
-  $('in_famcancer').checked=!!(I.famcancer||S.docs.famcancer); $('in_famheart').checked=!!I.famheart;
-  $('in_mental').checked=!!I.mental; $('in_surg2yr').checked=!!I.surg2yr;
-  $('in_majorcond').checked=!!I.majorcond; $('in_majorcond_note').value=I.majorcondNote||'';
-  $('in_diabetic').checked=!!I.diabetic; $('in_diabetic_note').value=I.diabeticNote||'';
+  $('in_tobacco_p').checked=!!(I.tobaccoP!==undefined?I.tobaccoP:I.tobacco); $('in_tobacco_s').checked=!!I.tobaccoS; $('in_dv').checked=!!I.dv;
+  var fillPS=function(k,legacy){ $('in_'+k+'_p').checked=!!(I[k+'P']!==undefined?I[k+'P']:legacy); $('in_'+k+'_s').checked=!!I[k+'S']; };
+  fillPS('famcancer', I.famcancer||S.docs.famcancer); fillPS('famheart', I.famheart); fillPS('maternity', I.maternity); fillPS('mental', I.mental); fillPS('surg2yr', I.surg2yr);
+  $('in_majorcond').checked=!!I.majorcond; $('in_majorcond_note').value=I.majorcondNote||''; autoGrow($('in_majorcond_note'));
+  $('in_diabetic').checked=!!I.diabetic; $('in_diabetic_note').value=I.diabeticNote||''; autoGrow($('in_diabetic_note'));
   $('in_health').value=I.health||'';
   $('in_docs1').value=I.docs1||''; $('in_docs2').value=I.docs2||''; $('in_docs3').value=I.docs3||'';
   $('in_keepaca').value=I.keepaca||''; $('in_keepafc').value=I.keepafc||''; $('in_docnote').value=I.docnote||'';
@@ -1539,11 +1548,62 @@ var SCRIPT_BEATS=[
   +"<p class=say>“Looking at my schedule, I have time at [time A] or [time B] — which works best for you and [spouse]?”</p>"
   +"<p class=note>BAMFAM — Book A Meeting From A Meeting. Confirm their email, restate day/date/time, and send a text reminder with your license # or digital card.</p>"}
 ];
-function scriptFlash(secId){ var el=document.getElementById(secId); if(!el) return; el.classList.add('sec-flash'); try{ el.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} setTimeout(function(){ el.classList.remove('sec-flash'); },1900); }
-function openScript(idx){
-  idx=Math.max(0,Math.min(SCRIPT_BEATS.length-1,idx));
-  var b=SCRIPT_BEATS[idx]; scriptFlash(b.sec);
-  var w=window.open('','hfScript','width=560,height=740');
+/* ---- Quote / Presentation Call (Call 2) ---- */
+var SCRIPT_QUOTE=[
+ {title:"Prep + open",sec:"sec_est",html:
+   "<p class=say>“Hey [Name], thanks for taking my call again today. I think you’ll be pleasantly surprised by the options I found for you and your family. Depending on what you like, I can email you brochures afterward. Sound good? Let’s walk through it together.”</p>"
+  +"<p class=note>Before the call, be logged into HealthSherpa / HealthCare.gov (ACA compare), firsthealthlbp.com (providers), and SingleCare.com (Rx) — with the Package of Protection quote ready to share.</p>"},
+ {title:"Set the stage",sec:"sec_est",html:
+   "<p class=say>“To review, I specialize in helping small business owners and 1099 professionals find affordable private coverage. Marketplace plans are great if you qualify for big subsidies — but they must include 10 government-mandated Essential Health Benefits, even ones you may never use. If you’re not pregnant, why pay for maternity? Our private PPO options let you pay for what you need and skip what you don’t. Make sense?”</p>"},
+ {title:"Networks & providers",sec:"sec_pkg",html:
+   "<p class=say>“The first thing I looked at was healthcare.gov — great if you qualify for discounts, but with your income you’d pay full price. So I checked your private PPO options. The one that stood out is through an A-rated carrier, ManhattanLife. The plan — Affordable Choice Elite — gives you day-one, first-dollar benefits and 10 doctor visits per person a year, and unused visits roll over.”</p>"
+  +"<p class=note>First Health Network (same as Aetna) — 810,000+ providers, 6,000 hospitals, 125,000 urgent cares. Look up local doctors at firsthealthlbp.com.</p>"},
+ {title:"Common questions",sec:"sec_pkg",html:
+   "<p class=say>“About out-of-network — you’re covered either way. In-network is direct billing; out-of-network is reimbursed to you, usually within two weeks. Underwriting just means you get better benefits if you qualify — I already reviewed your info and you should be good to go.”</p>"},
+ {title:"How coverage works — 3 buckets",sec:"sec_pkg",html:
+   "<p class=say><b>Day-to-day:</b> “Each person gets 10 doctor visits a year — and yes, you can use them for chiropractic care.”</p>"
+  +"<p class=say><b>Preventive:</b> “Wellness checks, mammograms, colonoscopies — a routine colonoscopy benefit alone is around $4,200, which exceeds the actual cost in most states.”</p>"
+  +"<p class=say><b>Prescriptions:</b> “$50/day Rx benefit ($75 on Elite Plus), up to $750/yr — but use SingleCare or RXedo for big discounts. I already looked yours up and texted you the best coupons; you’re well under the daily benefit.”</p>"
+  +"<p class=say><b>Catastrophic:</b> “ER and urgent care, hospital admission, surgery, and cancer coverage — zero deductible, zero coinsurance on Elite. $2,000 just for being admitted, plus up to $80,000/yr in cancer coverage.”</p>"},
+ {title:"Bonus benefits + exclusions",sec:"sec_pkg",html:
+   "<p class=say>“You also get free unlimited 24/7 telehealth, fixed annual premiums level to age 65, zero deductible, Green Imaging & Direct Labs discounts, and CareGuide for care coordination and bill savings.”</p>"
+  +"<p class=note><b>Exclusions:</b> to keep costs low, these plans don’t include maternity or mental health. Pre-existing conditions aren’t covered the first 12 months — but your medications are.</p>"
+  +"<p class=say>“Based on everything you’ve told me, this puts you in a better spot than before and checks all your boxes — would you agree?”</p>"},
+ {title:"The close",sec:"sec_save",html:
+   "<p class=say>“So the entire package — your AFC Elite health plan with the Specified Disease umbrella, DVH Select, ER/accident, out-of-pocket protection, and the Hospital Select rider — comes to $____ per month. That’s locked in, and you’re saving $____ vs. what you were paying.”</p>"
+  +"<p class=say><b>Living benefits:</b> “Here’s what most people do after we save them this much: take a small piece — usually $40–$70 — and protect their income with living-benefit insurance that pays YOU while you’re alive if you get cancer, a heart attack, or stroke. Health takes care of the bills; living benefits take care of your income. Want me to show you what that looks like for your age?”</p>"},
+ {title:"The bold step — submit the app",sec:"sec_save",html:
+   "<p class=say>“The next step is simple — we’ll submit your application. No cost to apply, takes about 10 minutes, and I’m your point of contact throughout. Underwriting reviews it and we should have approval in 3–5 business days. Ready to get that started?”</p>"
+  +"<p class=note>If they take living benefits, submit the life app first. If they need to think or talk to a spouse: “No problem — I’ll email the brochures and quote summary. Let’s talk same time tomorrow and put in the app then.” Confidence is key — never pause when it’s time to move forward.</p>"}
+];
+/* ---- Objection Handling · Feel–Felt–Found (list view) ---- */
+var SCRIPT_OBJ=[
+ {title:"“That sounds expensive.”",html:"<p class=say>I understand how you feel. Most people feel that way comparing it to $0 ACA ads. What they found is these plans save money long-term because they’re first-dollar — no $8,000 deductibles or surprise co-pays. <b>“Can I show you how it pays you back on real visits?”</b></p>"},
+ {title:"“I already have something through work / my spouse.”",html:"<p class=say>Glad you’re proactive. Clients felt the same, but found work plans leave gaps in dental, accident, and income protection — and a plan that pays them directly was a no-brainer. <b>“Open to seeing how this backs up your work plan?”</b></p>"},
+ {title:"“I want to think about it.”",html:"<p class=say>I understand — it’s important. What clients found is that having the quote in writing made it easier, and approval is based on today’s health. <b>“Let’s reserve your approval while you think — no harm if you pass. Sound fair?”</b></p>"},
+ {title:"“I need to talk to my spouse.”",html:"<p class=say>Smart — it’s a household decision. Clients found it helpful to get the spouse on a short follow-up so both hear it firsthand. <b>“Tomorrow evening or Saturday morning for 10 minutes?”</b></p>"},
+ {title:"“I can’t afford that right now.”",html:"<p class=say>Budgeting is real. Clients felt that way until they realized one ER visit is $3,000–$5,000. <b>“If I build a package that fits your budget and still protects you, worth reviewing together?”</b></p>"},
+ {title:"“I want something with no deductible.”",html:"<p class=say>Most people feel that way. These aren’t high-deductible ACA plans — they’re defined-benefit, first-dollar, paying from day one. <b>“Can I show you how that works in a real example?”</b></p>"},
+ {title:"“Why not just stick with my ACA plan?”",html:"<p class=say>Folks felt that way, especially with a subsidy. They found ACA = narrow networks, high deductibles, yearly rate jumps. ManhattanLife = renewable, stable, First Health PPO freedom. <b>“Want to see it side-by-side?”</b></p>"},
+ {title:"“I’ve never heard of ManhattanLife.”",html:"<p class=say>Fair — not a household name, but around since 1850, one of the oldest U.S. insurers. Clients found the private PPO via First Health gives more control, fewer restrictions. <b>“Want to see their AM Best rating and network?”</b></p>"},
+ {title:"“I’m healthy — I don’t need insurance.”",html:"<p class=say>Best time to buy. People felt that way until an accident or surprise bill. Being healthy locks in low rates that hold to age 65. <b>“Makes sense to protect your good health while it’s most affordable, right?”</b></p>"},
+ {title:"“Can you just send me some info?”",html:"<p class=say>Absolutely — but clients found reading alone didn’t show what they personally qualify for. I’ll send it and walk you through it in 5 minutes. <b>“This evening or tomorrow morning?”</b></p>"}
+];
+var SCRIPTS={
+ intake:{label:"Intake · Discovery Call",mode:"paged",beats:SCRIPT_BEATS},
+ quote:{label:"Quote · Presentation Call",mode:"paged",beats:SCRIPT_QUOTE},
+ obj:{label:"Objection Handling · Feel–Felt–Found",mode:"list",beats:SCRIPT_OBJ}
+};
+var _scriptSec=null;
+function scriptFlash(secId){
+  if(_scriptSec){ var prev=document.getElementById(_scriptSec); if(prev) prev.classList.remove('sec-flash'); }
+  var el=document.getElementById(secId); if(!el){ _scriptSec=null; return; }
+  el.classList.add('sec-flash'); _scriptSec=secId;
+  try{ el.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){}
+}
+function openScript(setKey,idx){
+  var set=SCRIPTS[setKey]; if(!set) return;
+  var w=window.open('','hfScript','width=560,height=760');
   if(!w){ alert('Allow pop-ups for this site to use the script window.'); return; }
   var css="body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#0f1d2e;color:#eef3f8}"
    +".loc{background:#1f3a5f;color:#cfe0f5;font-size:12px;font-weight:700;padding:11px 18px;letter-spacing:.03em}"
@@ -1552,12 +1612,24 @@ function openScript(idx){
    +".nav button:disabled{opacity:.35;cursor:default}"
    +".body{padding:18px 22px;font-size:17px;line-height:1.5}"
    +".body p{margin:0 0 14px}.say{color:#fff}"
-   +".note{color:#9fb6d4;font-size:13.5px;font-style:italic;border-left:3px solid #d8a23a;padding-left:11px}";
-  var html="<!doctype html><html><head><meta charset=utf-8><title>Say this — "+b.title+"</title><style>"+css+"</style></head><body>"
-   +"<div class=loc>Intake · beat "+(idx+1)+" of "+SCRIPT_BEATS.length+" — "+b.title+"</div>"
-   +"<div class=nav><button onclick=\"opener.openScript("+(idx-1)+")\""+(idx===0?" disabled":"")+">‹ Prev</button>"
-   +"<button onclick=\"opener.openScript("+(idx+1)+")\""+(idx===SCRIPT_BEATS.length-1?" disabled":"")+">Next ›</button></div>"
-   +"<div class=body>"+b.html+"</div></body></html>";
+   +".note{color:#9fb6d4;font-size:13.5px;font-style:italic;border-left:3px solid #d8a23a;padding-left:11px}"
+   +".obj{border-top:1px solid #24405f;padding:14px 0}.obj:first-child{border-top:none}"
+   +".objq{color:#d8a23a;font-weight:700;font-size:15px;margin-bottom:6px}";
+  var loc,nav="",body;
+  if(set.mode==="list"){
+    if(_scriptSec){ var pv=document.getElementById(_scriptSec); if(pv) pv.classList.remove('sec-flash'); _scriptSec=null; }
+    loc=set.label;
+    body=""; set.beats.forEach(function(b){ body+="<div class=obj><div class=objq>"+b.title+"</div>"+b.html+"</div>"; });
+  } else {
+    idx=Math.max(0,Math.min(set.beats.length-1,idx));
+    var b=set.beats[idx]; scriptFlash(b.sec);
+    loc=set.label+" · beat "+(idx+1)+" of "+set.beats.length+" — "+b.title;
+    nav="<div class=nav><button onclick=\"opener.openScript('"+setKey+"',"+(idx-1)+")\""+(idx===0?" disabled":"")+">‹ Prev</button>"
+      +"<button onclick=\"opener.openScript('"+setKey+"',"+(idx+1)+")\""+(idx===set.beats.length-1?" disabled":"")+">Next ›</button></div>";
+    body=b.html;
+  }
+  var html="<!doctype html><html><head><meta charset=utf-8><title>"+set.label+"</title><style>"+css+"</style></head><body>"
+   +"<div class=loc>"+loc+"</div>"+nav+"<div class=body>"+body+"</div></body></html>";
   w.document.open(); w.document.write(html); w.document.close(); w.focus();
 }
 function bindInputs(){
@@ -1594,7 +1666,9 @@ function bindInputs(){
   $('in_ded_sel').addEventListener('change',onDedChange);
   $('in_ded').addEventListener('input',function(){ var d=effDed(); if(d>0) $('in_oop').value=d; captureIntake(); });
   $('addMed').onclick=function(){ S.intake.medList=S.intake.medList||[]; S.intake.medList.push({name:'',cost:0,forP:true,forS:false}); renderMeds(); };
-  document.querySelectorAll('.sayico').forEach(function(s){ s.onclick=function(){ openScript(+s.dataset.beat||0); }; });
+  document.querySelectorAll('.sayico').forEach(function(s){ s.onclick=function(){ openScript(s.dataset.set||'intake', +s.dataset.beat||0); }; });
+  ['in_tobacco_p','in_tobacco_s','in_famcancer_p','in_famcancer_s','in_famheart_p','in_famheart_s','in_maternity_p','in_maternity_s','in_mental_p','in_mental_s','in_surg2yr_p','in_surg2yr_s'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('change',function(){ captureIntake(); }); });
+  document.querySelectorAll('textarea.autogrow').forEach(function(t){ t.addEventListener('input',function(){ autoGrow(t); }); });
   document.querySelectorAll('#ageseg button').forEach(function(b){ b.onclick=function(){ S.estBand=+b.dataset.band; renderEstimate(); autosave(); }; });
   $('emailBtn').onclick=function(e){ e.preventDefault(); var m=buildEmail();
     try{ if(navigator.clipboard) navigator.clipboard.writeText('To: '+m.to+'\nSubject: '+m.subject+'\n\n'+m.body); }catch(err){}
