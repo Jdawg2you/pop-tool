@@ -283,7 +283,7 @@
   .medrow button.del{border:none;background:transparent;color:#b23;font-size:16px;line-height:1;padding:0 4px}
   .doccallout{padding:0 15px 6px;font-size:12.5px;font-weight:700}
   .doccallout:empty{display:none}
-  .doccallout .ok{color:var(--green)}.doccallout .warn{color:var(--maroon)}
+  .doccallout .ok{color:var(--green)}.doccallout .warn{color:var(--maroon)}.doccallout .orange{color:#b5651d}
   input.invalid{border-color:#c0392b!important;box-shadow:0 0 0 1px #c0392b}
   .recbadge{display:inline-block;background:var(--gold-pill);color:#26324a;font-size:10px;font-weight:800;letter-spacing:.08em;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle}
   .tabs button.rec .t::after{content:' \2605';color:var(--gold)}
@@ -368,7 +368,11 @@
     <div class="intake-sec">Client information</div>
     <div class="intakegrid">
       <div class="fld"><label>Primary name</label><input id="in_pname" placeholder="First Last"></div>
+      <div class="fld"><label>Primary height</label><input id="in_pheight" placeholder="5'10"></div>
+      <div class="fld"><label>Primary weight</label><input id="in_pweight" placeholder="180 lbs"></div>
       <div class="fld"><label>Spouse name</label><input id="in_sname" placeholder="(optional)"></div>
+      <div class="fld"><label>Spouse height</label><input id="in_sheight" placeholder="5'6"></div>
+      <div class="fld"><label>Spouse weight</label><input id="in_sweight" placeholder="140 lbs"></div>
       <div class="fld"><label>Client phone</label><input id="in_phone" placeholder="(000) 000-0000"></div>
       <div class="fld"><label>Client email</label><input id="in_email" placeholder="name@example.com"></div>
       <div class="fld"><label>Date of birth</label><input id="in_date" placeholder="MM/DD/YYYY"></div>
@@ -399,7 +403,7 @@
       <div class="fld"><label>Overall health</label><select id="in_health" class="selfld"><option value="">—</option><option>Excellent</option><option>Good</option><option>Average</option><option>Complicated</option></select></div>
     </div>
 
-    <div class="intake-sec">Preferred doctors <a href="https://providerlocator.firsthealth.com/" target="_blank" rel="noopener" class="seclink">↗ Look up First Health network</a></div>
+    <div class="intake-sec">Preferred doctors <a href="https://providerlocator.firsthealth.com/LocateProvider/LocateProviderSearch/" target="_blank" rel="noopener" class="seclink">↗ Look up First Health network</a></div>
     <div class="intakegrid">
       <div class="fld"><label>Doctor / facility 1</label><input id="in_docs1" placeholder="Dr. Ramirez (cardiology)"></div>
       <div class="fld"><label>Doctor / facility 2</label><input id="in_docs2" placeholder="(optional)"></div>
@@ -412,7 +416,7 @@
     </div>
     <label class="chip" style="margin-top:8px"><input type="checkbox" id="in_net"> Network status verified with client (First Health)</label>
 
-    <div class="intake-sec">Medications <span class="secnote">— look up best price:</span> <a href="https://www.singlecare.com/" target="_blank" rel="noopener" class="seclink">SingleCare ↗</a> <a href="https://www.goodrx.com/" target="_blank" rel="noopener" class="seclink">GoodRx ↗</a> <a href="https://costplusdrugs.com/" target="_blank" rel="noopener" class="seclink">Cost Plus ↗</a></div>
+    <div class="intake-sec">Medications <span class="secnote">— look up best price:</span> <a href="https://www.singlecare.com" target="_blank" rel="noopener" class="seclink">SingleCare ↗</a> <a href="https://www.goodrx.com/" target="_blank" rel="noopener" class="seclink">GoodRx ↗</a> <a href="https://www.costplusdrugs.com/" target="_blank" rel="noopener" class="seclink">Cost Plus ↗</a> <a href="https://www.mdsave.com/" target="_blank" rel="noopener" class="seclink">MDSave ↗</a></div>
     <div class="note" style="padding-top:2px">For each med enter two costs. <b>ACA copay</b> = the monthly amount on their ACA plan — use the plan's copay if it has one; if the drug isn't copay-covered, enter the full price (it goes toward their deductible). <b>Discount</b> = the discounted cash price from the links above. ACA copays fill the ACA side; the discount total feeds the Package.</div>
     <div class="medhead"><span>Medication</span><span>ACA copay</span><span>Discount</span><span></span></div>
     <div id="medList"></div>
@@ -420,7 +424,7 @@
     <div style="margin-top:8px;display:flex;gap:24px;flex-wrap:wrap;font-family:var(--serif);font-weight:700;color:var(--navy)"><span>ACA copay total: <span id="medTotalACA">$0.00</span></span><span>Discount total: <span id="medTotalDisc">$0.00</span></span></div>
     <label class="chip" style="margin-top:8px"><input type="checkbox" id="in_rx"> Rx prices verified (SingleCare / RXedo / AFC reimbursement)</label>
 
-    <div class="intake-sec">Current insurance <span style="font-family:-apple-system,sans-serif;font-weight:400;font-size:12px;color:var(--muted)">— fills the ACA side of the quote</span></div>
+    <div class="intake-sec">Current insurance <span class="secnote">— fills the ACA side · look up on</span> <a href="https://www.healthsherpa.com/sessions/new" target="_blank" rel="noopener" class="seclink">HealthSherpa ↗</a></div>
     <div class="intakegrid">
       <div class="fld"><label>Carrier</label><input id="in_carrier" placeholder="BCBS"></div>
       <div class="fld"><label>Plan name</label><input id="in_plan" placeholder="Bronze"></div>
@@ -815,7 +819,7 @@ function blankState(){
     pension:{monthly:100,note:'e.g., IUL / tax-free retirement savings for your future',cv10:0,cv20:0,cv30:0,leg1:0,leg25:0},
     big:{desc:'Hospital stay – 7 days',charge:41660.41,disc:18747.18,days:7,daily:4000,adm:2000,his:10000,other:0},
     reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
-    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobacco:false,maternity:false,dv:false,famcancer:false,famheart:false,mental:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:''},
+    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobacco:false,maternity:false,dv:false,famcancer:false,famheart:false,mental:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'',pweight:'',sheight:'',sweight:''},
     recommended:'best',
     recFlags:[],
     step:'intake',
@@ -925,9 +929,10 @@ function read(){
 
 function compute(){
   read();
-  var dc=function(v){ return v==='yes' ? '<span class="ok">✓ Keeps current doctors</span>' : (v==='no' ? '<span class="warn">⚠ May lose current doctor</span>' : ''); };
-  if($('o_aca_doc')) $('o_aca_doc').innerHTML=dc((S.intake&&S.intake.keepaca)||'');
-  if($('o_pop_doc')) $('o_pop_doc').innerHTML=dc((S.intake&&S.intake.keepafc)||'');
+  var dcA=function(v){ return v==='yes' ? '<span class="ok">✓ Keeps current doctors</span>' : (v==='no' ? '<span class="warn">⚠ Loses current doctors</span>' : ''); };
+  var dcF=function(v){ return v==='yes' ? '<span class="ok">✓ Keeps current doctors</span>' : (v==='no' ? '<span class="orange">⚠ May lose current doctors</span>' : ''); };
+  if($('o_aca_doc')) $('o_aca_doc').innerHTML=dcA((S.intake&&S.intake.keepaca)||'');
+  if($('o_pop_doc')) $('o_pop_doc').innerHTML=dcF((S.intake&&S.intake.keepafc)||'');
   var a=S.aca;
   var annPrem=a.prem*12;
   var dedMo=a.ded/12;
@@ -1211,6 +1216,7 @@ function readIntake(){
   S.intake.savings=+$('in_savings').value||0; S.intake.invest=+$('in_invest').value||0; S.intake.invprot=$('in_invprot').checked; S.intake.invsra=$('in_invsra').checked; S.intake.invnote=$('in_invnote').value;
   S.intake.docs1=$('in_docs1').value; S.intake.docs2=$('in_docs2').value; S.intake.docs3=$('in_docs3').value;
   S.intake.keepaca=$('in_keepaca').value; S.intake.keepafc=$('in_keepafc').value; S.intake.docnote=$('in_docnote').value;
+  S.intake.pheight=$('in_pheight').value; S.intake.pweight=$('in_pweight').value; S.intake.sheight=$('in_sheight').value; S.intake.sweight=$('in_sweight').value;
   S.docs.net=$('in_net').checked; S.docs.rx=$('in_rx').checked; S.docs.famcancer=$('in_famcancer').checked||$('in_famheart').checked;
 }
 function effDed(){ var s=$('in_ded_sel').value; return s==='other' ? (+$('in_ded').value||0) : (+s||0); }
@@ -1240,6 +1246,7 @@ function fillIntake(){
   $('in_health').value=I.health||'';
   $('in_docs1').value=I.docs1||''; $('in_docs2').value=I.docs2||''; $('in_docs3').value=I.docs3||'';
   $('in_keepaca').value=I.keepaca||''; $('in_keepafc').value=I.keepafc||''; $('in_docnote').value=I.docnote||'';
+  $('in_pheight').value=I.pheight||''; $('in_pweight').value=I.pweight||''; $('in_sheight').value=I.sheight||''; $('in_sweight').value=I.sweight||'';
   $('in_net').checked=!!S.docs.net; $('in_rx').checked=!!S.docs.rx;
   $('in_carrier').value=I.carrier||''; $('in_plan').value=I.plan||'';
   $('in_prem').value=S.aca.prem||''; $('in_oop').value=S.aca.oop||''; $('in_visits').value=S.aca.visits||''; $('in_copay').value=S.aca.copay||'';
@@ -1427,7 +1434,7 @@ function bindInputs(){
   document.querySelectorAll('#stepper button').forEach(function(b){ b.onclick=function(){ if(S.step==='intake' && b.dataset.step!=='intake') captureIntake(); goStep(b.dataset.step); }; });
   $('buildQuoteBtn').onclick=buildQuote;
   document.querySelectorAll('#step-intake .chip input').forEach(function(cb){ cb.addEventListener('change',function(){ syncChips(); readIntake(); autosave(); }); });
-  ['in_pname','in_sname','in_agent','in_state','in_zip','in_page','in_sage','in_majorcond_note','in_diabetic_note','in_docs1','in_docs2','in_docs3','in_carrier','in_plan','in_prem','in_oop','in_visits','in_copay','in_income','in_retage','in_savings','in_invest','in_invnote','in_docnote','in_budget','in_notes']
+  ['in_pname','in_pheight','in_pweight','in_sname','in_sheight','in_sweight','in_agent','in_state','in_zip','in_page','in_sage','in_majorcond_note','in_diabetic_note','in_docs1','in_docs2','in_docs3','in_carrier','in_plan','in_prem','in_oop','in_visits','in_copay','in_income','in_retage','in_savings','in_invest','in_invnote','in_docnote','in_budget','in_notes']
     .forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',function(){ captureIntake(); }); });
   $('in_phone').addEventListener('input',function(){ this.value=fmtPhone(this.value); markValid(this,phoneOK(this.value)); captureIntake(); });
   $('in_date').addEventListener('input',function(){ this.value=fmtDate(this.value); markValid(this,dateOK(this.value)); captureIntake(); });
