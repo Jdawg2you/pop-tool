@@ -1294,7 +1294,7 @@ function readIntake(){
   S.intake.docs1=$('in_docs1').value; S.intake.docs2=$('in_docs2').value; S.intake.docs3=$('in_docs3').value;
   S.intake.keepaca=$('in_keepaca').value; S.intake.keepafc=$('in_keepafc').value; S.intake.docnote=$('in_docnote').value;
   S.intake.pheight=$('in_pheight').value; S.intake.pweight=$('in_pweight').value; S.intake.sheight=$('in_sheight').value; S.intake.sweight=$('in_sweight').value; S.intake.psex=$('in_psex').value; S.intake.ssex=$('in_ssex').value; S.intake.kidsNote=$('in_kids').value; S.intake.routeNote=$('in_routenote').value; S.intake.docsNote=$('in_docsnote').value; S.intake.whyShop=$('in_whyshop').value; S.intake.effDate=$('in_effdate').value;
-  S.docs.net=$('in_net').checked; S.docs.rx=$('in_rx').checked; S.docs.famcancer=$('in_famcancer').checked||$('in_famheart').checked;
+  S.docs.net=$('in_net').checked; S.docs.rx=$('in_rx').checked; S.docs.famcancer=!!(S.intake.famcancer||S.intake.famheart);
 }
 function effDed(){ var s=$('in_ded_sel').value; return s==='other' ? (+$('in_ded').value||0) : (+s||0); }
 function captureIntake(){
@@ -1305,7 +1305,7 @@ function captureIntake(){
   updateMedTotal();
   S.docs.docs=[$('in_docs1').value,$('in_docs2').value,$('in_docs3').value].filter(function(x){return x&&x.trim();}).join('; ');
   S.docs.meds=((S.intake.medList||[]).map(function(m){return m.name;}).filter(function(x){return x&&String(x).trim();})).join(', ');
-  S.docs.famcancer=$('in_famcancer').checked;
+  S.docs.famcancer=!!S.intake.famcancer;
   autosave();
 }
 function fillIntake(){
