@@ -298,6 +298,21 @@
   .sayico::before{content:"";width:12px;height:12px;flex:0 0 12px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M4 3h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z'/></svg>") center/contain no-repeat}
   .sayico:hover{background:linear-gradient(180deg,#6b7688,#485266)}
   .sec-flash{outline:3px solid #d8a23a;outline-offset:4px;border-radius:8px}
+  .popwrap{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+  .popgauge{position:relative;width:132px;height:132px;flex:0 0 132px;margin:0 auto}
+  .popnum{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .popnum b{font-size:36px;font-family:var(--serif);line-height:1}
+  .popnum span{font-size:9.5px;letter-spacing:.09em;color:var(--muted);text-transform:uppercase;margin-top:3px}
+  .pop3{display:flex;gap:8px;margin-top:10px}
+  .pop3 .t{flex:1;text-align:center;border:1px solid var(--line);border-radius:8px;padding:6px 4px;font-size:10px;letter-spacing:.04em;color:var(--muted);cursor:pointer}
+  .pop3 .t b{display:block;font-size:19px;font-family:var(--serif);line-height:1.1}
+  .pop3 .t.on{border-color:var(--navy);box-shadow:0 0 0 1px var(--navy)}
+  .popwhy{flex:1;min-width:250px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .popwhy .col>b{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .popwhy ul{margin:5px 0 0;padding:0;list-style:none;font-size:12.5px;line-height:1.5}
+  .popwhy li{margin:3px 0}
+  .popwhy .pos li{color:#1c6b38}.popwhy .neg li{color:#a12525}
+  @media(max-width:640px){.popwhy{grid-template-columns:1fr}}
   .ps-ctrl{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:#fbfaf6;font-weight:600;color:#3a4358}
   .ps-ctrl.on{background:#fbe7d1;border-color:#e6bd85;color:#8a5111}
   .ps-ctrl.red.on{background:#fbe0dd;border-color:#e6aaa2;color:#8a271a}
@@ -572,6 +587,11 @@
     </div>
   </div>
 
+  <div class="card pad" id="popScoreCard">
+    <div class="sectitle" style="margin-bottom:10px">POP Score <span style="font-family:-apple-system,sans-serif;font-weight:400;font-size:12px;color:var(--muted)">— how completely this package protects you, weighted to your health &amp; family history</span></div>
+    <div id="popScoreBody"></div>
+  </div>
+
   <div class="card pad" id="sec_save">
     <div class="hidein-client" style="margin-bottom:6px"><span class="sayico" data-set="quote" data-beat="6" title="Close + living benefits script">Say this — Close</span></div>
     <div class="band-navy">
@@ -690,7 +710,7 @@
       <div class="note hidein-client" style="padding-top:10px">“Email to client” uses your computer’s default mail app; “Gmail” / “Outlook” open the web compose window with everything filled in (no setup needed). Then click “Print Quote,” save the PDF, and attach it. (Email to client also copies the letter to your clipboard as a backup.)</div>
       <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
         <div style="font-family:var(--serif);font-weight:700;color:var(--navy);margin-bottom:8px">Helpful links</div>
-        <a href="https://ratings.ambest.com/CompanyProfile.aspx?BL=0&amp;ambnum=6222&amp;AltNum=7486222&amp;AltSrc=3" target="_blank" rel="noopener" class="seclink">ManhattanLife AM Best rating ↗</a>
+        <div class="note" style="padding:0;font-style:normal">More links coming soon.</div>
       </div>
     </div>
    </div>
@@ -741,6 +761,81 @@ function ageFromDOB(v){ var d=(v||'').replace(/\D/g,''); if(d.length!==8) return
 function fillHeightOpts(sel){ if(!sel) return; var s=''; for(var i=48;i<=84;i++){ s+='<option value="'+i+'"'+(i===70?' selected':'')+'>'+Math.floor(i/12)+"'"+(i%12)+'"</option>'; } sel.innerHTML=s; }
 function bmiCat(b){ return b<18.5?'Underweight':(b<25?'Normal':(b<30?'Overweight':(b<35?'Obese':'Obese II+'))); }
 function autoGrow(t){ if(!t) return; t.style.height='auto'; t.style.height=(t.scrollHeight)+'px'; }
+/* ========== POP SCORE — coverage completeness, risk-weighted (excludes savings/TFRA) ========== */
+function popStrengths(tier){
+  var pk=S.packages[tier]||{products:[],lb:0};
+  var names=(pk.products||[]).map(function(p){return (p.name||'').toLowerCase();});
+  var has=function(kw){ return names.some(function(n){return n.indexOf(kw)>=0;}); };
+  var afcName=(pk.products||[]).map(function(p){return p.name||'';}).filter(function(n){return /afc|core health/i.test(n);})[0]||'';
+  var afcPresent=!!afcName; var lvl=afcLevelIdx(afcName); if(lvl<0) lvl=1;
+  var everyday   = afcPresent ? [100,88,74,60][lvl] : 0;
+  var preventive = afcPresent ? [100,90,76,62][lvl] : 0;
+  var cat=0;
+  if(afcPresent) cat+=[35,30,24,18][lvl];
+  if(has('hospital indemnity')||has('hi select')) cat+=30;
+  if(has('gap')||has('omni flex')||has('out-of-pocket')) cat+=25;
+  if(has('home health')) cat+=10;
+  cat=Math.min(100,cat);
+  var accident = has('2 unit')?100:(has('1 unit')?70:(has('accident')?80:0));
+  var cancer=has('cancer'), hstroke=(has('heart attack')||has('stroke')||has('heart &'));
+  var critical=Math.min(100,(cancer?60:0)+(hstroke?40:0));
+  var dvh = (has('dvh')||has('dental')||has('vision')) ? ((has('$3k')||has('3k'))?100:((has('1.5k')||has('$1.5'))?78:85)) : 0;
+  var life = (pk.lb>0)?100:((has('living benefit')||has('final expense')||has(' life'))?70:0);
+  return {everyday:everyday,preventive:preventive,cat:cat,accident:accident,critical:critical,dvh:dvh,life:life};
+}
+function popWeights(){
+  var I=S.intake||{}, age=+S.client.page||0, band=age?(age<30?0:age<40?1:age<50?2:3):2;
+  var w={everyday:12,preventive:7,cat:24,accident:9,critical:12,dvh:7,life:9};
+  if(band===2){w.cat+=5;w.critical+=4;}
+  if(band===3){w.cat+=12;w.critical+=9;w.everyday+=3;}
+  if(I.famcancer){w.critical+=20;}
+  if(I.famheart){w.critical+=10;w.cat+=8;}
+  if(I.diabetic){w.cat+=8;w.everyday+=5;}
+  if(I.majorcond){w.cat+=8;w.everyday+=4;}
+  if(I.surg2yr){w.cat+=7;}
+  if(I.tobaccoP||I.tobaccoS){w.critical+=6;w.cat+=5;}
+  var hi=+I.pheight||0,wt=+I.pweight||0,bmi=(hi&&wt)?(wt/(hi*hi))*703:0; if(bmi>=30){w.cat+=6;}
+  if(I.who&&(I.who.spouse||I.who.kids)){w.life+=12;}
+  return w;
+}
+function computePop(tier){
+  var s=popStrengths(tier), w=popWeights(), keys=['everyday','preventive','cat','accident','critical','dvh','life'];
+  var num=0,den=0; keys.forEach(function(k){ num+=w[k]*s[k]; den+=w[k]; });
+  var raw=den?num/den:0, score=Math.round(100*Math.pow(raw/100,0.8));
+  return {score:Math.max(0,Math.min(100,score)), s:s, w:w};
+}
+function popWhy(tier){
+  var r=computePop(tier), s=r.s, I=S.intake||{}, pos=[], neg=[];
+  if(s.cat>=75) pos.push('Strong hospitalization &amp; catastrophic protection');
+  if(s.critical>=90) pos.push('Cancer + heart/stroke lump sum in place');
+  else if(s.critical>=40) pos.push('Partial critical-illness lump sum');
+  if(s.life>=80) pos.push('Living benefits protect your family’s income');
+  if(s.everyday>=80) pos.push('Everyday doctor visits &amp; Rx stay first-dollar');
+  if(s.accident>=90) pos.push('Full accident cash coverage');
+  if(s.dvh>=90) pos.push('Dental, vision &amp; hearing covered');
+  if(I.famcancer && s.critical<60) neg.push('No cancer lump sum — you flagged family cancer history');
+  if(I.famheart && s.critical<100) neg.push('Light heart/stroke lump sum — family history flagged');
+  if((I.who&&(I.who.spouse||I.who.kids)) && s.life<50) neg.push('No living benefits — spouse/kids rely on your income');
+  if(s.cat<60) neg.push('Thin hospitalization/gap coverage for a big event');
+  if(s.accident<40) neg.push('Little or no accident coverage');
+  if(s.dvh<40) neg.push('No dental / vision / hearing');
+  if(s.critical<40 && !I.famcancer && !I.famheart) neg.push('No critical-illness lump sum (cancer / heart / stroke)');
+  return {pos:pos, neg:neg, score:r.score};
+}
+function renderPopScore(){
+  var host=$('popScoreBody'); if(!host) return;
+  var scores={good:computePop('good').score,better:computePop('better').score,best:computePop('best').score};
+  var at=S.activeTab, cur=popWhy(at), sc=cur.score;
+  var colf=function(v){return v>=80?'#2f9e56':(v>=60?'#d8a23a':'#c85a5a');};
+  var col=colf(sc), C=2*Math.PI*56, dash=(C*sc/100).toFixed(1);
+  var ring='<div class="popgauge"><svg width="132" height="132" viewBox="0 0 132 132" style="transform:rotate(-90deg)"><circle cx="66" cy="66" r="56" fill="none" stroke="#ece4d3" stroke-width="12"/><circle cx="66" cy="66" r="56" fill="none" stroke="'+col+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+dash+' '+C.toFixed(1)+'"/></svg><div class="popnum"><b style="color:'+col+'">'+sc+'</b><span>POP Score</span></div></div>';
+  var three='<div class="pop3">'+['good','better','best'].map(function(t){var v=scores[t];return '<div class="t'+(t===at?' on':'')+'" data-tier="'+t+'"><b style="color:'+colf(v)+'">'+v+'</b>'+t.toUpperCase()+'</div>';}).join('')+'</div>';
+  var posli=cur.pos.length?cur.pos.map(function(x){return '<li>✓ '+x+'</li>';}).join(''):'<li style="color:var(--muted)">—</li>';
+  var negli=cur.neg.length?cur.neg.map(function(x){return '<li>✗ '+x+'</li>';}).join(''):'<li style="color:#1c6b38">Nothing major missing — well protected</li>';
+  var why='<div class="popwhy"><div class="col pos"><b>What’s lifting it</b><ul>'+posli+'</ul></div><div class="col neg"><b>What’s dragging it</b><ul>'+negli+'</ul></div></div>';
+  host.innerHTML='<div class="popwrap"><div style="text-align:center">'+ring+three+'</div>'+why+'</div>';
+  host.querySelectorAll('.pop3 .t').forEach(function(el){ el.onclick=function(){ read(); S.activeTab=el.dataset.tier; fill(); compute(); }; });
+}
 function updateBMI(who){ var h=+$('in_'+who+'height').value||0, w=+$('in_'+who+'weight').value||0, el=$('in_'+who+'bmi'); if(!el) return; if(h>0&&w>0){ var b=(w/(h*h))*703; el.value=b.toFixed(1)+' ('+bmiCat(b)+')'; } else el.value=''; }
 // ManhattanLife Affordable Choice build chart (AGT-AFC7010). Keyed by height in inches -> [min,max] lbs.
 var BUILD_CHART={
@@ -1077,6 +1172,7 @@ function compute(){
   refreshClientDisp();
   if($('estBody')) renderEstimate();
   if($('recFlags')) renderFlags();
+  if($('popScoreBody')) renderPopScore();
   if(S.step==='enroll') renderEnroll();
   autosave();
 }
