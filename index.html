@@ -285,6 +285,7 @@
   .doccallout:empty{display:none}
   .doccallout .ok{color:var(--green)}.doccallout .warn{color:var(--maroon)}.doccallout .orange{color:#b5651d}
   input.invalid{border-color:#c0392b!important;box-shadow:0 0 0 1px #c0392b}
+  .fld input.keyfield{border-color:#5aa46e;box-shadow:0 0 0 1px rgba(90,164,110,.35)}
   .recbadge{display:inline-block;background:var(--gold-pill);color:#26324a;font-size:10px;font-weight:800;letter-spacing:.08em;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle}
   .tabs button.rec .t::after{content:' \2605';color:var(--gold)}
   .flagbox{background:#fbeee9;border:1px solid #e6b7ad;color:#8a2b1c;border-radius:10px;padding:10px 14px;font-size:13px;margin:0 0 14px}
@@ -367,16 +368,17 @@
 
     <div class="intake-sec">Client information</div>
     <div class="intakegrid">
-      <div class="fld"><label>Primary name</label><input id="in_pname" placeholder="First Last"></div>
-      <div class="fld"><label>Date of birth</label><input id="in_date" placeholder="MM/DD/YYYY"></div>
+      <div class="fld"><label>Primary name</label><input id="in_pname" class="keyfield" placeholder="First Last"></div>
+      <div class="fld"><label>Date of birth</label><input id="in_date" class="keyfield" placeholder="MM/DD/YYYY"></div>
       <div class="fld"><label>Age <small>auto from DOB</small></label><input id="in_page" placeholder="49"></div>
-      <div class="fld"><label>Height</label><input id="in_pheight" placeholder="5'10"></div>
-      <div class="fld"><label>Weight</label><input id="in_pweight" placeholder="180 lbs"></div>
+      <div class="fld"><label>Height</label><select id="in_pheight" class="selfld"></select></div>
+      <div class="fld"><label>Weight (lbs)</label><input id="in_pweight" type="number" placeholder="180"></div>
+      <div class="fld"><label>BMI <small>auto</small></label><input id="in_pbmi" readonly placeholder="—"></div>
       <div class="fld"><label>Client phone</label><input id="in_phone" placeholder="(000) 000-0000"></div>
       <div class="fld"><label>Client email</label><input id="in_email" placeholder="name@example.com"></div>
       <div class="fld"><label>Address</label><input id="in_address" placeholder="Street, City"></div>
-      <div class="fld"><label>State</label><input id="in_state" placeholder="TX"></div>
-      <div class="fld"><label>ZIP</label><input id="in_zip" placeholder="78163"></div>
+      <div class="fld"><label>State</label><input id="in_state" class="keyfield" placeholder="TX"></div>
+      <div class="fld"><label>ZIP</label><input id="in_zip" class="keyfield" placeholder="78163"></div>
     </div>
 
     <div class="intake-sec">Spouse information <span class="secnote">(if applicable)</span></div>
@@ -384,8 +386,9 @@
       <div class="fld"><label>Spouse name</label><input id="in_sname" placeholder="First Last"></div>
       <div class="fld"><label>Date of birth</label><input id="in_sdob" placeholder="MM/DD/YYYY"></div>
       <div class="fld"><label>Age <small>auto from DOB</small></label><input id="in_sage" placeholder="45"></div>
-      <div class="fld"><label>Height</label><input id="in_sheight" placeholder="5'6"></div>
-      <div class="fld"><label>Weight</label><input id="in_sweight" placeholder="140 lbs"></div>
+      <div class="fld"><label>Height</label><select id="in_sheight" class="selfld"></select></div>
+      <div class="fld"><label>Weight (lbs)</label><input id="in_sweight" type="number" placeholder="140"></div>
+      <div class="fld"><label>BMI <small>auto</small></label><input id="in_sbmi" readonly placeholder="—"></div>
     </div>
 
     <div class="intake-sec">Health &amp; routing</div>
@@ -695,6 +698,9 @@ function dateOK(v){ var d=(v||'').replace(/\D/g,''); if(d.length!==8) return fal
 function emailOK(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||''); }
 function markValid(el,ok){ if(el) el.classList.toggle('invalid', !!(el.value && !ok)); }
 function ageFromDOB(v){ var d=(v||'').replace(/\D/g,''); if(d.length!==8) return ''; var mm=+d.slice(0,2), dd=+d.slice(2,4), yy=+d.slice(4,8); var t=new Date(); var age=t.getFullYear()-yy; if((t.getMonth()+1)<mm || ((t.getMonth()+1)===mm && t.getDate()<dd)) age--; return (age>=0&&age<130)?String(age):''; }
+function fillHeightOpts(sel){ if(!sel) return; var s=''; for(var i=48;i<=84;i++){ s+='<option value="'+i+'"'+(i===70?' selected':'')+'>'+Math.floor(i/12)+"'"+(i%12)+'"</option>'; } sel.innerHTML=s; }
+function bmiCat(b){ return b<18.5?'Underweight':(b<25?'Normal':(b<30?'Overweight':(b<35?'Obese':'Obese II+'))); }
+function updateBMI(who){ var h=+$('in_'+who+'height').value||0, w=+$('in_'+who+'weight').value||0, el=$('in_'+who+'bmi'); if(!el) return; if(h>0&&w>0){ var b=(w/(h*h))*703; el.value=b.toFixed(1)+' ('+bmiCat(b)+')'; } else el.value=''; }
 
 /* Carrier producer portals (enroll step) */
 var MANHATTAN_URL='https://producer.manhattanlife.com/life/account/login.aspx?AsAgent';
@@ -826,7 +832,7 @@ function blankState(){
     pension:{monthly:100,note:'e.g., IUL / tax-free retirement savings for your future',cv10:0,cv20:0,cv30:0,leg1:0,leg25:0},
     big:{desc:'Hospital stay – 7 days',charge:41660.41,disc:18747.18,days:7,daily:4000,adm:2000,his:10000,other:0},
     reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
-    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobacco:false,maternity:false,dv:false,famcancer:false,famheart:false,mental:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'',pweight:'',sheight:'',sweight:''},
+    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobacco:false,maternity:false,dv:false,famcancer:false,famheart:false,mental:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'70',pweight:'',sheight:'70',sweight:''},
     recommended:'best',
     recFlags:[],
     step:'intake',
@@ -1253,7 +1259,7 @@ function fillIntake(){
   $('in_health').value=I.health||'';
   $('in_docs1').value=I.docs1||''; $('in_docs2').value=I.docs2||''; $('in_docs3').value=I.docs3||'';
   $('in_keepaca').value=I.keepaca||''; $('in_keepafc').value=I.keepafc||''; $('in_docnote').value=I.docnote||'';
-  $('in_pheight').value=I.pheight||''; $('in_pweight').value=I.pweight||''; $('in_sheight').value=I.sheight||''; $('in_sweight').value=I.sweight||'';
+  $('in_pheight').value=I.pheight||'70'; $('in_pweight').value=I.pweight||''; $('in_sheight').value=I.sheight||'70'; $('in_sweight').value=I.sweight||''; updateBMI('p'); updateBMI('s');
   $('in_net').checked=!!S.docs.net; $('in_rx').checked=!!S.docs.rx;
   $('in_carrier').value=I.carrier||''; $('in_plan').value=I.plan||'';
   $('in_prem').value=S.aca.prem||''; $('in_oop').value=S.aca.oop||''; $('in_visits').value=S.aca.visits||''; $('in_copay').value=S.aca.copay||'';
@@ -1440,8 +1446,13 @@ function bindInputs(){
   document.querySelectorAll('#viewseg button').forEach(function(b){ b.onclick=function(){ setView(b.dataset.view); }; });
   document.querySelectorAll('#stepper button').forEach(function(b){ b.onclick=function(){ if(S.step==='intake' && b.dataset.step!=='intake') captureIntake(); goStep(b.dataset.step); }; });
   $('buildQuoteBtn').onclick=buildQuote;
+  fillHeightOpts($('in_pheight')); fillHeightOpts($('in_sheight'));
+  $('in_pheight').addEventListener('change',function(){ updateBMI('p'); readIntake(); autosave(); });
+  $('in_sheight').addEventListener('change',function(){ updateBMI('s'); readIntake(); autosave(); });
+  $('in_pweight').addEventListener('input',function(){ updateBMI('p'); captureIntake(); });
+  $('in_sweight').addEventListener('input',function(){ updateBMI('s'); captureIntake(); });
   document.querySelectorAll('#step-intake .chip input').forEach(function(cb){ cb.addEventListener('change',function(){ syncChips(); readIntake(); autosave(); }); });
-  ['in_pname','in_pheight','in_pweight','in_sname','in_sheight','in_sweight','in_agent','in_address','in_state','in_zip','in_page','in_sage','in_majorcond_note','in_diabetic_note','in_docs1','in_docs2','in_docs3','in_carrier','in_plan','in_prem','in_oop','in_visits','in_copay','in_income','in_retage','in_savings','in_invest','in_invnote','in_docnote','in_budget','in_notes']
+  ['in_pname','in_sname','in_agent','in_address','in_state','in_zip','in_page','in_sage','in_majorcond_note','in_diabetic_note','in_docs1','in_docs2','in_docs3','in_carrier','in_plan','in_prem','in_oop','in_visits','in_copay','in_income','in_retage','in_savings','in_invest','in_invnote','in_docnote','in_budget','in_notes']
     .forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',function(){ captureIntake(); }); });
   $('in_phone').addEventListener('input',function(){ this.value=fmtPhone(this.value); markValid(this,phoneOK(this.value)); captureIntake(); });
   $('in_date').addEventListener('input',function(){ this.value=fmtDate(this.value); markValid(this,dateOK(this.value)); var a=ageFromDOB(this.value); if(a) $('in_page').value=a; captureIntake(); });
