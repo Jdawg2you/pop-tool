@@ -294,8 +294,9 @@
   #in_pbuild.ok,#in_sbuild.ok{color:#1c6b38;border-color:#5aa46e;background:rgba(90,164,110,.08)}
   #in_pbuild.warn,#in_sbuild.warn{color:#8a5a00;border-color:#d8a23a;background:rgba(216,162,58,.1)}
   #in_pbuild.bad,#in_sbuild.bad{color:#a12525;border-color:#c85a5a;background:rgba(200,90,90,.1)}
-  .sayico{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:#fff;background:var(--navy);border-radius:20px;padding:2px 10px;margin-left:8px;cursor:pointer;vertical-align:middle;user-select:none;white-space:nowrap}
-  .sayico:hover{filter:brightness(1.15)}
+  .sayico{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:#fff;background:var(--navy);border-radius:20px;padding:3px 11px;margin-left:8px;cursor:pointer;vertical-align:middle;user-select:none;white-space:nowrap;transition:background .15s,color .15s}
+  .sayico::before{content:"";width:12px;height:12px;flex:0 0 12px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M4 3h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z'/></svg>") center/contain no-repeat}
+  .sayico:hover{background:linear-gradient(180deg,#6b7688,#485266)}
   .sec-flash{outline:3px solid #d8a23a;outline-offset:4px;border-radius:8px}
   .ps-ctrl{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:#fbfaf6;font-weight:600;color:#3a4358}
   .ps-ctrl.on{background:#fbe7d1;border-color:#e6bd85;color:#8a5111}
@@ -367,7 +368,7 @@
     <div class="sectitle"><span class="dot">●</span> Client Intake</div>
     <div class="note" style="padding-top:2px">Fill what the client gives you, then hit Build Quote. It pre-fills the comparison and recommends Good / Better / Best from your answers.</div>
 
-    <div class="intake-sec" id="sec_who">Who needs coverage <span class="sayico" data-beat="0" title="Say this — opens the script">🗣 Say this</span></div>
+    <div class="intake-sec" id="sec_who">Who needs coverage <span class="sayico" data-beat="0" title="Say this — opens the script">Say this</span></div>
     <div class="chips">
       <label class="chip on"><input type="checkbox" id="in_who_app" checked> Applicant</label>
       <label class="chip"><input type="checkbox" id="in_who_spouse"> Spouse</label>
@@ -382,7 +383,7 @@
       <div class="fld"><label>Agent email</label><input id="in_aemail" placeholder="you@agency.com"></div>
     </div>
 
-    <div class="intake-sec" id="sec_client">Client Information <span class="sayico" data-beat="1" title="Say this — opens the script">🗣 Say this</span></div>
+    <div class="intake-sec" id="sec_client">Client Information <span class="sayico" data-beat="1" title="Say this — opens the script">Say this</span></div>
     <div class="fld" style="margin-bottom:8px"><label>Why shopping / current-plan pain <small>what prompted them · what they dislike</small></label><input id="in_whyshop" placeholder="e.g. premium jumped, deductible too high, lost group plan"></div>
     <div class="intakegrid">
       <div class="fld"><label>Primary name</label><input id="in_pname" class="keyfield" placeholder="First Last"></div>
@@ -401,7 +402,7 @@
       <div class="fld"><label>Desired effective date <small>1st/15th · ≥15 days out</small></label><input id="in_effdate" placeholder="MM/DD/YYYY"></div>
     </div>
 
-    <div class="intake-sec" id="sec_spouse">Spouse Information <span class="sayico" data-beat="5" title="Say this — opens the script">🗣 Say this</span> <span class="secnote" id="spouseHint">(to expand, select <b>Spouse</b> under “Who needs coverage” above)</span></div>
+    <div class="intake-sec" id="sec_spouse">Spouse Information <span class="sayico" data-beat="5" title="Say this — opens the script">Say this</span> <span class="secnote" id="spouseHint">(to expand, select <b>Spouse</b> under “Who needs coverage” above)</span></div>
     <div class="intakegrid" id="spouseGrid" style="display:none">
       <div class="fld"><label>Spouse name</label><input id="in_sname" placeholder="First Last"></div>
       <div class="fld"><label>Date of birth</label><input id="in_sdob" class="keyfield" placeholder="MM/DD/YYYY"></div>
@@ -413,12 +414,12 @@
       <div class="fld"><label>Build check <small>ManhattanLife</small></label><input id="in_sbuild" readonly placeholder="—"></div>
     </div>
 
-    <div class="intake-sec" id="sec_kids">Children <span class="sayico" data-beat="5" title="Say this — opens the script">🗣 Say this</span> <span class="secnote" id="kidsHint">(to expand, select <b>Children</b> under “Who needs coverage” above)</span></div>
+    <div class="intake-sec" id="sec_kids">Children <span class="sayico" data-beat="5" title="Say this — opens the script">Say this</span> <span class="secnote" id="kidsHint">(to expand, select <b>Children</b> under “Who needs coverage” above)</span></div>
     <div id="kidsGrid" style="display:none">
       <textarea id="in_kids" rows="3" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;background:#fff;resize:vertical" placeholder="List all children with names and ages/DOBs — e.g. Emma (age 8), Liam (age 5), Noah 03/14/2019. Any number of kids is the same price, so just list who's covered."></textarea>
     </div>
 
-    <div class="intake-sec" id="sec_health">Health &amp; Routing <span class="sayico" data-beat="6" title="Say this — opens the script">🗣 Say this</span></div>
+    <div class="intake-sec" id="sec_health">Health &amp; Routing <span class="sayico" data-beat="6" title="Say this — opens the script">Say this</span></div>
     <div class="chips">
       <span class="ps-ctrl">Family history of cancer? <label class="tob"><input type="checkbox" id="in_famcancer_p"> P</label><label class="tob"><input type="checkbox" id="in_famcancer_s"> S</label></span>
       <span class="ps-ctrl">Family history of heart attack / stroke? <label class="tob"><input type="checkbox" id="in_famheart_p"> P</label><label class="tob"><input type="checkbox" id="in_famheart_s"> S</label></span>
@@ -440,7 +441,7 @@
     </div>
     <div style="margin-top:10px"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Routing notes</label><textarea id="in_routenote" rows="2" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;background:#fff;resize:vertical" placeholder="Anything to clarify about health or routing — conditions, timing, special situations."></textarea></div>
 
-    <div class="intake-sec" id="sec_docs">Preferred Doctors <span class="sayico" data-beat="7" title="Say this — opens the script">🗣 Say this</span> <a href="https://providerlocator.firsthealth.com/LocateProvider/LocateProviderSearch/" target="_blank" rel="noopener" class="seclink">↗ Look up First Health network</a></div>
+    <div class="intake-sec" id="sec_docs">Preferred Doctors <span class="sayico" data-beat="7" title="Say this — opens the script">Say this</span> <a href="https://providerlocator.firsthealth.com/LocateProvider/LocateProviderSearch/" target="_blank" rel="noopener" class="seclink">↗ Look up First Health network</a></div>
     <div class="intakegrid">
       <div class="fld"><label>Doctor / facility 1</label><input id="in_docs1" placeholder="Dr. Ramirez (cardiology)"></div>
       <div class="fld"><label>Doctor / facility 2</label><input id="in_docs2" placeholder="(optional)"></div>
@@ -454,7 +455,7 @@
     <label class="chip" style="margin-top:8px"><input type="checkbox" id="in_net"> Network status verified with client (First Health)</label>
     <div style="margin-top:10px"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Preferred doctor notes</label><textarea id="in_docsnote" rows="2" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;background:#fff;resize:vertical" placeholder="Notes on providers / networks — e.g. wants to keep current PCP, specialist not in-network, willing to switch."></textarea></div>
 
-    <div class="intake-sec" id="sec_meds">Medications <span class="sayico" data-beat="6" title="Say this — opens the script">🗣 Say this</span> <span class="secnote">— look up best price:</span> <a href="https://www.singlecare.com" target="_blank" rel="noopener" class="seclink">SingleCare ↗</a> <a href="https://www.goodrx.com/" target="_blank" rel="noopener" class="seclink">GoodRx ↗</a> <a href="https://www.costplusdrugs.com/" target="_blank" rel="noopener" class="seclink">Cost Plus ↗</a> <a href="https://www.mdsave.com/" target="_blank" rel="noopener" class="seclink">MDSave ↗</a></div>
+    <div class="intake-sec" id="sec_meds">Medications <span class="sayico" data-beat="6" title="Say this — opens the script">Say this</span> <span class="secnote">— look up best price:</span> <a href="https://www.singlecare.com" target="_blank" rel="noopener" class="seclink">SingleCare ↗</a> <a href="https://www.goodrx.com/" target="_blank" rel="noopener" class="seclink">GoodRx ↗</a> <a href="https://www.costplusdrugs.com/" target="_blank" rel="noopener" class="seclink">Cost Plus ↗</a> <a href="https://www.mdsave.com/" target="_blank" rel="noopener" class="seclink">MDSave ↗</a></div>
     <div class="note" style="padding-top:2px">For each medication enter two costs. <b>ACA copay</b> = the monthly amount the ACA plan would cost for that medication; if the drug isn't copay-covered, enter the full price (that cost will go toward their deductible). <b>Discount</b> = the discounted cash price found by using the links above. These costs will calculate on the Package of Protection sections on the Quote.</div>
     <div class="medhead"><span class="h1">Medication</span><span class="h2">ACA copay</span><span class="h2">Discount</span><span class="hw" title="Primary">P</span><span class="hw" title="Spouse">S</span><span class="hx"></span></div>
     <div id="medList"></div>
@@ -462,7 +463,7 @@
     <div style="margin-top:8px;display:flex;gap:24px;flex-wrap:wrap;font-family:var(--serif);font-weight:700;color:var(--navy)"><span>ACA copay total: <span id="medTotalACA">$0.00</span></span><span>Discount total: <span id="medTotalDisc">$0.00</span></span></div>
     <label class="chip" style="margin-top:8px"><input type="checkbox" id="in_rx"> Rx prices verified (SingleCare / RXedo / AFC reimbursement)</label>
 
-    <div class="intake-sec" id="sec_curins">Current Insurance <span class="sayico" data-beat="8" title="Say this — opens the script">🗣 Say this</span> <span class="secnote">— fills the ACA side · look up on</span> <a href="https://www.healthsherpa.com/sessions/new" target="_blank" rel="noopener" class="seclink">HealthSherpa ↗</a></div>
+    <div class="intake-sec" id="sec_curins">Current Insurance <span class="sayico" data-beat="8" title="Say this — opens the script">Say this</span> <span class="secnote">— fills the ACA side · look up on</span> <a href="https://www.healthsherpa.com/sessions/new" target="_blank" rel="noopener" class="seclink">HealthSherpa ↗</a></div>
     <div class="intakegrid">
       <div class="fld"><label>Carrier</label><input id="in_carrier" placeholder="BCBS"></div>
       <div class="fld"><label>Plan name</label><input id="in_plan" placeholder="Bronze"></div>
@@ -488,7 +489,7 @@
     <div class="fld" style="margin-top:10px"><label>Investment notes</label><input id="in_invnote" placeholder="e.g., old 401k (eligible), current-employer plan (locked), sitting in CDs"></div>
     <div class="note" style="padding-top:2px">Protected = already out of the market. Eligible for SRA = available to move into a Secure Retirement Account (e.g., an old policy, not a current-employer plan). Reserves under ~6 months of income → stronger case for living benefits / accident.</div>
 
-    <div class="intake-sec" id="sec_budget">Budget &amp; Notes <span class="sayico" data-beat="9" title="Say this — opens the script">🗣 Say this</span></div>
+    <div class="intake-sec" id="sec_budget">Budget &amp; Notes <span class="sayico" data-beat="9" title="Say this — opens the script">Say this</span></div>
     <div class="intakegrid" style="grid-template-columns:1fr 1fr">
       <div class="fld"><label>Max comfortable monthly</label><input id="in_budget" type="number" step="0.01" placeholder="e.g., 1000"></div>
       <div class="fld"><label>Priority</label><select id="in_priority" style="width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:#fbfaf6;font:inherit"><option value="coverage">Coverage / peace of mind</option><option value="price">Lowest price</option></select></div>
@@ -514,7 +515,7 @@
   <div id="recFlags" class="hidein-client"></div>
 
   <div class="estcard hidein-client" id="sec_est">
-    <div class="sectitle" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><span><span class="dot">●</span> Ballpark estimate <span class="sayico" data-set="quote" data-beat="0" title="Presentation call script">🗣 Say this</span> <span class="sayico" data-set="obj" data-beat="0" title="Objection handling">💬 Objections</span> <span class="note" style="display:inline;padding:0;font-style:normal">— full package per tier; AFC from the rate guide; not the final quote</span></span>
+    <div class="sectitle" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><span><span class="dot">●</span> Ballpark estimate <span class="sayico" data-set="quote" data-beat="0" title="Presentation call script">Say this</span> <span class="sayico" data-set="obj" data-beat="0" title="Objection handling">Objections</span> <span class="note" style="display:inline;padding:0;font-style:normal">— full package per tier; AFC from the rate guide; not the final quote</span></span>
       <span class="ageseg" id="ageseg"><button data-band="0">18–29</button><button data-band="1">30–39</button><button data-band="2">40–49</button><button data-band="3">50–64</button></span>
     </div>
     <div id="estBody" style="margin-top:8px"></div>
@@ -528,7 +529,7 @@
     </div>
 
     <div class="pad hidein-client" style="border-bottom:1px solid var(--line)">
-      <div style="margin-bottom:6px"><span class="sayico" data-set="quote" data-beat="2" title="Presentation call script">🗣 Say this</span></div>
+      <div style="margin-bottom:6px"><span class="sayico" data-set="quote" data-beat="2" title="Presentation call script">Say this</span></div>
       <div class="note" id="drugsDocsReminder" style="padding-top:0">Before you present: confirm on the Intake that the client's doctors were checked against the First Health network and their medication prices were looked up. Don't present the savings below until both are done.</div>
     </div>
 
@@ -572,7 +573,7 @@
   </div>
 
   <div class="card pad" id="sec_save">
-    <div class="hidein-client" style="margin-bottom:6px"><span class="sayico" data-set="quote" data-beat="6" title="Close + living benefits script">🗣 Say this — Close</span></div>
+    <div class="hidein-client" style="margin-bottom:6px"><span class="sayico" data-set="quote" data-beat="6" title="Close + living benefits script">Say this — Close</span></div>
     <div class="band-navy">
       <div class="savegrid">
         <div class="h l">YOUR SAVINGS vs ACA</div><div class="h">Monthly</div><div class="h">Annual</div>
