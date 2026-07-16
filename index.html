@@ -293,6 +293,9 @@
   #in_pbuild.ok,#in_sbuild.ok{color:#1c6b38;border-color:#5aa46e;background:rgba(90,164,110,.08)}
   #in_pbuild.warn,#in_sbuild.warn{color:#8a5a00;border-color:#d8a23a;background:rgba(216,162,58,.1)}
   #in_pbuild.bad,#in_sbuild.bad{color:#a12525;border-color:#c85a5a;background:rgba(200,90,90,.1)}
+  .sayico{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:#fff;background:var(--navy);border-radius:20px;padding:2px 10px;margin-left:8px;cursor:pointer;vertical-align:middle;user-select:none;white-space:nowrap}
+  .sayico:hover{filter:brightness(1.15)}
+  .sec-flash{outline:3px solid #d8a23a;outline-offset:4px;border-radius:8px}
   .recbadge{display:inline-block;background:var(--gold-pill);color:#26324a;font-size:10px;font-weight:800;letter-spacing:.08em;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle}
   .tabs button.rec .t::after{content:' \2605';color:var(--gold)}
   .flagbox{background:#fbeee9;border:1px solid #e6b7ad;color:#8a2b1c;border-radius:10px;padding:10px 14px;font-size:13px;margin:0 0 14px}
@@ -358,7 +361,7 @@
     <div class="sectitle"><span class="dot">●</span> Client Intake</div>
     <div class="note" style="padding-top:2px">Fill what the client gives you, then hit Build Quote. It pre-fills the comparison and recommends Good / Better / Best from your answers.</div>
 
-    <div class="intake-sec">Who needs coverage</div>
+    <div class="intake-sec" id="sec_who">Who needs coverage <span class="sayico" data-beat="0" title="Say this — opens the script">🗣 Say this</span></div>
     <div class="chips">
       <label class="chip on"><input type="checkbox" id="in_who_app" checked> Applicant</label>
       <label class="chip"><input type="checkbox" id="in_who_spouse"> Spouse</label>
@@ -373,7 +376,7 @@
       <div class="fld"><label>Agent email</label><input id="in_aemail" placeholder="you@agency.com"></div>
     </div>
 
-    <div class="intake-sec">Client Information</div>
+    <div class="intake-sec" id="sec_client">Client Information <span class="sayico" data-beat="1" title="Say this — opens the script">🗣 Say this</span></div>
     <div class="intakegrid">
       <div class="fld"><label>Primary name</label><input id="in_pname" class="keyfield" placeholder="First Last"></div>
       <div class="fld"><label>Date of birth</label><input id="in_date" class="keyfield" placeholder="MM/DD/YYYY"></div>
@@ -388,9 +391,11 @@
       <div class="fld"><label>Address</label><input id="in_address" placeholder="Street, City"></div>
       <div class="fld"><label>State</label><input id="in_state" class="keyfield" placeholder="TX"></div>
       <div class="fld"><label>ZIP</label><input id="in_zip" class="keyfield" placeholder="78163"></div>
+      <div class="fld"><label>Desired effective date <small>1st/15th · ≥15 days out</small></label><input id="in_effdate" placeholder="MM/DD/YYYY"></div>
     </div>
+    <div class="fld" style="margin-top:8px"><label>Why shopping / current-plan pain <small>what prompted them · what they dislike</small></label><input id="in_whyshop" placeholder="e.g. premium jumped, deductible too high, lost group plan"></div>
 
-    <div class="intake-sec">Spouse Information <span class="secnote" id="spouseHint">(to expand, select <b>Spouse</b> under “Who needs coverage” above)</span></div>
+    <div class="intake-sec" id="sec_spouse">Spouse Information <span class="sayico" data-beat="5" title="Say this — opens the script">🗣 Say this</span> <span class="secnote" id="spouseHint">(to expand, select <b>Spouse</b> under “Who needs coverage” above)</span></div>
     <div class="intakegrid" id="spouseGrid" style="display:none">
       <div class="fld"><label>Spouse name</label><input id="in_sname" placeholder="First Last"></div>
       <div class="fld"><label>Date of birth</label><input id="in_sdob" class="keyfield" placeholder="MM/DD/YYYY"></div>
@@ -402,12 +407,12 @@
       <div class="fld"><label>Build check <small>ManhattanLife</small></label><input id="in_sbuild" readonly placeholder="—"></div>
     </div>
 
-    <div class="intake-sec">Children <span class="secnote" id="kidsHint">(to expand, select <b>Children</b> under “Who needs coverage” above)</span></div>
+    <div class="intake-sec" id="sec_kids">Children <span class="sayico" data-beat="5" title="Say this — opens the script">🗣 Say this</span> <span class="secnote" id="kidsHint">(to expand, select <b>Children</b> under “Who needs coverage” above)</span></div>
     <div id="kidsGrid" style="display:none">
       <textarea id="in_kids" rows="3" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;background:#fff;resize:vertical" placeholder="List all children with names and ages/DOBs — e.g. Emma (age 8), Liam (age 5), Noah 03/14/2019. Any number of kids is the same price, so just list who's covered."></textarea>
     </div>
 
-    <div class="intake-sec">Health &amp; Routing</div>
+    <div class="intake-sec" id="sec_health">Health &amp; Routing <span class="sayico" data-beat="6" title="Say this — opens the script">🗣 Say this</span></div>
     <div class="chips">
       <label class="chip tone-orange"><input type="checkbox" id="in_famcancer"> Family history of cancer?</label>
       <label class="chip tone-orange"><input type="checkbox" id="in_famheart"> Family history of heart attack / stroke?</label>
@@ -429,7 +434,7 @@
     </div>
     <div style="margin-top:10px"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Routing notes</label><textarea id="in_routenote" rows="2" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;background:#fff;resize:vertical" placeholder="Anything to clarify about health or routing — conditions, timing, special situations."></textarea></div>
 
-    <div class="intake-sec">Preferred Doctors <a href="https://providerlocator.firsthealth.com/LocateProvider/LocateProviderSearch/" target="_blank" rel="noopener" class="seclink">↗ Look up First Health network</a></div>
+    <div class="intake-sec" id="sec_docs">Preferred Doctors <span class="sayico" data-beat="7" title="Say this — opens the script">🗣 Say this</span> <a href="https://providerlocator.firsthealth.com/LocateProvider/LocateProviderSearch/" target="_blank" rel="noopener" class="seclink">↗ Look up First Health network</a></div>
     <div class="intakegrid">
       <div class="fld"><label>Doctor / facility 1</label><input id="in_docs1" placeholder="Dr. Ramirez (cardiology)"></div>
       <div class="fld"><label>Doctor / facility 2</label><input id="in_docs2" placeholder="(optional)"></div>
@@ -443,7 +448,7 @@
     <label class="chip" style="margin-top:8px"><input type="checkbox" id="in_net"> Network status verified with client (First Health)</label>
     <div style="margin-top:10px"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Preferred doctor notes</label><textarea id="in_docsnote" rows="2" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;background:#fff;resize:vertical" placeholder="Notes on providers / networks — e.g. wants to keep current PCP, specialist not in-network, willing to switch."></textarea></div>
 
-    <div class="intake-sec">Medications <span class="secnote">— look up best price:</span> <a href="https://www.singlecare.com" target="_blank" rel="noopener" class="seclink">SingleCare ↗</a> <a href="https://www.goodrx.com/" target="_blank" rel="noopener" class="seclink">GoodRx ↗</a> <a href="https://www.costplusdrugs.com/" target="_blank" rel="noopener" class="seclink">Cost Plus ↗</a> <a href="https://www.mdsave.com/" target="_blank" rel="noopener" class="seclink">MDSave ↗</a></div>
+    <div class="intake-sec" id="sec_meds">Medications <span class="sayico" data-beat="6" title="Say this — opens the script">🗣 Say this</span> <span class="secnote">— look up best price:</span> <a href="https://www.singlecare.com" target="_blank" rel="noopener" class="seclink">SingleCare ↗</a> <a href="https://www.goodrx.com/" target="_blank" rel="noopener" class="seclink">GoodRx ↗</a> <a href="https://www.costplusdrugs.com/" target="_blank" rel="noopener" class="seclink">Cost Plus ↗</a> <a href="https://www.mdsave.com/" target="_blank" rel="noopener" class="seclink">MDSave ↗</a></div>
     <div class="note" style="padding-top:2px">For each medication enter two costs. <b>ACA copay</b> = the monthly amount the ACA plan would cost for that medication; if the drug isn't copay-covered, enter the full price (that cost will go toward their deductible). <b>Discount</b> = the discounted cash price found by using the links above. These costs will calculate on the Package of Protection sections on the Quote.</div>
     <div class="medhead"><span class="h1">Medication</span><span class="h2">ACA copay</span><span class="h2">Discount</span><span class="hw" title="Primary">P</span><span class="hw" title="Spouse">S</span><span class="hx"></span></div>
     <div id="medList"></div>
@@ -451,7 +456,7 @@
     <div style="margin-top:8px;display:flex;gap:24px;flex-wrap:wrap;font-family:var(--serif);font-weight:700;color:var(--navy)"><span>ACA copay total: <span id="medTotalACA">$0.00</span></span><span>Discount total: <span id="medTotalDisc">$0.00</span></span></div>
     <label class="chip" style="margin-top:8px"><input type="checkbox" id="in_rx"> Rx prices verified (SingleCare / RXedo / AFC reimbursement)</label>
 
-    <div class="intake-sec">Current Insurance <span class="secnote">— fills the ACA side · look up on</span> <a href="https://www.healthsherpa.com/sessions/new" target="_blank" rel="noopener" class="seclink">HealthSherpa ↗</a></div>
+    <div class="intake-sec" id="sec_curins">Current Insurance <span class="sayico" data-beat="8" title="Say this — opens the script">🗣 Say this</span> <span class="secnote">— fills the ACA side · look up on</span> <a href="https://www.healthsherpa.com/sessions/new" target="_blank" rel="noopener" class="seclink">HealthSherpa ↗</a></div>
     <div class="intakegrid">
       <div class="fld"><label>Carrier</label><input id="in_carrier" placeholder="BCBS"></div>
       <div class="fld"><label>Plan name</label><input id="in_plan" placeholder="Bronze"></div>
@@ -477,7 +482,7 @@
     <div class="fld" style="margin-top:10px"><label>Investment notes</label><input id="in_invnote" placeholder="e.g., old 401k (eligible), current-employer plan (locked), sitting in CDs"></div>
     <div class="note" style="padding-top:2px">Protected = already out of the market. Eligible for SRA = available to move into a Secure Retirement Account (e.g., an old policy, not a current-employer plan). Reserves under ~6 months of income → stronger case for living benefits / accident.</div>
 
-    <div class="intake-sec">Budget &amp; Notes</div>
+    <div class="intake-sec" id="sec_budget">Budget &amp; Notes <span class="sayico" data-beat="9" title="Say this — opens the script">🗣 Say this</span></div>
     <div class="intakegrid" style="grid-template-columns:1fr 1fr">
       <div class="fld"><label>Max comfortable monthly</label><input id="in_budget" type="number" step="0.01" placeholder="e.g., 1000"></div>
       <div class="fld"><label>Priority</label><select id="in_priority" style="width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:#fbfaf6;font:inherit"><option value="coverage">Coverage / peace of mind</option><option value="price">Lowest price</option></select></div>
@@ -872,7 +877,7 @@ function blankState(){
     pension:{monthly:100,note:'e.g., IUL / tax-free retirement savings for your future',cv10:0,cv20:0,cv30:0,leg1:0,leg25:0},
     big:{desc:'Hospital stay – 7 days',charge:41660.41,disc:18747.18,days:7,daily:4000,adm:2000,his:10000,other:0},
     reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
-    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobacco:false,maternity:false,dv:false,famcancer:false,famheart:false,mental:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'70',pweight:'',sheight:'70',sweight:'',psex:'',ssex:'',kidsNote:'',routeNote:'',docsNote:''},
+    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobacco:false,maternity:false,dv:false,famcancer:false,famheart:false,mental:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'70',pweight:'',sheight:'70',sweight:'',psex:'',ssex:'',kidsNote:'',routeNote:'',docsNote:'',whyShop:'',effDate:''},
     recommended:'best',
     recFlags:[],
     step:'intake',
@@ -1278,7 +1283,7 @@ function readIntake(){
   S.intake.savings=+$('in_savings').value||0; S.intake.invest=+$('in_invest').value||0; S.intake.invprot=$('in_invprot').checked; S.intake.invsra=$('in_invsra').checked; S.intake.invnote=$('in_invnote').value;
   S.intake.docs1=$('in_docs1').value; S.intake.docs2=$('in_docs2').value; S.intake.docs3=$('in_docs3').value;
   S.intake.keepaca=$('in_keepaca').value; S.intake.keepafc=$('in_keepafc').value; S.intake.docnote=$('in_docnote').value;
-  S.intake.pheight=$('in_pheight').value; S.intake.pweight=$('in_pweight').value; S.intake.sheight=$('in_sheight').value; S.intake.sweight=$('in_sweight').value; S.intake.psex=$('in_psex').value; S.intake.ssex=$('in_ssex').value; S.intake.kidsNote=$('in_kids').value; S.intake.routeNote=$('in_routenote').value; S.intake.docsNote=$('in_docsnote').value;
+  S.intake.pheight=$('in_pheight').value; S.intake.pweight=$('in_pweight').value; S.intake.sheight=$('in_sheight').value; S.intake.sweight=$('in_sweight').value; S.intake.psex=$('in_psex').value; S.intake.ssex=$('in_ssex').value; S.intake.kidsNote=$('in_kids').value; S.intake.routeNote=$('in_routenote').value; S.intake.docsNote=$('in_docsnote').value; S.intake.whyShop=$('in_whyshop').value; S.intake.effDate=$('in_effdate').value;
   S.docs.net=$('in_net').checked; S.docs.rx=$('in_rx').checked; S.docs.famcancer=$('in_famcancer').checked||$('in_famheart').checked;
 }
 function effDed(){ var s=$('in_ded_sel').value; return s==='other' ? (+$('in_ded').value||0) : (+s||0); }
@@ -1308,7 +1313,7 @@ function fillIntake(){
   $('in_health').value=I.health||'';
   $('in_docs1').value=I.docs1||''; $('in_docs2').value=I.docs2||''; $('in_docs3').value=I.docs3||'';
   $('in_keepaca').value=I.keepaca||''; $('in_keepafc').value=I.keepafc||''; $('in_docnote').value=I.docnote||'';
-  $('in_pheight').value=I.pheight||'70'; $('in_pweight').value=I.pweight||''; $('in_sheight').value=I.sheight||'70'; $('in_sweight').value=I.sweight||''; $('in_psex').value=I.psex||''; $('in_ssex').value=I.ssex||''; $('in_kids').value=I.kidsNote||''; $('in_routenote').value=I.routeNote||''; $('in_docsnote').value=I.docsNote||''; updateBMI('p'); updateBMI('s'); buildFlag('p'); buildFlag('s');
+  $('in_pheight').value=I.pheight||'70'; $('in_pweight').value=I.pweight||''; $('in_sheight').value=I.sheight||'70'; $('in_sweight').value=I.sweight||''; $('in_psex').value=I.psex||''; $('in_ssex').value=I.ssex||''; $('in_kids').value=I.kidsNote||''; $('in_routenote').value=I.routeNote||''; $('in_docsnote').value=I.docsNote||''; $('in_whyshop').value=I.whyShop||''; $('in_effdate').value=I.effDate||''; updateBMI('p'); updateBMI('s'); buildFlag('p'); buildFlag('s');
   $('in_net').checked=!!S.docs.net; $('in_rx').checked=!!S.docs.rx;
   $('in_carrier').value=I.carrier||''; $('in_plan').value=I.plan||'';
   $('in_prem').value=S.aca.prem||''; $('in_oop').value=S.aca.oop||''; $('in_visits').value=S.aca.visits||''; $('in_copay').value=S.aca.copay||'';
@@ -1490,6 +1495,71 @@ function buildEmail(){
   return {to:to,subject:subj,body:body};
 }
 
+/* ========== INTAKE "SAY THIS" SCRIPT (discovery call) ========== */
+var SCRIPT_BEATS=[
+ {title:"Opening & permission",sec:"sec_who",html:
+   "<p class=say>“Hi, [first name]! (pause) This is [your name], your health insurance expert. (pause) How are you?”</p>"
+  +"<p class=say>“It looks like you responded to an ad for more affordable PPO health plans. Is this an appropriate time?”</p>"
+  +"<p class=note>Give them the option to work with you — offering the choice sets you up as a professional whose time they should respect.</p>"},
+ {title:"Why they're shopping",sec:"sec_client",html:
+   "<p class=say>“Before I get into who we are and all that boring stuff, I need to see if I can even help you. Did you already find a good plan, or are you still looking for something better?”</p>"
+  +"<p class=say>“So I can understand your situation — what prompted you to start looking into new health insurance?”</p>"
+  +"<p class=say>“What type of insurance do you have now, if any? Was it more the cost, the coverage, or something else that made you say ‘this isn’t working for me’?”</p>"
+  +"<p class=note>Whatever they say, they’re right — agree with them, and bring their reasons back up on the presentation call. Jot it in the “Why shopping” field.</p>"},
+ {title:"Positioning",sec:"sec_client",html:
+   "<p class=say>“I specialize in helping small business owners and self-employed folks who are frustrated with the high cost of healthcare. My job is to get you an affordable, comprehensive plan that’s easy to understand — no paying for benefits you don’t need, like maternity if you’re not planning kids.”</p>"
+  +"<p class=say>“Every marketplace plan includes 10 essential benefits; most people don’t need all of them, so I tailor a private plan to what you actually need — saving money while still getting great coverage. Sound familiar?”</p>"},
+ {title:"Demographics + effective date",sec:"sec_client",html:
+   "<p class=say>“So, provided we can get you qualified, when would you like the coverage to start?”</p>"
+  +"<p class=note>Usually no sooner than 15 days out — the 1st or 15th of the month.</p>"
+  +"<p class=say>“I see you live in [state] — can I grab your zip code? And what’s your age and birthday?”</p>"
+  +"<p class=note>Make a little small talk about where they live.</p>"},
+ {title:"Tobacco + build",sec:"sec_client",html:
+   "<p class=say>“Are you a smoker, or do you use any tobacco products?”</p>"
+  +"<p class=note>Needed for the other products, not AFC.</p>"
+  +"<p class=say>“Some carriers use build charts — no need to get on a scale, but roughly how tall are you and about how much do you weigh?”</p>"},
+ {title:"Who's covered — spouse & kids",sec:"sec_spouse",html:
+   "<p class=say>“Are you looking for coverage just for yourself, or possibly for someone else — your spouse or partner, or kids?”</p>"
+  +"<p class=note>Get ages, DOBs, heights and weights for everyone who needs coverage.</p>"},
+ {title:"Health — meds, surgeries, history",sec:"sec_health",html:
+   "<p class=say>“Do any of you have health problems or take regular prescription medications?”</p>"
+  +"<p class=note>Note the dosage and frequency.</p>"
+  +"<p class=say>“Have any of you been hospitalized or had surgeries in the past 2 years?”</p>"
+  +"<p class=say>“Have any of you had serious health problems in the past — a heart attack, stroke, or cancer?”</p>"
+  +"<p class=note>Heart attack: when, # of occurrences, treatments. Cancer: type, stage, recurrence, location, treatment. Stroke: severity, recurrence. Targeting working business owners means you won’t hit many major concerns.</p>"},
+ {title:"Preferred doctor + First Health",sec:"sec_docs",html:
+   "<p class=say>“Do you currently have a primary care provider you’re in love with? What’s their name — and when did you last see them?”</p>"
+  +"<p class=note>If they’re married to their PCP, verify the provider participates in the First Health Network.</p>"},
+ {title:"Current coverage cost",sec:"sec_curins",html:
+   "<p class=say>“(If they have coverage) What are you paying roughly per month now? Any deductibles or co-pays? Did you hit your deductible last year?”</p>"
+  +"<p class=note>Acknowledge what a bummer it is to hit a large deductible before getting much benefit from a big monthly premium.</p>"},
+ {title:"Soft close — book Call 2 (BAMFAM)",sec:"sec_budget",html:
+   "<p class=say>“I think I can show you a few private plans that meet your exact needs — without paying for benefits you don’t use — would you be open to looking at those options?”</p>"
+  +"<p class=say>“Are you also open to seeing how bundling dental, vision, life or retirement could actually lower your total monthly cost while giving you more protection?”</p>"
+  +"<p class=say>“Looking at my schedule, I have time at [time A] or [time B] — which works best for you and [spouse]?”</p>"
+  +"<p class=note>BAMFAM — Book A Meeting From A Meeting. Confirm their email, restate day/date/time, and send a text reminder with your license # or digital card.</p>"}
+];
+function scriptFlash(secId){ var el=document.getElementById(secId); if(!el) return; el.classList.add('sec-flash'); try{ el.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} setTimeout(function(){ el.classList.remove('sec-flash'); },1900); }
+function openScript(idx){
+  idx=Math.max(0,Math.min(SCRIPT_BEATS.length-1,idx));
+  var b=SCRIPT_BEATS[idx]; scriptFlash(b.sec);
+  var w=window.open('','hfScript','width=560,height=740');
+  if(!w){ alert('Allow pop-ups for this site to use the script window.'); return; }
+  var css="body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#0f1d2e;color:#eef3f8}"
+   +".loc{background:#1f3a5f;color:#cfe0f5;font-size:12px;font-weight:700;padding:11px 18px;letter-spacing:.03em}"
+   +".nav{display:flex;gap:8px;padding:10px 16px;background:#16283f;position:sticky;top:0}"
+   +".nav button{flex:1;font:inherit;font-weight:700;font-size:13px;padding:9px;border:none;border-radius:8px;background:#2f5183;color:#fff;cursor:pointer}"
+   +".nav button:disabled{opacity:.35;cursor:default}"
+   +".body{padding:18px 22px;font-size:17px;line-height:1.5}"
+   +".body p{margin:0 0 14px}.say{color:#fff}"
+   +".note{color:#9fb6d4;font-size:13.5px;font-style:italic;border-left:3px solid #d8a23a;padding-left:11px}";
+  var html="<!doctype html><html><head><meta charset=utf-8><title>Say this — "+b.title+"</title><style>"+css+"</style></head><body>"
+   +"<div class=loc>Intake · beat "+(idx+1)+" of "+SCRIPT_BEATS.length+" — "+b.title+"</div>"
+   +"<div class=nav><button onclick=\"opener.openScript("+(idx-1)+")\""+(idx===0?" disabled":"")+">‹ Prev</button>"
+   +"<button onclick=\"opener.openScript("+(idx+1)+")\""+(idx===SCRIPT_BEATS.length-1?" disabled":"")+">Next ›</button></div>"
+   +"<div class=body>"+b.html+"</div></body></html>";
+  w.document.open(); w.document.write(html); w.document.close(); w.focus();
+}
 function bindInputs(){
   ['c_pname','c_sname','c_agent','c_state','c_zip','c_page','c_sage','a_prem','a_ded','a_oop','a_med','a_visits','a_copay','p_lb','p_lb_carrier','p_lb_cov','p_rxben','p_pension','p_pnote','pp_cv10','pp_cv20','pp_cv30','pp_leg1','pp_leg25',
    'b_desc','b_charge','b_disc','b_days','b_daily','b_adm','b_his','b_other','r_desc','r_charge','r_pay','r_aca']
@@ -1509,7 +1579,7 @@ function bindInputs(){
   $('in_ssex').addEventListener('change',function(){ buildFlag('s'); captureIntake(); });
   $('in_diabetic').addEventListener('change',function(){ buildFlag('p'); buildFlag('s'); });
   document.querySelectorAll('#step-intake .chip input').forEach(function(cb){ cb.addEventListener('change',function(){ syncChips(); readIntake(); autosave(); }); });
-  ['in_pname','in_sname','in_agent','in_address','in_state','in_zip','in_page','in_sage','in_majorcond_note','in_diabetic_note','in_docs1','in_docs2','in_docs3','in_carrier','in_plan','in_prem','in_oop','in_visits','in_copay','in_income','in_retage','in_savings','in_invest','in_invnote','in_docnote','in_budget','in_notes','in_kids','in_routenote','in_docsnote']
+  ['in_pname','in_sname','in_agent','in_address','in_state','in_zip','in_page','in_sage','in_majorcond_note','in_diabetic_note','in_docs1','in_docs2','in_docs3','in_carrier','in_plan','in_prem','in_oop','in_visits','in_copay','in_income','in_retage','in_savings','in_invest','in_invnote','in_docnote','in_budget','in_notes','in_kids','in_routenote','in_docsnote','in_whyshop','in_effdate']
     .forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',function(){ captureIntake(); }); });
   $('in_phone').addEventListener('input',function(){ this.value=fmtPhone(this.value); markValid(this,phoneOK(this.value)); captureIntake(); });
   $('in_date').addEventListener('input',function(){ this.value=fmtDate(this.value); markValid(this,dateOK(this.value)); var a=ageFromDOB(this.value); if(a) $('in_page').value=a; captureIntake(); });
@@ -1524,6 +1594,7 @@ function bindInputs(){
   $('in_ded_sel').addEventListener('change',onDedChange);
   $('in_ded').addEventListener('input',function(){ var d=effDed(); if(d>0) $('in_oop').value=d; captureIntake(); });
   $('addMed').onclick=function(){ S.intake.medList=S.intake.medList||[]; S.intake.medList.push({name:'',cost:0,forP:true,forS:false}); renderMeds(); };
+  document.querySelectorAll('.sayico').forEach(function(s){ s.onclick=function(){ openScript(+s.dataset.beat||0); }; });
   document.querySelectorAll('#ageseg button').forEach(function(b){ b.onclick=function(){ S.estBand=+b.dataset.band; renderEstimate(); autosave(); }; });
   $('emailBtn').onclick=function(e){ e.preventDefault(); var m=buildEmail();
     try{ if(navigator.clipboard) navigator.clipboard.writeText('To: '+m.to+'\nSubject: '+m.subject+'\n\n'+m.body); }catch(err){}
