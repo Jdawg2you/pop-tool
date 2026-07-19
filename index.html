@@ -289,7 +289,7 @@
   .doccallout:empty{display:none}
   .doccallout .ok{color:var(--green)}.doccallout .warn{color:var(--maroon)}.doccallout .orange{color:#b5651d}
   input.invalid{border-color:#c0392b!important;box-shadow:0 0 0 1px #c0392b}
-  .fld input.keyfield{border-color:#5aa46e;box-shadow:0 0 0 1px rgba(90,164,110,.35)}
+  .fld input.keyfield,.fld select.keyfield{border-color:#5aa46e;box-shadow:0 0 0 1px rgba(90,164,110,.35)}
   #in_pbuild,#in_sbuild{font-size:11px}
   #in_pbuild.ok,#in_sbuild.ok{color:#1c6b38;border-color:#5aa46e;background:rgba(90,164,110,.08)}
   #in_pbuild.warn,#in_sbuild.warn{color:#8a5a00;border-color:#d8a23a;background:rgba(216,162,58,.1)}
@@ -297,6 +297,9 @@
   .sayico{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:#fff;background:var(--navy);border-radius:20px;padding:3px 11px;margin-left:8px;cursor:pointer;vertical-align:middle;user-select:none;white-space:nowrap;transition:background .15s,color .15s}
   .sayico::before{content:"";width:12px;height:12px;flex:0 0 12px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M4 3h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z'/></svg>") center/contain no-repeat}
   .sayico:hover{background:linear-gradient(180deg,#6b7688,#485266)}
+  .sayico.helpico{background:var(--gold-pill);color:#26324a;font-size:11.5px;padding:5px 14px;margin-left:0;border:1px solid #b0872f}
+  .sayico.helpico::before{background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2326324a' d='M4 3h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z'/></svg>") center/contain no-repeat}
+  .sayico.helpico:hover{background:#f0e0b8}
   .sec-flash{outline:3px solid #d8a23a;outline-offset:4px;border-radius:8px}
   .popwrap{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
   .popgauge{position:relative;width:132px;height:132px;flex:0 0 132px;margin:0 auto}
@@ -385,6 +388,7 @@
    <div class="card pad">
     <div class="sectitle"><span class="dot">●</span> Client Intake</div>
     <div class="note" style="padding-top:2px">Fill what the client gives you, then hit Build Quote. It pre-fills the comparison and recommends Good / Better / Best from your answers.</div>
+    <div style="margin:10px 0 2px"><span class="sayico helpico" data-set="help" data-beat="0" title="A quick walkthrough of how this tool works">New here? How to use this tool</span></div>
 
     <div class="intake-sec" id="sec_who">Who needs coverage <span class="sayico" data-beat="0" title="Say this — opens the script">Say this</span></div>
     <div class="chips">
@@ -408,12 +412,12 @@
       <div class="fld"><label>Date of birth</label><input id="in_date" class="keyfield" placeholder="MM/DD/YYYY"></div>
       <div class="fld"><label>Age <small>auto from DOB</small></label><input id="in_page" placeholder="49"></div>
       <div class="fld"><label>Sex <small>at birth</small></label><select id="in_psex" class="selfld"><option value="">—</option><option value="M">Male</option><option value="F">Female</option></select></div>
-      <div class="fld"><label>Height</label><select id="in_pheight" class="selfld"></select></div>
-      <div class="fld"><label>Weight (lbs)</label><input id="in_pweight" type="number" placeholder="180"></div>
+      <div class="fld"><label>Height</label><select id="in_pheight" class="selfld keyfield"></select></div>
+      <div class="fld"><label>Weight (lbs)</label><input id="in_pweight" class="keyfield" type="number" placeholder="180"></div>
       <div class="fld"><label>BMI <small>auto</small></label><input id="in_pbmi" readonly placeholder="—"></div>
       <div class="fld"><label>Build check <small>ManhattanLife</small></label><input id="in_pbuild" readonly placeholder="—"></div>
-      <div class="fld"><label>Client phone</label><input id="in_phone" placeholder="(000) 000-0000"></div>
-      <div class="fld"><label>Client email</label><input id="in_email" placeholder="name@example.com"></div>
+      <div class="fld"><label>Client phone</label><input id="in_phone" class="keyfield" placeholder="(000) 000-0000"></div>
+      <div class="fld"><label>Client email</label><input id="in_email" class="keyfield" placeholder="name@example.com"></div>
       <div class="fld"><label>Address</label><input id="in_address" placeholder="Street, City"></div>
       <div class="fld"><label>State</label><select id="in_state" class="selfld keyfield"><option value="">—</option><option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option><option value="DC">DC</option><option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option></select></div>
       <div class="fld"><label>ZIP</label><input id="in_zip" class="keyfield" placeholder="78163"></div>
@@ -713,7 +717,7 @@
       <div class="note hidein-client" style="padding-top:10px">“Email to client” uses your computer’s default mail app; “Gmail” / “Outlook” open the web compose window with everything filled in (no setup needed). Then click “Print Quote,” save the PDF, and attach it. (Email to client also copies the letter to your clipboard as a backup.)</div>
       <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
         <div style="font-family:var(--serif);font-weight:700;color:var(--navy);margin-bottom:8px">Helpful links</div>
-        <div class="note" style="padding:0;font-style:normal">More links coming soon.</div>
+        <a href="https://www.bbb.org/us/tx/houston/profile/life-insurance/manhattan-life-group-inc-0915-58736" target="_blank" rel="noopener" class="seclink">ManhattanLife — BBB Profile (A+ rating, accredited since 2013) ↗</a>
       </div>
     </div>
    </div>
@@ -1914,7 +1918,40 @@ var SCRIPT_OBJ=[
  {title:"“I’m healthy — I don’t need insurance.”",html:"<p class=say>Best time to buy. People felt that way until an accident or surprise bill. Being healthy locks in low rates that hold to age 65. <b>“Makes sense to protect your good health while it’s most affordable, right?”</b></p>"},
  {title:"“Can you just send me some info?”",html:"<p class=say>Absolutely — but clients found reading alone didn’t show what they personally qualify for. I’ll send it and walk you through it in 5 minutes. <b>“This evening or tomorrow morning?”</b></p>"}
 ];
+/* ---- How to use this tool (new-agent guide) ---- */
+var SCRIPT_HELP=[
+ {title:"Start here — three steps",html:
+   "<p class=say>The tool runs left to right: <b>Intake → Quote → Enroll</b>. Work them in order and most of the rest fills itself in.</p>"},
+ {title:"Step 1 · Intake — capture the client",html:
+   "<p class=say>This is your discovery call. Grab the basics first — state, both dates of birth, and who's being covered — then keep the conversation going and fill in the rest as it comes up. Nothing has to be entered in order, and it saves as you type.</p>"
+  +"<p class=note>The <b>green-outlined fields</b> are the ones the tool needs in order to price a plan: name, date of birth, height, weight, phone, email, state and ZIP. Get those and you can quote.</p>"},
+ {title:"The “Say this” bubbles",html:
+   "<p class=say>Every section header has a small <b>Say this</b> bubble. Click it and a script window opens with the exact words for that part of the call, with Prev/Next to walk the whole conversation.</p>"
+  +"<p class=say>Drag that window to a second screen and it stays put — clicking a different section just swaps the script inside it. The section you're on gets outlined in gold so you never lose your place.</p>"
+  +"<p class=note>On the Quote step there's also an <b>Objections</b> bubble with Feel · Felt · Found answers to the ten things clients say most.</p>"},
+ {title:"Step 2 · Quote — the pricing is done for you",html:
+   "<p class=say>Hit <b>Build Quote</b> and all three packages price themselves from ManhattanLife's current rate guide. No lookups, no spreadsheets.</p>"
+  +"<p class=say>It automatically uses the state you picked, the <b>older of the two ages</b> (that's how these plans rate), and whether a spouse or children are covered. Policy fees are already folded in.</p>"
+  +"<p class=note>If a rate isn't on file for that state, the line still appears with a “verify” note so nothing silently disappears. And every price stays editable — type over any number and it sticks.</p>"},
+ {title:"Good / Better / Best",html:
+   "<p class=say>Three packages are always built. They carry the same core protection, stepped by <b>coverage amount</b> rather than by pulling products out. Best carries the richest coverage plus home health care; Good keeps the essentials at the lowest monthly.</p>"},
+ {title:"The POP Score",html:
+   "<p class=say>The dial scores how completely a package protects <b>this specific client</b>, 0 to 100. It weighs seven areas: everyday care, preventive, hospitalization, accident, critical illness, dental/vision/hearing, and income protection.</p>"
+  +"<p class=say>It's personalized. A family history of cancer pushes critical illness up. Being older, or heavier for their height, pushes hospitalization up. A young, healthy client isn't penalized for lighter coverage the way a 58-year-old would be.</p>"
+  +"<p class=note><b>What's lifting it</b> shows what's already working — those are your talking points for why the package is strong.</p>"},
+ {title:"Raising the score",html:
+   "<p class=say><b>How to raise it</b> lists exactly what to add, biggest impact first, showing the <b>points gained</b> and the <b>monthly cost</b> side by side.</p>"
+  +"<p class=say>Click any one and it's added to the package — the price and the score both update instantly. That's your upgrade conversation in one line: “for about $15 more a month, we close this gap.”</p>"},
+ {title:"Step 3 · Enroll",html:
+   "<p class=say>Confirm the package, then the carrier buttons take you straight to the application portal. Email the quote to the client in one click — Gmail, Outlook, or your default mail — and use <b>Print / PDF Quote</b> to save the comparison and attach it.</p>"},
+ {title:"Worth knowing",html:
+   "<p class=note>• Everything autosaves as you go. <b>Save Quote</b> writes a file you can reopen later and pick up where you left off.<br>"
+  +"• <b>Client view</b> hides your notes and agent-only tools — switch to it before you share your screen.<br>"
+  +"• Medication prices you look up on the intake feed the package math automatically.<br>"
+  +"• Build-chart and underwriting flags appear as you enter height and weight, so you'll know early if something needs a closer look.</p>"}
+];
 var SCRIPTS={
+ help:{label:"How to use this tool",mode:"list",beats:SCRIPT_HELP},
  intake:{label:"Intake · Discovery Call",mode:"paged",beats:SCRIPT_BEATS},
  quote:{label:"Quote · Presentation Call",mode:"paged",beats:SCRIPT_QUOTE},
  obj:{label:"Objection Handling · Feel–Felt–Found",mode:"list",beats:SCRIPT_OBJ}
@@ -1993,6 +2030,7 @@ function bindInputs(){
   $('addMed').onclick=function(){ S.intake.medList=S.intake.medList||[]; S.intake.medList.push({name:'',cost:0,forP:true,forS:false}); renderMeds(); };
   document.querySelectorAll('.sayico').forEach(function(s){ s.onclick=function(){ openScript(s.dataset.set||'intake', +s.dataset.beat||0); }; });
   $('p_lb_cov').addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); });
+  $('in_effdate').addEventListener('input',function(){ this.value=fmtDate(this.value); });
   ['in_tobacco_p','in_tobacco_s','in_famcancer_p','in_famcancer_s','in_famheart_p','in_famheart_s','in_maternity_p','in_maternity_s','in_mental_p','in_mental_s','in_surg2yr_p','in_surg2yr_s'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('change',function(){ syncChips(); captureIntake(); }); });
   document.querySelectorAll('textarea.autogrow').forEach(function(t){ t.addEventListener('input',function(){ autoGrow(t); }); });
   document.querySelectorAll('#ageseg button').forEach(function(b){ b.onclick=function(){ S.estBand=+b.dataset.band; renderEstimate(); autosave(); }; });
