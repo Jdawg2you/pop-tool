@@ -301,6 +301,12 @@
   .sayico.helpico::before{background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2326324a' d='M4 3h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z'/></svg>") center/contain no-repeat}
   .sayico.helpico:hover{background:#f0e0b8}
   .sec-flash{outline:3px solid #d8a23a;outline-offset:4px;border-radius:8px}
+  .lbctl{display:flex;gap:10px;flex-wrap:wrap;padding:8px 15px}
+  .lbgrp{flex:1;min-width:150px}
+  .lbgrp label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:3px}
+  .lbgrp select{width:100%}
+  .lbnote{padding:0 15px 8px;font-size:12px;line-height:1.45}
+  .lbnote .warn{color:#8a5111}.lbnote .bad{color:#a12525}.lbnote .ok{color:#1c6b38}
   .popwrap{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
   .popgauge{position:relative;width:132px;height:132px;flex:0 0 132px;margin:0 auto}
   .popnum{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -583,6 +589,15 @@
           <button class="addbtn hidein-client" id="addProd">+ Add product</button>
           <button class="addbtn hidein-client" id="resetTab" style="background:#efe9db">↻ Reset to default</button>
           <div class="row lbblock"><div class="lab">Living Benefits<small id="lb_desc">Pays the client cash on critical / chronic / terminal illness</small></div><input class="num money-in" id="p_lb" type="number" step="0.01"><span class="money-disp" data-for="p_lb"></span></div>
+          <div class="row lbctl hidein-client">
+            <div class="lbgrp"><label>Carrier</label>
+              <select id="lb_carrier" class="selfld"><option value="americo">Americo Term 125</option><option value="moo">Mutual of Omaha TLE</option></select></div>
+            <div class="lbgrp"><label>Coverage</label>
+              <select id="lb_face" class="selfld"><option value="auto">Auto ($50K, drops to $25K over $100)</option><option value="50000">$50,000</option><option value="25000">$25,000</option></select></div>
+            <div class="lbgrp"><label>Covers</label>
+              <select id="lb_who" class="selfld"><option value="primary">Primary</option><option value="spouse">Spouse</option><option value="both">Both</option></select></div>
+          </div>
+          <div class="lbnote hidein-client" id="lb_note"></div>
           <div class="row lbmeta-row hidein-client"><input id="p_lb_carrier" class="lbmeta m1" placeholder="Carrier (e.g., Americo HMS 125)"><input id="p_lb_cov" class="lbmeta m2" placeholder="Coverage amount"></div>
           <div class="row hidein-client"><div class="lab">Rx benefit / day (this plan)<small>daily prescription allowance for this tier</small></div><input class="num" id="p_rxben" type="number" step="0.01"></div>
           <div class="row"><div class="lab">Medications (net / mo)<small>discount total (from intake) − (daily benefit × 30)</small></div><div class="val" id="o_p_mednet">—</div></div>
@@ -837,11 +852,90 @@ function pHHC(R,st,age,col){
   return {price:row[col],note:'',prod:g.prod};
 }
 
+
+/* ===== LIVING BENEFITS RATES (20-Year Term, monthly) =====
+   Values: [nonTobacco_25K, nonTobacco_50K, tobacco_25K, tobacco_50K]
+   Americo Term 125 : UNISEX, issue ages 20-64. Verified, all states identical (ex-NY).
+   Mutual of Omaha TLE : gender-rated, issue ages 18-50. ONLY 18-27 loaded/verified;
+   28-50 intentionally absent -> engine returns null + "rate not loaded" so nothing is guessed. */
+var LB_RATES={
+ americo:{label:'Americo Term 125',unisex:true,min:20,max:64,r:{20:[12.09,15.63,14.89,21.23],21:[12.09,15.63,14.89,21.23],22:[12.09,15.63,14.89,21.23],23:[12.09,15.63,14.89,21.23],24:[12.09,15.63,14.89,21.23],25:[12.09,15.63,14.89,21.23],26:[12.3,16.06,15.2,21.85],27:[12.52,16.48,15.51,22.47],28:[12.68,16.82,15.84,23.13],29:[12.92,17.29,16.15,23.75],30:[13.16,17.77,16.51,24.46],31:[13.42,18.29,17.1,25.65],32:[13.68,18.81,17.69,26.84],33:[13.94,19.33,18.29,28.03],34:[14.2,19.86,18.88,29.21],35:[14.46,20.38,19.48,30.4],36:[15.03,21.52,20.66,32.78],37:[15.56,22.56,21.87,35.2],38:[16.15,23.75,23.06,37.57],39:[16.72,24.89,24.3,40.04],40:[17.27,25.98,25.46,42.37],41:[18.05,27.55,27.41,46.27],42:[18.81,29.07,29.33,50.11],43:[19.55,30.54,31.28,54.01],44:[20.31,32.06,33.2,57.86],45:[21.19,33.82,35.13,61.7],46:[22.54,36.53,37.34,66.12],47:[23.87,39.19,39.54,70.54],48:[25.22,41.9,41.75,74.96],49:[26.58,44.6,43.99,79.42],50:[27.91,47.26,46.24,83.93],51:[30.0,51.44,49.66,90.77],52:[32.06,55.58,53.08,97.61],53:[34.15,59.76,56.53,104.5],54:[36.24,63.94,59.95,111.34],55:[38.36,68.16,63.41,118.28],56:[42.23,75.91,70.28,132.0],57:[46.6,84.65,77.97,147.39],58:[51.51,94.48,86.69,164.83],59:[57.12,105.69,96.45,184.35],60:[63.44,118.32,107.45,206.34],61:[66.45,124.36,113.98,219.4],62:[69.64,130.72,120.94,233.32],63:[72.98,137.42,128.35,248.14],64:[76.52,144.5,136.25,263.96]}},
+ moo:{label:'Mutual of Omaha TLE',unisex:false,min:18,max:50,r:{18:{M:[8.7,12.06,12.75,20.16],F:[8.5,11.66,11.66,17.98]},19:{M:[8.7,12.06,12.75,20.16],F:[8.5,11.66,11.66,17.98]},20:{M:[8.7,12.06,12.75,20.16],F:[8.5,11.66,11.66,null]},21:{M:[8.7,12.06,12.75,20.16],F:[8.5,11.66,11.66,17.98]},22:{M:[8.7,12.06,12.75,20.16],F:[8.5,11.66,11.66,17.98]},23:{M:[8.7,12.06,12.77,20.2],F:[8.5,11.66,11.66,17.98]},24:{M:[8.7,12.06,12.77,20.2],F:[8.5,11.66,11.66,17.98]},25:{M:[8.7,12.06,12.77,20.2],F:[8.5,11.66,11.66,17.98]},26:{M:[8.86,12.37,12.88,20.43],F:[8.63,11.93,11.88,18.42]},27:{M:[9.01,12.68,12.95,20.56],F:[8.81,12.28,12.06,18.78]}}}
+};
+function lbIdx(tob,face){ return (tob?2:0)+(face==50000?1:0); }
+function lbRate(carrier,age,sex,tob,face){
+  var C=LB_RATES[carrier]; if(!C) return {price:null,note:'unknown carrier'};
+  age=+age||0;
+  if(!age) return {price:null,note:'enter age'};
+  if(age<C.min||age>C.max) return {price:null,note:C.label+' issue ages '+C.min+'-'+C.max+' only'};
+  var row=C.r[age];
+  if(!row) return {price:null,note:'rate not loaded for age '+age+' — verify in portal'};
+  var arr;
+  if(C.unisex){ arr=row; }
+  else { if(sex!=='M'&&sex!=='F') return {price:null,note:'select sex at birth'};
+         arr=row[sex]; if(!arr) return {price:null,note:'rate not loaded — verify'}; }
+  var v=arr[lbIdx(tob,face)];
+  if(v==null) return {price:null,note:'rate not loaded for age '+age+' — verify in portal'};
+  return {price:v,note:''};
+}
+/* $100 rule: default to $50K, but drop to $25K when $50K would exceed $100/mo */
+function lbAutoFace(carrier,age,sex,tob){
+  var f50=lbRate(carrier,age,sex,tob,50000);
+  if(f50.price!=null&&f50.price>100) return 25000;
+  return 50000;
+}
+function lbPersons(){
+  var I=S.intake||{}, out=[];
+  var who=(S.lb&&S.lb.who)||'primary';
+  if(who==='primary'||who==='both') out.push({tag:'Primary',age:+S.client.page||0,sex:I.psex||'',tob:!!I.tobaccoP});
+  if(who==='spouse'||who==='both')  out.push({tag:'Spouse', age:+S.client.sage||0,sex:I.ssex||'',tob:!!I.tobaccoS});
+  return out;
+}
+/* Returns {total, lines:[{tag,face,price,note}], note} — total is null if ANY person is unpriced */
+function lbCompute(){
+  S.lb=S.lb||{carrier:'americo',face:'auto',who:'primary'};
+  var c=S.lb.carrier, lines=[], total=0, missing=false;
+  lbPersons().forEach(function(p){
+    var face=(S.lb.face==='auto')?lbAutoFace(c,p.age,p.sex,p.tob):(+S.lb.face);
+    var r=lbRate(c,p.age,p.sex,p.tob,face);
+    if(r.price==null) missing=true; else total+=r.price;
+    lines.push({tag:p.tag,age:p.age,face:face,price:r.price,note:r.note});
+  });
+  if(!lines.length) return {total:null,lines:[],note:'no one selected'};
+  var dropped=lines.filter(function(l){return l.face===25000&&S.lb.face==='auto';});
+  var note='';
+  if(dropped.length) note='Coverage set to $25,000 for '+dropped.map(function(l){return l.tag;}).join(' & ')+' — $50,000 would exceed $100/mo.';
+  return {total:missing?null:Math.round(total*100)/100, lines:lines, note:note};
+}
+
 /* ===== RATE-SHEET AUTO-PRICING (rate sheet = source of truth; manual edits win once set) ===== */
 function ratingAge(){ var a=+S.client.page||0,b=+S.client.sage||0; return Math.max(a,b)||0; }
 function householdKey(){ var w=(S.intake&&S.intake.who)||{}; var sp=!!w.spouse,kd=!!w.kids; return sp&&kd?'f':(sp?'s':(kd?'c':'i')); }
 function sdrEscalate(){ var I=S.intake||{}; if(ratingAge()<50) return false; return !!(I.diabetic||I.majorcond||I.famcancer||I.famheart||(typeof overBuild==='function'&&overBuild())); }
 var LVLNAME={ElitePlus:'Elite Plus',Elite:'Elite',ClassicPlus:'Classic Plus',Classic:'Classic'};
+function renderLB(applyPrice){
+  if(!$('lb_carrier')) return;
+  S.lb=S.lb||{carrier:'americo',face:'auto',who:'primary'};
+  $('lb_carrier').value=S.lb.carrier; $('lb_face').value=S.lb.face; $('lb_who').value=S.lb.who;
+  var r=lbCompute(), C=LB_RATES[S.lb.carrier], html='';
+  r.lines.forEach(function(l){
+    if(l.price!=null) html+='<div class="ok">✓ '+l.tag+' (age '+l.age+') — $'+(l.face/1000)+'K = $'+l.price.toFixed(2)+'/mo</div>';
+    else html+='<div class="bad">✗ '+l.tag+(l.age?' (age '+l.age+')':'')+' — '+l.note+'</div>';
+  });
+  if(r.note) html+='<div class="warn">⚠ '+r.note+'</div>';
+  if(r.total==null&&r.lines.length) html+='<div class="warn">Price left blank — fill the missing rate in manually, or pick the other carrier.</div>';
+  html+='<div style="color:var(--muted);font-size:11px;margin-top:3px">'+C.label+' · 20-year term · issue ages '+C.min+'–'+C.max+(S.lb.carrier==='moo'?' · only ages 18–27 loaded so far':'')+'</div>';
+  $('lb_note').innerHTML=html;
+  if(applyPrice){
+    var pk=S.packages[S.activeTab];
+    if(pk){ pk.lb=(r.total==null)?0:r.total; pk.lbCarrier=C.label;
+      pk.lbCov=r.lines.map(function(l){return l.tag+' $'+(l.face/1000)+'K';}).join(' + ');
+      if($('p_lb')) $('p_lb').value=pk.lb||'';
+      if($('p_lb_carrier')) $('p_lb_carrier').value=pk.lbCarrier;
+      if($('p_lb_cov')) $('p_lb_cov').value=pk.lbCov;
+    }
+  }
+}
 function cfgClone(o){ return JSON.parse(JSON.stringify(o)); }
 /* Legacy/rate-driven product names are superseded by auto-pricing; anything else is a real manual extra */
 function isRateDriven(nm){
@@ -1210,6 +1304,7 @@ function blankState(){
     reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
     intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobaccoP:false,tobaccoS:false,maternityP:false,maternityS:false,maternity:false,dv:false,famcancerP:false,famcancerS:false,famcancer:false,famheartP:false,famheartS:false,famheart:false,mentalP:false,mentalS:false,mental:false,surg2yrP:false,surg2yrS:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'70',pweight:'',sheight:'70',sweight:'',psex:'',ssex:'',kidsNote:'',routeNote:'',docsNote:'',whyShop:'',effDate:''},
     recommended:'best',
+    lb:{carrier:'americo',face:'auto',who:'primary'},
     recFlags:[],
     step:'intake',
     estBand:null
@@ -1390,6 +1485,7 @@ function compute(){
   refreshClientDisp();
   if($('estBody')) renderEstimate();
   if($('recFlags')) renderFlags();
+  if($('lb_carrier')) renderLB(false);
   if($('popScoreBody')) renderPopScore();
   if(S.step==='enroll') renderEnroll();
   autosave();
@@ -2031,6 +2127,8 @@ function bindInputs(){
   document.querySelectorAll('.sayico').forEach(function(s){ s.onclick=function(){ openScript(s.dataset.set||'intake', +s.dataset.beat||0); }; });
   $('p_lb_cov').addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); });
   $('in_effdate').addEventListener('input',function(){ this.value=fmtDate(this.value); });
+  ['lb_carrier','lb_face','lb_who'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('change',function(){
+    S.lb=S.lb||{}; S.lb[id.replace('lb_','')]=el.value; renderLB(true); compute(); }); });
   ['in_tobacco_p','in_tobacco_s','in_famcancer_p','in_famcancer_s','in_famheart_p','in_famheart_s','in_maternity_p','in_maternity_s','in_mental_p','in_mental_s','in_surg2yr_p','in_surg2yr_s'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('change',function(){ syncChips(); captureIntake(); }); });
   document.querySelectorAll('textarea.autogrow').forEach(function(t){ t.addEventListener('input',function(){ autoGrow(t); }); });
   document.querySelectorAll('#ageseg button').forEach(function(b){ b.onclick=function(){ S.estBand=+b.dataset.band; renderEstimate(); autosave(); }; });
