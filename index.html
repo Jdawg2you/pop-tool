@@ -841,9 +841,14 @@ var LVLNAME={ElitePlus:'Elite Plus',Elite:'Elite',ClassicPlus:'Classic Plus',Cla
 function cfgClone(o){ return JSON.parse(JSON.stringify(o)); }
 /* Legacy/rate-driven product names are superseded by auto-pricing; anything else is a real manual extra */
 function isRateDriven(nm){
-  nm=(nm||'').toLowerCase();
-  return /afc|core health/.test(nm)||/hospital indemnity|hi select/.test(nm)||/24-hr accident|accident cash/.test(nm)
-      ||/gap|omni flex|out-of-pocket/.test(nm)||/dvh|dental/.test(nm)||/home health|hhc/.test(nm)||/specified disease/.test(nm);
+  nm=(nm||'').toLowerCase().replace(/\s+/g,' ');
+  return /\bafc\b|core health|affordable choice/.test(nm)
+      || /hospital indemnity|hi select/.test(nm)
+      || /accident/.test(nm)
+      || /\bgap\b|omni ?flex|out ?- ?of ?- ?pocket|out of pocket/.test(nm)
+      || /\bdvh\b|dental/.test(nm)
+      || /home health|\bhhc\b/.test(nm)
+      || /specified disease/.test(nm);
 }
 function manualExtras(prev){ return (prev||[]).filter(function(p){ return !p.k && !isRateDriven(p.name); }); }
 function effCfg(t){ S.cfg=S.cfg||{}; if(!S.cfg[t]) S.cfg[t]=cfgClone(TIERCFG[t]); return S.cfg[t]; }
@@ -925,14 +930,14 @@ function popStrengthsPk(pk){
   pk=pk||{products:[],lb:0};
   var names=(pk.products||[]).map(function(p){return (p.name||'').toLowerCase();});
   var has=function(kw){ return names.some(function(n){return n.indexOf(kw)>=0;}); };
-  var afcName=(pk.products||[]).map(function(p){return p.name||'';}).filter(function(n){return /afc|core health/i.test(n);})[0]||'';
+  var afcName=(pk.products||[]).map(function(p){return p.name||'';}).filter(function(n){return /\bafc\b|core health|affordable choice/i.test(n);})[0]||'';
   var afcPresent=!!afcName; var lvl=afcLevelIdx(afcName); if(lvl<0) lvl=1;
   var everyday   = afcPresent ? [100,88,74,60][lvl] : 0;
   var preventive = afcPresent ? [100,90,76,62][lvl] : 0;
   var cat=0;
   if(afcPresent) cat+=[40,34,27,20][lvl];
   if(has('hospital indemnity')||has('hi select')) cat+=32;
-  if(has('gap')||has('omni flex')||has('out-of-pocket')) cat+=28;
+  if(has('gap')||has('omni flex')||has('omniflex')||has('out-of-pocket')||has('out of pocket')) cat+=28;
   cat=Math.min(100,cat);
   var homecare=(has('home health')||has('hhc'))?100:0;
   var accident = has('2 unit')?100:(has('1 unit')?70:(has('accident')?80:0));
@@ -1026,9 +1031,12 @@ function renderPopScore(){
   var ring='<div class="popgauge"><svg width="132" height="132" viewBox="0 0 132 132" style="transform:rotate(-90deg)"><circle cx="66" cy="66" r="56" fill="none" stroke="#ece4d3" stroke-width="12"/><circle cx="66" cy="66" r="56" fill="none" stroke="'+col+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+dash+' '+C.toFixed(1)+'"/></svg><div class="popnum"><b style="color:'+col+'">'+sc+'</b><span>POP Score</span></div></div>';
   var three='<div class="pop3">'+['good','better','best'].map(function(t){var v=scores[t];return '<div class="t'+(t===at?' on':'')+'" data-tier="'+t+'"><b style="color:'+colf(v)+'">'+v+'</b>'+t.toUpperCase()+'</div>';}).join('')+'</div>';
   var posli=pos.length?pos.map(function(x){return '<li>✓ '+x+'</li>';}).join(''):'<li style="color:var(--muted)">—</li>';
-  var sug=(typeof popSuggestions==='function')?popSuggestions(at):{list:[]};
+  var canPrice=(typeof HF_RATES!=='undefined')&&!!(S.client.state||'').trim()&&!!ratingAge();
+  var sug=(typeof popSuggestions==='function'&&canPrice)?popSuggestions(at):{list:[]};
   var negli;
-  if(sug.list.length){
+  if(canPrice&&!sug.list.length){
+    negli='<li style="color:#1c6b38">Nothing major missing — well protected</li>';
+  } else if(sug.list.length){
     negli=sug.list.map(function(s,ix){
       var cost=s.dCost>=0?('+$'+s.dCost.toFixed(2)+'/mo'):('−$'+Math.abs(s.dCost).toFixed(2)+'/mo');
       return '<li class="sugg" data-ix="'+ix+'" title="Click to add this to the package">'+s.label
