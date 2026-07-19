@@ -905,9 +905,11 @@ function lbCompute(){
     if(!S.lb[p.k]) S.lb[p.k]={carrier:'americo',face:'',manual:null};
     var cfg=S.lb[p.k];
     if(!cfg.carrier) cfg.carrier='americo';
-    var auto=(cfg.face==='')?String(lbAutoFace(cfg.carrier,p.age,p.sex,p.tob)):cfg.face;
+    var isOtherCarrier=(cfg.carrier==='other');
+    var auto=(cfg.face===''&&!isOtherCarrier)?String(lbAutoFace(cfg.carrier,p.age,p.sex,p.tob)):(cfg.face||'50000');
     var rated=null,note='';
-    if(auto!=='other'){ var r=lbRate(cfg.carrier,p.age,p.sex,p.tob,+auto); rated=r.price; note=r.note; }
+    if(isOtherCarrier){ note='enter the monthly price'; }
+    else if(auto!=='other'){ var r=lbRate(cfg.carrier,p.age,p.sex,p.tob,+auto); rated=r.price; note=r.note; }
     else { note='enter the monthly price'; }
     var price=(cfg.manual!=null)?cfg.manual:rated;
     if(price==null) missing=true; else total+=price;
@@ -924,8 +926,16 @@ function ratingAge(){ var a=+S.client.page||0,b=+S.client.sage||0; return Math.m
 function householdKey(){ var w=(S.intake&&S.intake.who)||{}; var sp=!!w.spouse,kd=!!w.kids; return sp&&kd?'f':(sp?'s':(kd?'c':'i')); }
 function sdrEscalate(){ var I=S.intake||{}; if(ratingAge()<50) return false; return !!(I.diabetic||I.majorcond||I.famcancer||I.famheart||(typeof overBuild==='function'&&overBuild())); }
 var LVLNAME={ElitePlus:'Elite Plus',Elite:'Elite',ClassicPlus:'Classic Plus',Classic:'Classic'};
+function lbLabel(c){ return c==='other'?'Other carrier':(LB_RATES[c]?LB_RATES[c].label:c); }
 function renderLB(applyPrice){
   var host=$('lbRows'); if(!host) return;
+  // Never rebuild the rows while someone is typing in a manual price — it would kill focus mid-entry.
+  var ae=document.activeElement;
+  if(ae&&ae.classList&&ae.classList.contains('lbmanual')&&!applyPrice){
+    var t0=lbCompute(), tt=host.querySelector('.lbtotal');
+    if(tt) tt.innerHTML='Living Benefits total <b>'+(t0.total==null?'—':'$'+t0.total.toFixed(2)+'/mo')+'</b>';
+    return;
+  }
   var r=lbCompute(), html='';
   if(!r.lines.length){ host.innerHTML='<div class="lbnote" style="color:var(--muted)">No one selected for coverage — check Applicant or Spouse on the Intake.</div>'; return; }
   r.lines.forEach(function(l){
@@ -936,7 +946,8 @@ function renderLB(applyPrice){
       +'<div class="lbctls">'
         +'<select class="selfld lbsel" data-k="'+l.k+'" data-f="carrier">'
           +'<option value="americo"'+(l.carrier==='americo'?' selected':'')+'>Americo Term 125</option>'
-          +'<option value="moo"'+(l.carrier==='moo'?' selected':'')+'>Mutual of Omaha TLE</option></select>'
+          +'<option value="moo"'+(l.carrier==='moo'?' selected':'')+'>Mutual of Omaha TLE</option>'
+          +'<option value="other"'+(l.carrier==='other'?' selected':'')+'>Other</option></select>'
         +'<select class="selfld lbsel" data-k="'+l.k+'" data-f="face">'
           +'<option value="50000"'+(l.faceSel==='50000'?' selected':'')+'>$50,000</option>'
           +'<option value="25000"'+(l.faceSel==='25000'?' selected':'')+'>$25,000</option>'
@@ -973,7 +984,7 @@ function renderLB(applyPrice){
   if(applyPrice){
     var pk=S.packages[S.activeTab];
     if(pk){ pk.lb=(r.total==null)?0:r.total;
-      pk.lbCarrier=r.lines.map(function(l){return l.tag+': '+LB_RATES[l.carrier].label;}).join(' | ');
+      pk.lbCarrier=r.lines.map(function(l){return l.tag+': '+lbLabel(l.carrier);}).join(' | ');
       pk.lbCov=r.lines.map(function(l){return l.tag+' $'+(l.face/1000)+'K';}).join(' + ');
       if($('p_lb')) $('p_lb').value=pk.lb||'';
       if($('p_lb_carrier')) $('p_lb_carrier').value=pk.lbCarrier;
