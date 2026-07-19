@@ -307,9 +307,12 @@
   .lbtag{flex:0 0 118px;font-weight:700;color:var(--navy);font-size:13px;line-height:1.2}
   .lbtag small{display:block;font-weight:400;font-size:10.5px;color:var(--muted);margin-top:1px}
   .lbrow select.lbsel{flex:1;min-width:140px}
-  .lbprice{flex:0 0 118px;text-align:right;font-family:var(--serif);font-weight:700;font-size:16px;color:var(--navy)}
-  .lbprice small{display:block;font-family:-apple-system,sans-serif;font-weight:400;font-size:10px;color:var(--muted)}
-  .lbprice.bad{color:#a12525}
+  .lbpw{flex:0 0 132px;display:flex;align-items:baseline;justify-content:flex-end;gap:1px;border:1px solid var(--line);border-radius:8px;padding:3px 8px;background:#fff}
+  .lbpw span{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--navy)}
+  .lbpw input.lbmanual{width:72px;border:none;outline:none;background:transparent;text-align:right;font-family:var(--serif);font-weight:700;font-size:19px;color:var(--navy);padding:0;-moz-appearance:textfield}
+  .lbpw input.lbmanual::-webkit-outer-spin-button,.lbpw input.lbmanual::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .lbpw em{font-style:normal;font-size:10.5px;color:var(--muted);margin-left:2px}
+  .lbpw.man{border-color:#b0872f;background:#fdf7e8}
   .lbrownote{font-size:11.5px;line-height:1.4;padding:2px 0 4px}
   .lbrownote.warn{color:#8a5111}.lbrownote.bad{color:#a12525}
   .lbtotal{border-top:1px solid var(--line);margin-top:4px;padding-top:6px;text-align:right;font-size:12.5px;color:var(--navy)}
@@ -890,19 +893,25 @@ function lbPersons(){
   if(w.spouse)      out.push({k:'s',tag:'Spouse', age:+S.client.sage||0,sex:I.ssex||'',tob:!!I.tobaccoS});
   return out;
 }
-/* Each covered person carries their own carrier + coverage choice. Total is null if ANY line is unpriced. */
+/* Each covered person carries their own carrier + coverage + optional manual price.
+   face:''  = follow the $100 rule (default)   face:'25000'/'50000' = explicit   face:'other' = manual only
+   manual!=null always wins until a dropdown is changed again. */
 function lbCompute(){
   S.lb=S.lb||{};
   var lines=[], total=0, missing=false;
   lbPersons().forEach(function(p){
-    if(!S.lb[p.k]) S.lb[p.k]={carrier:'americo',face:'auto'};
+    if(!S.lb[p.k]) S.lb[p.k]={carrier:'americo',face:'',manual:null};
     var cfg=S.lb[p.k];
-    var face=(cfg.face==='auto')?lbAutoFace(cfg.carrier,p.age,p.sex,p.tob):(+cfg.face);
-    var r=lbRate(cfg.carrier,p.age,p.sex,p.tob,face);
-    if(r.price==null) missing=true; else total+=r.price;
-    lines.push({k:p.k,tag:p.tag,age:p.age,sex:p.sex,tob:p.tob,carrier:cfg.carrier,faceSel:cfg.face,
-                face:face,price:r.price,note:r.note,
-                dropped:(cfg.face==='auto'&&face===25000)});
+    if(!cfg.carrier) cfg.carrier='americo';
+    var auto=(cfg.face==='')?String(lbAutoFace(cfg.carrier,p.age,p.sex,p.tob)):cfg.face;
+    var rated=null,note='';
+    if(auto!=='other'){ var r=lbRate(cfg.carrier,p.age,p.sex,p.tob,+auto); rated=r.price; note=r.note; }
+    else { note='enter the monthly price'; }
+    var price=(cfg.manual!=null)?cfg.manual:rated;
+    if(price==null) missing=true; else total+=price;
+    lines.push({k:p.k,tag:p.tag,age:p.age,sex:p.sex,tob:p.tob,carrier:cfg.carrier,
+                faceSel:auto, price:price, manual:(cfg.manual!=null), note:note,
+                dropped:(cfg.face===''&&auto==='25000')});
   });
   if(!lines.length) return {total:null,lines:[]};
   return {total:missing?null:Math.round(total*100)/100, lines:lines};
@@ -926,21 +935,37 @@ function renderLB(applyPrice){
         +'<option value="americo"'+(l.carrier==='americo'?' selected':'')+'>Americo Term 125</option>'
         +'<option value="moo"'+(l.carrier==='moo'?' selected':'')+'>Mutual of Omaha TLE</option></select>'
       +'<select class="selfld lbsel" data-k="'+l.k+'" data-f="face">'
-        +'<option value="auto"'+(l.faceSel==='auto'?' selected':'')+'>Auto ($100 rule)</option>'
         +'<option value="50000"'+(l.faceSel==='50000'?' selected':'')+'>$50,000</option>'
-        +'<option value="25000"'+(l.faceSel==='25000'?' selected':'')+'>$25,000</option></select>'
-      +'<div class="lbprice '+(l.price==null?'bad':'')+'">'+(l.price!=null?('$'+l.price.toFixed(2)+'<small>/mo · $'+(l.face/1000)+'K</small>'):'—')+'</div>'
+        +'<option value="25000"'+(l.faceSel==='25000'?' selected':'')+'>$25,000</option>'
+        +'<option value="other"'+(l.faceSel==='other'?' selected':'')+'>Other</option></select>'
+      +'<div class="lbpw'+(l.manual?' man':'')+'"><span>$</span>'
+        +'<input class="lbmanual" data-k="'+l.k+'" type="number" step="0.01" placeholder="—" value="'+(l.price!=null?l.price.toFixed(2):'')+'">'
+        +'<em>/mo</em></div>'
       +'</div>';
-    if(l.price==null) html+='<div class="lbrownote bad">✗ '+l.tag+': '+l.note+'</div>';
-    else if(l.dropped) html+='<div class="lbrownote warn">⚠ '+l.tag+' set to $25,000 — $50,000 would exceed $100/mo.</div>';
+    if(l.price==null&&l.note) html+='<div class="lbrownote bad">'+l.tag+': '+l.note+'</div>';
+    else if(l.manual) html+='<div class="lbrownote warn">'+l.tag+' price entered manually — pick a coverage amount again to go back to the rate sheet.</div>';
+    else if(l.dropped) html+='<div class="lbrownote warn">'+l.tag+' set to $25,000 — $50,000 would exceed $100/mo.</div>';
   });
   if(r.lines.length>1&&r.total!=null) html+='<div class="lbtotal">Living Benefits total <b>$'+r.total.toFixed(2)+'/mo</b></div>';
   if(r.total==null) html+='<div class="lbrownote warn">Total left blank until every line prices — fill the missing rate manually or switch that person’s carrier.</div>';
   host.innerHTML=html;
   host.querySelectorAll('select.lbsel').forEach(function(sel){
     sel.onchange=function(){ var k=sel.dataset.k, f=sel.dataset.f;
-      S.lb=S.lb||{}; S.lb[k]=S.lb[k]||{carrier:'americo',face:'auto'};
-      S.lb[k][f]=sel.value; renderLB(true); compute(); };
+      S.lb=S.lb||{}; S.lb[k]=S.lb[k]||{carrier:'americo',face:'',manual:null};
+      S.lb[k][f]=sel.value;
+      S.lb[k].manual=null;              // any dropdown click re-takes the rate-sheet price
+      renderLB(true); compute(); };
+  });
+  host.querySelectorAll('input.lbmanual').forEach(function(inp){
+    inp.oninput=function(){ var k=inp.dataset.k;
+      S.lb=S.lb||{}; S.lb[k]=S.lb[k]||{carrier:'americo',face:'',manual:null};
+      var v=parseFloat(inp.value);
+      S.lb[k].manual=isNaN(v)?null:v;   // manual entry wins until a dropdown is touched
+      var pk=S.packages[S.activeTab], t=lbCompute();
+      if(pk){ pk.lb=(t.total==null)?0:t.total; if($('p_lb')) $('p_lb').value=pk.lb||''; }
+      var tot=host.querySelector('.lbtotal');
+      if(tot) tot.innerHTML='Living Benefits total <b>'+(t.total==null?'—':'$'+t.total.toFixed(2)+'/mo')+'</b>';
+      compute(); };
   });
   if(applyPrice){
     var pk=S.packages[S.activeTab];
