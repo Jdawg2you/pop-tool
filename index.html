@@ -808,7 +808,15 @@ var copyArr=function(a){return (a||[]).map(function(x){return {name:x.name,month
 /* input masking + validation */
 function fmtPhone(v){ var d=(v||'').replace(/\D/g,'').slice(0,10); if(d.length>6) return '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6); if(d.length>3) return '('+d.slice(0,3)+') '+d.slice(3); if(d.length>0) return '('+d; return ''; }
 function fmtDate(v){ var d=(v||'').replace(/\D/g,'').slice(0,8); if(d.length>=5) return d.slice(0,2)+'/'+d.slice(2,4)+'/'+d.slice(4); if(d.length>=3) return d.slice(0,2)+'/'+d.slice(2); return d; }
-function fmtMoneyStr(v){ var d=(v||'').replace(/[^0-9]/g,''); if(!d) return ''; return '$'+(+d).toLocaleString('en-US'); }
+function fmtMoneyStr(v){
+  var s=String(v==null?'':v).replace(/[^0-9.]/g,'');
+  if(!s) return '';
+  var i=s.indexOf('.');
+  if(i<0) return '$'+(+s).toLocaleString('en-US');
+  var whole=s.slice(0,i), dec=s.slice(i+1).replace(/\./g,'').slice(0,2);   // keep cents, drop extra dots
+  var out='$'+(+(whole||'0')).toLocaleString('en-US')+'.';
+  return out+dec;   // trailing '.' preserved so you can keep typing cents
+}
 function phoneOK(v){ return (v||'').replace(/\D/g,'').length===10; }
 function dateOK(v){ var d=(v||'').replace(/\D/g,''); if(d.length!==8) return false; var m=+d.slice(0,2), day=+d.slice(2,4), y=+d.slice(4,8); return m>=1&&m<=12&&day>=1&&day<=31&&y>=1900&&y<=2100; }
 function emailOK(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||''); }
@@ -943,7 +951,7 @@ function lbCompute(){
     var price=(cfg.manual!=null)?cfg.manual:rated;
     if(price==null) missing=true; else total+=price;
     lines.push({k:p.k,tag:p.tag,age:p.age,sex:p.sex,tob:p.tob,carrier:cfg.carrier,
-                faceSel:auto, price:price, manual:(cfg.manual!=null), note:note,
+                faceSel:auto, face:(auto==='other'?null:+auto), price:price, manual:(cfg.manual!=null), note:note,
                 dropped:(cfg.face===''&&auto==='25000')});
   });
   if(!lines.length) return {total:null,lines:[]};
@@ -991,7 +999,7 @@ function acaEstimate(){
 /* Fill the ACA side as a placeholder — only when the agent hasn't already put a premium in */
 function applyAcaEstimate(force){
   var e=acaEstimate(); if(!e) return;
-  if(!force && (+S.aca.prem>0)) return;
+  if(!force && S.acaEdited) return;      // the agent typed their own numbers — leave them alone
   S.aca.prem=e.prem; S.aca.ded=e.ded;
   if(!(+S.aca.oop>0)) S.aca.oop=e.ded;
   S.acaEst=true;
@@ -1112,7 +1120,7 @@ function renderLB(applyPrice){
     var pk=S.packages[S.activeTab];
     if(pk){ pk.lb=(r.total==null)?0:r.total;
       pk.lbCarrier=r.lines.map(function(l){return l.tag+': '+lbLabel(l.carrier);}).join(' | ');
-      pk.lbCov=r.lines.map(function(l){return l.tag+' $'+(l.face/1000)+'K';}).join(' + ');
+      pk.lbCov=r.lines.map(function(l){return l.tag+' '+(l.face?('$'+(l.face/1000)+'K'):'custom');}).join(' + ');
       if($('p_lb')) $('p_lb').value=pk.lb||'';
       if($('p_lb_carrier')) $('p_lb_carrier').value=pk.lbCarrier;
       if($('p_lb_cov')) $('p_lb_cov').value=pk.lbCov;
@@ -1473,7 +1481,7 @@ function blankState(){
     client:{pname:'',sname:'',date:'',sdob:'',agent:'',state:'TX',zip:'78163',page:'49',sage:'45',address:''},
     docs:{docs:'',meds:'',net:false,rx:false,famcancer:false},
     tabLabels:{good:'Affordable core',better:'Solid package',best:'Full package of protection'},
-    aca:{subsidy:0,prem:1082.90,ded:10600,oop:10600,med:0,visits:0,copay:0,fullded:true},
+    aca:{subsidy:0,prem:0,ded:0,oop:0,med:0,visits:0,copay:0,fullded:true},
     activeTab:'best',
     library:defLibrary(),
     defaults:{good:defProducts('good'),better:defProducts('better'),best:defProducts('best')},
@@ -1487,6 +1495,7 @@ function blankState(){
     reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
     intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobaccoP:false,tobaccoS:false,maternityP:false,maternityS:false,maternity:false,dv:false,famcancerP:false,famcancerS:false,famcancer:false,famheartP:false,famheartS:false,famheart:false,mentalP:false,mentalS:false,mental:false,surg2yrP:false,surg2yrS:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,pincome:0,sincome:0,hhManual:false,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'70',pweight:'',sheight:'70',sweight:'',psex:'',ssex:'',kidsNote:'',routeNote:'',docsNote:'',whyShop:'',effDate:''},
     recommended:'best',
+    acaEdited:false,
     follow:{},
     lb:{p:{carrier:'americo',face:'auto'},s:{carrier:'americo',face:'auto'}},
     recFlags:[],
@@ -2107,7 +2116,7 @@ function goStep(s){
   var cs=$('clientStrip'); if(cs) cs.style.display=(s==='intake')?'none':'';
   if(s==='intake') fillIntake();
   if(s==='enroll') renderEnroll();
-  if(s==='quote'){ fill(); compute(); }
+  if(s==='quote'){ applyAcaEstimate(false); autoPriceTiers(); fill(); compute(); }
   autosave(); window.scrollTo(0,0);
 }
 
@@ -2340,6 +2349,8 @@ function bindInputs(){
   $('in_effdate').addEventListener('input',function(){ this.value=fmtDate(this.value); });
   $('in_subsidy').addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); captureIntake(); compute(); });
   ['in_prem','in_oop','in_savings','in_invest'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); captureIntake(); }); });
+  ['in_prem','in_oop'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',function(){ S.acaEdited=true; }); });
+  ['a_prem','a_ded','a_oop'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',function(){ S.acaEdited=true; }); });
   if($('in_followNote')) $('in_followNote').addEventListener('input',function(){ S.follow=S.follow||{}; S.follow.note=this.value; autoGrow(this); autosave(); });
   // Income: currency-format all three. Primary/Spouse auto-sum into Household unless Household was typed.
   ['in_pincome','in_sincome'].forEach(function(id){ $(id).addEventListener('input',function(){
