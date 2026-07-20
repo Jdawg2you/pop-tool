@@ -780,14 +780,12 @@
 <!-- PLAN LIBRARY MODAL -->
 <div class="modal-backdrop" id="planModal">
   <div class="modal">
-    <div class="modal-head"><b>Plan Library</b><span>Manage the plans that feed the product dropdowns</span><button class="btn-gold" id="closePlans">Done</button></div>
+    <div class="modal-head"><b>Plan Library</b><span>Every plan available to this client, priced live</span><button class="btn-gold" id="closePlans">Done</button></div>
     <div class="modal-body">
       <div id="masterStatus" class="note" style="padding-top:0;font-style:normal;color:var(--navy);font-weight:600"></div>
-      <button class="addbtn" id="refreshMaster" style="margin:0 0 10px">↻ Refresh plans from master sheet</button>
-      <div class="note" style="padding-top:0">Add each product — and each benefit level as its own row (e.g., HI Select $5K, HI Select $10K). Prices are starting points; edit to match your ARC quote for the client's age/family. This list feeds every "pick a plan" dropdown and saves with your quotes.</div>
+      <div class="note" style="padding-top:0">This list is generated from the <b>master rate matrix</b> — you don't edit it. Every plan is priced for <i>this</i> client's state, rating age and household from the intake, so what you see here is what the "pick a plan" dropdowns will add. Plans marked <i>rate not loaded</i> aren't filed in this client's state; <i>enter price</i> means no rate sheet exists yet and you type the number.</div>
       <div class="libhead"><div class="a">Plan name</div><div class="b">Monthly $</div><div class="c"></div></div>
       <div id="libList"></div>
-      <button class="addbtn" id="addLib" style="margin-left:0">+ Add plan</button>
       <div style="border-top:1px solid var(--line);margin:16px 0 6px"></div>
       <div class="sectitle" style="font-size:14px">Default bundles <span style="font-family:-apple-system,sans-serif;font-weight:400;font-size:12px;color:var(--muted)">— what loads on each tab for a new quote</span></div>
       <div class="note" style="padding-top:2px">Edit each tab's starting bundle, or click "Use current … tab" to capture what you've built live. New quotes and "Reset to default" use these. Saved with your quotes.</div>
@@ -1451,9 +1449,10 @@ function loadMaster(cb){
 }
 function updateMasterStatus(){
   var el=$('masterStatus'); if(!el) return;
-  if(!MASTER_SHEET_CSV_URL) el.textContent='Not connected to a master sheet — using the built-in list. (An admin can paste a published Google Sheet link into the tool to connect it.)';
-  else if(masterConnected) el.textContent='Connected to the master sheet ✓  The plan list and Good/Better/Best defaults come from the sheet. Any edits below are local to this device until the next Refresh.';
-  else el.textContent='Master sheet is set, but it could not be loaded right now (offline or link issue) — using the last-known / built-in list.';
+  var st=(S.client.state||'').toUpperCase(), ag=ratingAge(), hh=householdKey();
+  var hhTxt={i:'Individual',s:'Individual + Spouse',c:'Individual + Child(ren)',f:'Family'}[hh]||hh;
+  if(!st||!ag){ el.textContent='Enter the client’s state and age on the intake to price this list.'; return; }
+  el.textContent='Priced for '+st+' · rating age '+ag+' · '+hhTxt+'  —  change the intake and these prices follow.';
 }
 
 function defLibrary(){
@@ -1530,11 +1529,99 @@ function blankState(){
 var S=blankState();
 var view='agent';
 
+/* ===== PLAN CATALOG — every priceable variant. NO stored prices: the matrix prices
+   each one for the client's own state / age / household / sex / tobacco. ===== */
+var PLAN_CATALOG=[
+ {g:'Core Health Plan (AFC)', n:'AFC Elite Plus',   k:'afc', set:function(c){c.afc='ElitePlus';}},
+ {g:'Core Health Plan (AFC)', n:'AFC Elite',        k:'afc', set:function(c){c.afc='Elite';}},
+ {g:'Core Health Plan (AFC)', n:'AFC Classic Plus', k:'afc', set:function(c){c.afc='ClassicPlus';}},
+ {g:'Core Health Plan (AFC)', n:'AFC Classic',      k:'afc', set:function(c){c.afc='Classic';}},
+
+ {g:'Specified Disease Rider', n:'SDR $500K max / $25K ded', k:'sdr', set:function(c){c.sdr={max:'500000',ded:'25000'};}},
+ {g:'Specified Disease Rider', n:'SDR $500K max / $50K ded', k:'sdr', set:function(c){c.sdr={max:'500000',ded:'50000'};}},
+ {g:'Specified Disease Rider', n:'SDR $500K max / $75K ded', k:'sdr', set:function(c){c.sdr={max:'500000',ded:'75000'};}},
+ {g:'Specified Disease Rider', n:'SDR $500K max / $100K ded',k:'sdr', set:function(c){c.sdr={max:'500000',ded:'100000'};}},
+ {g:'Specified Disease Rider', n:'SDR $250K max / $25K ded', k:'sdr', set:function(c){c.sdr={max:'250000',ded:'25000'};}},
+ {g:'Specified Disease Rider', n:'SDR $250K max / $50K ded', k:'sdr', set:function(c){c.sdr={max:'250000',ded:'50000'};}},
+ {g:'Specified Disease Rider', n:'SDR $250K max / $75K ded', k:'sdr', set:function(c){c.sdr={max:'250000',ded:'75000'};}},
+ {g:'Specified Disease Rider', n:'SDR $250K max / $100K ded',k:'sdr', set:function(c){c.sdr={max:'250000',ded:'100000'};}},
+
+ {g:'Hospital Indemnity (HI Select)', n:'HI Select $10K + Outpatient $1,000', k:'his', set:function(c){c.his={ben:10000,amb:1,outp:1000};}},
+ {g:'Hospital Indemnity (HI Select)', n:'HI Select $10K + Outpatient $500',   k:'his', set:function(c){c.his={ben:10000,amb:1,outp:500};}},
+ {g:'Hospital Indemnity (HI Select)', n:'HI Select $10K (no rider)',          k:'his', set:function(c){c.his={ben:10000,amb:1,outp:0};}},
+ {g:'Hospital Indemnity (HI Select)', n:'HI Select $5K (no rider)',           k:'his', set:function(c){c.his={ben:5000,amb:1,outp:0};}},
+
+ {g:'24-Hr Accident', n:'24-Hr Accident — 2 Unit', k:'acc', set:function(c){c.acc=2;}},
+ {g:'24-Hr Accident', n:'24-Hr Accident — 1 Unit', k:'acc', set:function(c){c.acc=1;}},
+
+ {g:'Out-of-Pocket / Gap', n:'Gap $200/day · $6,350 adm · $3,000 outpatient', k:'gap', set:function(c){c.gap={daily:'200',adm:'6350',outp:'3000',ea:1};}},
+ {g:'Out-of-Pocket / Gap', n:'Gap $200/day · $5,000 adm · $2,000 outpatient', k:'gap', set:function(c){c.gap={daily:'200',adm:'5000',outp:'2000',ea:1};}},
+ {g:'Out-of-Pocket / Gap', n:'Gap $200/day · $5,000 adm · $1,000 outpatient', k:'gap', set:function(c){c.gap={daily:'200',adm:'5000',outp:'1000',ea:1};}},
+ {g:'Out-of-Pocket / Gap', n:'Gap $200/day · $5,000 adm',                     k:'gap', set:function(c){c.gap={daily:'200',adm:'5000',outp:0,ea:1};}},
+ {g:'Out-of-Pocket / Gap', n:'Gap $100/day · $2,500 adm · $1,000 outpatient', k:'gap', set:function(c){c.gap={daily:'100',adm:'2500',outp:'1000',ea:1};}},
+ {g:'Out-of-Pocket / Gap', n:'Gap $100/day · $2,500 adm',                     k:'gap', set:function(c){c.gap={daily:'100',adm:'2500',outp:0,ea:1};}},
+
+ {g:'Dental · Vision · Hearing', n:'DVH Select $5K · $0 ded',   k:'dvh', set:function(c){c.dvh={max:'5000',ded:'0'};}},
+ {g:'Dental · Vision · Hearing', n:'DVH Select $3K · $0 ded',   k:'dvh', set:function(c){c.dvh={max:'3000',ded:'0'};}},
+ {g:'Dental · Vision · Hearing', n:'DVH Select $1.5K · $0 ded', k:'dvh', set:function(c){c.dvh={max:'1500',ded:'0'};}},
+ {g:'Dental · Vision · Hearing', n:'DVH Select $1K · $0 ded',   k:'dvh', set:function(c){c.dvh={max:'1000',ded:'0'};}},
+ {g:'Dental · Vision · Hearing', n:'DVH Select $3K · $100 ded', k:'dvh', set:function(c){c.dvh={max:'3000',ded:'100'};}},
+ {g:'Dental · Vision · Hearing', n:'DVH Select $1.5K · $100 ded',k:'dvh',set:function(c){c.dvh={max:'1500',ded:'100'};}},
+
+ {g:'Home Health Care', n:'HHC Deluxe',  k:'hhc', set:function(c){c.hhc='Deluxe';}},
+ {g:'Home Health Care', n:'HHC Premier', k:'hhc', set:function(c){c.hhc='Premier';}},
+ {g:'Home Health Care', n:'HHC Classic', k:'hhc', set:function(c){c.hhc='Classic';}},
+
+ /* No rate data — these carry a flat price the agent can edit */
+ {g:'Manual (no rate sheet)', n:'Cancer Lump Sum — $30K',        manual:62.50},
+ {g:'Manual (no rate sheet)', n:'Cancer Lump Sum — $15K',        manual:0},
+ {g:'Manual (no rate sheet)', n:'Heart Attack & Stroke — $10K',  manual:19.17},
+ {g:'Manual (no rate sheet)', n:'Cancer • Heart • Stroke — $25K',manual:68.50},
+ {g:'Manual (no rate sheet)', n:'Final Expense Life — $10K',     manual:27.90}
+];
+/* Price one catalog entry for THIS client — state, rating age, household, sex,
+   tobacco all come from the intake. Returns null if no rate is loaded. */
+function catalogPrice(p){
+  if(p.manual!==undefined) return p.manual;
+  try{
+    var c2=cfgClone(effCfg(S.activeTab||'best'));
+    p.set(c2);
+    var hit=(buildTierProducts(c2,null,[])||[]).filter(function(x){ return x.k===p.k; })[0];
+    return hit? (+hit.monthly||0) : null;
+  }catch(e){ return null; }
+}
 function libOptions(){
-  var s='<option value="">— pick a plan —</option>';
-  S.library.forEach(function(p,i){ s+='<option value="'+i+'">'+esc(p.name)+(p.price?(' — $'+p.price):'')+'</option>'; });
+  var s='<option value="">— pick a plan —</option>', last='';
+  PLAN_CATALOG.forEach(function(p,i){
+    if(p.g!==last){ if(last) s+='</optgroup>'; s+='<optgroup label="'+esc(p.g)+'">'; last=p.g; }
+    var pr=catalogPrice(p), tag;
+    if(pr==null)      tag=' — rate not loaded';
+    else if(pr===0)   tag=' — enter price';
+    else              tag=' — $'+pr.toFixed(2)+'/mo';
+    s+='<option value="'+i+'">'+esc(p.n+tag)+'</option>';
+  });
+  if(last) s+='</optgroup>';
   s+='<option value="custom">Custom (type below)</option>';
   return s;
+}
+/* Apply a catalog pick to the active tier. Fills the matching slot, or adds a
+   manual-priced extra line if that slot is already taken (lets you double up). */
+function applyCatalogPick(idx,rowIndex){
+  var p=PLAN_CATALOG[+idx]; if(!p) return;
+  var t=S.activeTab, pk=S.packages[t];
+  if(p.manual!==undefined){
+    pk.products[rowIndex]={name:p.n,monthly:p.manual,manual:true};
+    renderProducts(); compute(); return;
+  }
+  var slotTaken=(pk.products||[]).some(function(x,i){ return x.k===p.k && i!==rowIndex; });
+  if(slotTaken){
+    var c2=cfgClone(effCfg(t)); p.set(c2);
+    var priced=buildTierProducts(c2,null,[]).find(function(x){ return x.k===p.k; });
+    pk.products[rowIndex]={name:p.n,monthly:priced?priced.monthly:0,manual:true};
+    renderProducts(); compute(); return;
+  }
+  p.set(effCfg(t));
+  autoPriceTiers(); fill(); compute();
 }
 function renderProducts(){
   var pk=S.packages[S.activeTab];
@@ -1553,8 +1640,8 @@ function renderProducts(){
     del.onclick=function(){pk.products.splice(i,1);renderProducts();compute();};
     sel.onchange=function(){
       var v=sel.value;
-      if(v==='custom'){ name.focus(); }
-      else if(v!==''){ var lp=S.library[+v]; if(lp){ pk.products[i].name=lp.name; pk.products[i].monthly=lp.price; name.value=lp.name; val.value=lp.price; compute(); } }
+      if(v==='custom'){ pk.products[i].manual=true; name.focus(); }
+      else if(v!==''){ applyCatalogPick(v,i); }
     };
     row.appendChild(lab); row.appendChild(val); row.appendChild(disp); row.appendChild(del);
     host.appendChild(row);
@@ -1562,13 +1649,22 @@ function renderProducts(){
 }
 
 function renderLib(){
-  var host=$('libList'); host.innerHTML='';
-  S.library.forEach(function(p,i){
+  var host=$('libList'); host.innerHTML=''; var last='';
+  PLAN_CATALOG.forEach(function(p){
+    if(p.g!==last){
+      var h=document.createElement('div');
+      h.style.cssText='font-weight:700;color:var(--navy);font-size:12px;letter-spacing:.04em;text-transform:uppercase;margin:12px 0 4px';
+      h.textContent=p.g; host.appendChild(h); last=p.g;
+    }
+    var pr=catalogPrice(p), txt, col='var(--navy)';
+    if(pr==null){ txt='rate not loaded'; col='var(--muted)'; }
+    else if(pr===0){ txt='enter price'; col='var(--muted)'; }
+    else txt='$'+pr.toFixed(2);
     var row=document.createElement('div'); row.className='librow';
-    var nm=document.createElement('input'); nm.className='lname'; nm.value=p.name; nm.oninput=function(){S.library[i].name=nm.value;};
-    var pr=document.createElement('input'); pr.className='lprice'; pr.type='number'; pr.step='0.01'; pr.value=p.price; pr.oninput=function(){S.library[i].price=parseFloat(pr.value)||0;};
-    var del=document.createElement('button'); del.textContent='×'; del.title='remove'; del.onclick=function(){S.library.splice(i,1);renderLib();};
-    row.appendChild(nm); row.appendChild(pr); row.appendChild(del); host.appendChild(row);
+    var nm=document.createElement('div'); nm.className='lname'; nm.style.cssText='padding:6px 2px'; nm.textContent=p.n;
+    var pe=document.createElement('div'); pe.className='lprice'; pe.style.cssText='padding:6px 2px;text-align:right;font-weight:700;color:'+col; pe.textContent=txt;
+    row.appendChild(nm); row.appendChild(pe); row.appendChild(document.createElement('div'));
+    host.appendChild(row);
   });
 }
 
@@ -2411,7 +2507,8 @@ function bindInputs(){
     window.open('https://outlook.office.com/mail/deeplink/compose?to='+encodeURIComponent(m.to)+'&subject='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body),'_blank','noopener');
   };
   $('printBtn2').onclick=function(){ buildPrintout(); var prev=document.title; document.title=printDocName(); window.print(); setTimeout(function(){ document.title=prev; },800); };
-  $('addProd').onclick=function(){ S.packages[S.activeTab].products.push({name:'New product',monthly:0}); renderProducts(); compute(); };
+  $('addProd').onclick=function(){ S.packages[S.activeTab].products.push({name:'',monthly:0,manual:true}); renderProducts(); compute();
+    var sels=document.querySelectorAll('#prodlist select.pick'); if(sels.length) sels[sels.length-1].focus(); };
   $('saveBtn').onclick=saveQuote;
   $('printBtn').onclick=function(){
     buildPrintout();
@@ -2424,9 +2521,7 @@ function bindInputs(){
   $('newBtn').onclick=function(){ if(confirm('Start a new blank quote? Unsaved changes will be lost.')){ var lib=S.library, defs=S.defaults, ag=S.agency, agn=S.client.agent, aph=S.agentPhone, aem=S.agentEmail; S=blankState(); S.library=lib; S.defaults=defs; S.agency=ag; S.client.agent=agn; S.agentPhone=aph; S.agentEmail=aem; S.packages={good:{products:copyArr(defs.good),lb:0,lbCarrier:'',lbCov:'',med:0,rxBenefit:0},better:{products:copyArr(defs.better),lb:0,lbCarrier:'',lbCov:'',med:0,rxBenefit:0},best:{products:copyArr(defs.best),lb:45,lbCarrier:'Mutual of Omaha TLE',lbCov:'$50,000',med:0,rxBenefit:0}}; fill(); compute(); goStep('intake'); } };
   $('resetTab').onclick=function(){ read(); S.packages[S.activeTab].products=copyArr(S.defaults[S.activeTab]); renderProducts(); compute(); };
   $('managePlansBtn').onclick=function(){ renderLib(); renderDefaults(); updateMasterStatus(); $('planModal').classList.add('open'); };
-  $('refreshMaster').onclick=function(){ $('masterStatus').textContent='Refreshing…'; loadMaster(function(){ renderLib(); renderDefaults(); }); };
   $('closePlans').onclick=function(){ $('planModal').classList.remove('open'); renderProducts(); compute(); autosave(); };
-  $('addLib').onclick=function(){ S.library.push({name:'New plan',price:0}); renderLib(); };
   $('planModal').addEventListener('click',function(e){ if(e.target===$('planModal')){ $('planModal').classList.remove('open'); renderProducts(); compute(); } });
 }
 
