@@ -321,6 +321,14 @@
   .lbnote{padding:0 15px 8px;font-size:12px;line-height:1.45}
   .acaest{margin:0 15px 8px;padding:7px 10px;border:1px solid #e6bd85;background:#fdf6ea;border-radius:8px;font-size:11.5px;line-height:1.45;color:#6b4a12}
   .acaest:empty{display:none}
+  .fitem{display:flex;gap:9px;align-items:flex-start;padding:8px 10px;margin:5px 0;border:1px solid var(--line);border-radius:9px;background:#fbfaf6;cursor:pointer;font-size:12.5px;line-height:1.45}
+  .fitem:hover{background:#f3efe3}
+  .fitem input{margin:1px 0 0;flex:0 0 auto;width:15px;height:15px}
+  .fitem.done{opacity:.55}
+  .fitem.done span{text-decoration:line-through}
+  .fitem.big{background:var(--green-soft);border:2px solid var(--green);box-shadow:0 0 0 3px rgba(90,164,110,.22);font-size:13.5px;padding:11px 12px}
+  .fitem.big span{color:#14532d;font-weight:600}
+  .fitem.big.done{opacity:.5;box-shadow:none}
   .fld.needsub input{border-color:#d8a23a;background:#fdf6ea;box-shadow:0 0 0 2px rgba(216,162,58,.25)}
   .fld.needsub label{color:#8a5111;font-weight:700}
   .fld.needsub label:after{content:' — may qualify, look this up';font-weight:400;font-size:10px}
@@ -513,13 +521,13 @@
     <div class="intakegrid">
       <div class="fld"><label>Carrier</label><input id="in_carrier" placeholder="BCBS"></div>
       <div class="fld"><label>Plan name</label><input id="in_plan" placeholder="Bronze"></div>
-      <div class="fld"><label>Monthly premium</label><input id="in_prem" type="number" step="0.01" placeholder="1082"></div>
+      <div class="fld"><label>Monthly premium</label><input id="in_prem" placeholder="$0"></div>
       <div class="fld" id="subsidyFld"><label>Monthly ACA subsidy <small>APTC — look up on HealthSherpa</small></label><input id="in_subsidy" placeholder="$0"></div>
       <div class="fld"><label>Annual deductible</label>
         <select id="in_ded_sel" class="selfld"><option value="2500">$2,500</option><option value="5000">$5,000</option><option value="10600" selected>$10,600</option><option value="12200">$12,200 (2026)</option><option value="other">Other…</option></select>
         <input id="in_ded" type="number" placeholder="Enter deductible" style="display:none;margin-top:6px">
       </div>
-      <div class="fld"><label>Out-of-pocket max<small>defaults to the deductible</small></label><input id="in_oop" type="number" placeholder="10600"></div>
+      <div class="fld"><label>Out-of-pocket max<small>defaults to the deductible</small></label><input id="in_oop" placeholder="$0"></div>
       <div class="fld"><label>Doctor visits / year</label><input id="in_visits" type="number" placeholder="0"></div>
       <div class="fld"><label>Avg co-pay / visit</label><input id="in_copay" type="number" step="0.01" placeholder="0"></div>
     </div>
@@ -530,10 +538,11 @@
       <div class="fld"><label>Spouse annual income</label><input id="in_sincome" placeholder="$0"></div>
       <div class="fld"><label>Household income <small>auto-adds unless you type it</small></label><input id="in_income" class="keyfield" placeholder="$0"></div>
       <div class="fld"><label>Target retirement age</label><input id="in_retage" type="number" placeholder="65"></div>
-      <div class="fld"><label>Liquid savings</label><input id="in_savings" type="number" placeholder="emergency reserves"></div>
+      <div class="fld"><label>Liquid savings</label><input id="in_savings" placeholder="$ total"></div>
     </div>
     <div class="fld" style="margin-top:10px"><label>Investment accounts</label>
-      <div class="qnote"><input id="in_invest" type="number" placeholder="$ total" style="min-width:200px"><label class="chip tone-yellow"><input type="checkbox" id="in_invprot"> Protected</label><label class="chip tone-green"><input type="checkbox" id="in_invsra"> Eligible for SRA</label></div>
+      <div class="qnote"><input id="in_invest" placeholder="$ total" style="min-width:200px"><label class="chip tone-yellow"><input type="checkbox" id="in_invprot"> Protected *</label><label class="chip tone-green"><input type="checkbox" id="in_invsra"> Eligible for SRA</label></div>
+      <div class="note" style="padding:5px 0 0;font-size:10.5px">* <b>Protected</b> means the money sits somewhere a market drop can't reduce it. <b>Most investment accounts are not</b> — 401(k)s, IRAs and brokerage accounts are exposed to the market, so leave this unchecked unless you've confirmed otherwise.</div>
     </div>
     <div class="fld" style="margin-top:10px"><label>Investment notes</label><input id="in_invnote" placeholder="e.g., old 401k (eligible), current-employer plan (locked), sitting in CDs"></div>
     <div class="note" style="padding-top:2px">Protected = already out of the market. Eligible for SRA = available to move into a Secure Retirement Account (e.g., an old policy, not a current-employer plan). Reserves under ~6 months of income → stronger case for living benefits / accident.</div>
@@ -747,6 +756,13 @@
         <button class="btn-gold" id="printBtn2" style="padding:12px 18px">&#128424; Print / PDF Quote</button>
       </div>
       <div class="note hidein-client" style="padding-top:10px">“Email to client” uses your computer’s default mail app; “Gmail” / “Outlook” open the web compose window with everything filled in (no setup needed). Then click “Print Quote,” save the PDF, and attach it. (Email to client also copies the letter to your clipboard as a backup.)</div>
+      <div class="hidein-client" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">
+        <div class="sectitle" style="margin-bottom:4px">Agent — Items to Follow Up</div>
+        <div class="note" style="padding:0 0 8px">Checked items save with the quote. Prompts appear automatically based on what you captured.</div>
+        <div id="followList"></div>
+        <div style="margin-top:10px"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Other follow-up notes</label>
+          <textarea id="in_followNote" class="autogrow" rows="2" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;background:#fff;resize:vertical" placeholder="Anything else to circle back on with this client."></textarea></div>
+      </div>
       <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
         <div style="font-family:var(--serif);font-weight:700;color:var(--navy);margin-bottom:8px">Helpful links</div>
         <a href="https://www.bbb.org/us/tx/houston/profile/life-insurance/manhattan-life-group-inc-0915-58736" target="_blank" rel="noopener" class="seclink">ManhattanLife — BBB Profile (A+ rating, accredited since 2013) ↗</a>
@@ -1002,6 +1018,40 @@ function renderAcaNote(){
   // Highlight the intake subsidy field when they may qualify but nothing's entered
   var fld=$('subsidyFld');
   if(fld) fld.classList.toggle('needsub', !!(e&&e.maySubsidize&&!(+S.aca.subsidy>0)));
+}
+/* ===== AGENT FOLLOW-UP ITEMS (Enroll) — always-on prompts + opportunity flags ===== */
+function followTasks(){
+  var I=S.intake||{}, pk=S.packages[S.activeTab]||{products:[],lb:0}, t=[];
+  // Highest-value opportunity first: unprotected money that's SRA-eligible
+  if((+I.invest>0) && !I.invprot && I.invsra)
+    t.push({id:'sra',big:true,text:'Schedule the Secure Retirement Account conversation — they have '+fmt(+I.invest)+' in investments flagged <b>unprotected</b> and <b>SRA-eligible</b>.'});
+  // Living benefits not in the package
+  if(!(+pk.lb>0))
+    t.push({id:'lb',text:'Schedule a follow-up to discuss <b>Living Benefits</b> — not included in the selected package.'});
+  // Room in the budget / savings vs ACA, and no TFRA funded
+  var pMo=(pk.products||[]).reduce(function(s,p){return s+(+p.monthly||0);},0)+(+pk.lb||0)+(+pk.med||0);
+  var vsAca=Math.max(0,(acaNetPrem()+(+S.aca.med||0))-pMo);
+  var vsBudget=(+I.budget>0)?Math.max(0,(+I.budget)-pMo):0;
+  var left=Math.max(vsAca,vsBudget);
+  if(left>0 && !(+((S.pension||{}).monthly)>0))
+    t.push({id:'tfra',text:'Have you discussed a <b>Tax-Free Retirement Account</b>? About '+fmt(left)+'/mo of room between this package and what they were already spending.'});
+  // Always-on
+  t.push({id:'employer',text:'Ask about their <b>employer</b> — could this open a group-plan opportunity?'});
+  t.push({id:'referrals',text:'<b>Ask for referrals.</b>'});
+  return t;
+}
+function renderFollowUps(){
+  var host=$('followList'); if(!host) return;
+  S.follow=S.follow||{};
+  var t=followTasks(), html='';
+  t.forEach(function(x){
+    var on=!!S.follow[x.id];
+    html+='<label class="fitem'+(x.big?' big':'')+(on?' done':'')+'"><input type="checkbox" data-id="'+x.id+'"'+(on?' checked':'')+'><span>'+x.text+'</span></label>';
+  });
+  host.innerHTML=html;
+  host.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+    cb.onchange=function(){ S.follow[cb.dataset.id]=cb.checked; renderFollowUps(); autosave(); };
+  });
 }
 function lbLabel(c){ return c==='other'?'Other carrier':(LB_RATES[c]?LB_RATES[c].label:c); }
 function renderLB(applyPrice){
@@ -1437,6 +1487,7 @@ function blankState(){
     reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
     intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobaccoP:false,tobaccoS:false,maternityP:false,maternityS:false,maternity:false,dv:false,famcancerP:false,famcancerS:false,famcancer:false,famheartP:false,famheartS:false,famheart:false,mentalP:false,mentalS:false,mental:false,surg2yrP:false,surg2yrS:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,pincome:0,sincome:0,hhManual:false,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'70',pweight:'',sheight:'70',sweight:'',psex:'',ssex:'',kidsNote:'',routeNote:'',docsNote:'',whyShop:'',effDate:''},
     recommended:'best',
+    follow:{},
     lb:{p:{carrier:'americo',face:'auto'},s:{carrier:'americo',face:'auto'}},
     recFlags:[],
     step:'intake',
@@ -1852,7 +1903,7 @@ function readIntake(){
   S.intake.health=$('in_health').value;
   S.intake.pincome=moneyVal($('in_pincome').value); S.intake.sincome=moneyVal($('in_sincome').value);
   S.intake.income=moneyVal($('in_income').value); S.intake.retage=$('in_retage').value;
-  S.intake.savings=+$('in_savings').value||0; S.intake.invest=+$('in_invest').value||0; S.intake.invprot=$('in_invprot').checked; S.intake.invsra=$('in_invsra').checked; S.intake.invnote=$('in_invnote').value;
+  S.intake.savings=moneyVal($('in_savings').value); S.intake.invest=moneyVal($('in_invest').value); S.intake.invprot=$('in_invprot').checked; S.intake.invsra=$('in_invsra').checked; S.intake.invnote=$('in_invnote').value;
   S.intake.docs1=$('in_docs1').value; S.intake.docs2=$('in_docs2').value; S.intake.docs3=$('in_docs3').value;
   S.intake.keepaca=$('in_keepaca').value; S.intake.keepafc=$('in_keepafc').value; S.intake.docnote=$('in_docnote').value;
   S.intake.pheight=$('in_pheight').value; S.intake.pweight=$('in_pweight').value; S.intake.sheight=$('in_sheight').value; S.intake.sweight=$('in_sweight').value; S.intake.psex=$('in_psex').value; S.intake.ssex=$('in_ssex').value; S.intake.kidsNote=$('in_kids').value; S.intake.routeNote=$('in_routenote').value; S.intake.docsNote=$('in_docsnote').value; S.intake.whyShop=$('in_whyshop').value; S.intake.effDate=$('in_effdate').value;
@@ -1863,7 +1914,7 @@ function captureIntake(){
   readIntake();
   S.client.pname=$('in_pname').value; S.client.sname=$('in_sname').value; S.client.agent=$('in_agent').value;
   S.client.state=$('in_state').value; S.client.zip=$('in_zip').value; S.client.page=$('in_page').value; S.client.sage=$('in_sage').value; S.client.date=$('in_date').value; S.client.sdob=$('in_sdob').value; S.client.address=$('in_address').value;
-  S.aca.prem=+$('in_prem').value||0; S.aca.subsidy=moneyVal($('in_subsidy').value); S.aca.ded=effDed(); S.aca.oop=+$('in_oop').value||0; S.aca.visits=+$('in_visits').value||0; S.aca.copay=+$('in_copay').value||0;
+  S.aca.prem=moneyVal($('in_prem').value); S.aca.subsidy=moneyVal($('in_subsidy').value); S.aca.ded=effDed(); S.aca.oop=moneyVal($('in_oop').value); S.aca.visits=+$('in_visits').value||0; S.aca.copay=+$('in_copay').value||0;
   updateMedTotal();
   S.docs.docs=[$('in_docs1').value,$('in_docs2').value,$('in_docs3').value].filter(function(x){return x&&x.trim();}).join('; ');
   S.docs.meds=((S.intake.medList||[]).map(function(m){return m.name;}).filter(function(x){return x&&String(x).trim();})).join(', ');
@@ -1888,10 +1939,10 @@ function fillIntake(){
   $('in_pheight').value=I.pheight||'70'; $('in_pweight').value=I.pweight||''; $('in_sheight').value=I.sheight||'70'; $('in_sweight').value=I.sweight||''; $('in_psex').value=I.psex||''; $('in_ssex').value=I.ssex||''; $('in_kids').value=I.kidsNote||''; $('in_routenote').value=I.routeNote||''; $('in_docsnote').value=I.docsNote||''; $('in_whyshop').value=I.whyShop||''; $('in_effdate').value=I.effDate||''; updateBMI('p'); updateBMI('s'); buildFlag('p'); buildFlag('s');
   $('in_net').checked=!!S.docs.net; $('in_rx').checked=!!S.docs.rx;
   $('in_carrier').value=I.carrier||''; $('in_plan').value=I.plan||'';
-  $('in_prem').value=S.aca.prem||''; $('in_subsidy').value=(+S.aca.subsidy)?fmtMoneyStr(String(S.aca.subsidy)):''; $('in_oop').value=S.aca.oop||''; $('in_visits').value=S.aca.visits||''; $('in_copay').value=S.aca.copay||'';
+  $('in_prem').value=S.aca.prem?fmtMoneyStr(String(S.aca.prem)):''; $('in_subsidy').value=(+S.aca.subsidy)?fmtMoneyStr(String(S.aca.subsidy)):''; $('in_oop').value=S.aca.oop?fmtMoneyStr(String(S.aca.oop)):''; $('in_visits').value=S.aca.visits||''; $('in_copay').value=S.aca.copay||'';
   fillDed();
   $('in_pincome').value=I.pincome?fmtMoneyStr(String(I.pincome)):''; $('in_sincome').value=I.sincome?fmtMoneyStr(String(I.sincome)):'';
-  $('in_income').value=I.income?fmtMoneyStr(String(I.income)):''; $('in_retage').value=I.retage||''; $('in_savings').value=I.savings||''; $('in_invest').value=I.invest||''; $('in_invprot').checked=!!I.invprot; $('in_invsra').checked=!!I.invsra; $('in_invnote').value=I.invnote||'';
+  $('in_income').value=I.income?fmtMoneyStr(String(I.income)):''; $('in_retage').value=I.retage||''; $('in_savings').value=I.savings?fmtMoneyStr(String(I.savings)):''; $('in_invest').value=I.invest?fmtMoneyStr(String(I.invest)):''; $('in_invprot').checked=!!I.invprot; $('in_invsra').checked=!!I.invsra; $('in_invnote').value=I.invnote||'';
   $('in_budget').value=I.budget||''; $('in_priority').value=I.priority||'coverage'; $('in_notes').value=I.notes||'';
   renderMeds();
   $('in_aphone').value=fmtPhone($('in_aphone').value); $('in_phone').value=fmtPhone($('in_phone').value); $('in_date').value=fmtDate($('in_date').value); $('in_sdob').value=fmtDate($('in_sdob').value);
@@ -2011,6 +2062,8 @@ function renderFlags(){
   el.innerHTML=f.length? f.map(function(t){return '<div class="flagbox">⚠ '+esc(t)+'</div>';}).join('') : '';
 }
 function renderEnroll(){
+  if($('followList')) renderFollowUps();
+  if($('in_followNote')) { $('in_followNote').value=(S.follow&&S.follow.note)||''; autoGrow($('in_followNote')); }
   var pk=S.packages[S.activeTab]||{products:[]};
   var mo=pkMonthly(pk);
   var name=S.client.pname||'Client'; if(S.client.sname) name+=' & '+S.client.sname;
@@ -2286,6 +2339,8 @@ function bindInputs(){
   $('p_lb_cov').addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); });
   $('in_effdate').addEventListener('input',function(){ this.value=fmtDate(this.value); });
   $('in_subsidy').addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); captureIntake(); compute(); });
+  ['in_prem','in_oop','in_savings','in_invest'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); captureIntake(); }); });
+  if($('in_followNote')) $('in_followNote').addEventListener('input',function(){ S.follow=S.follow||{}; S.follow.note=this.value; autoGrow(this); autosave(); });
   // Income: currency-format all three. Primary/Spouse auto-sum into Household unless Household was typed.
   ['in_pincome','in_sincome'].forEach(function(id){ $(id).addEventListener('input',function(){
     this.value=fmtMoneyStr(this.value);
