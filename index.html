@@ -319,6 +319,12 @@
   .lbrownote.warn{color:#8a5111}.lbrownote.bad{color:#a12525}
   .lbtotal{border-top:1px solid var(--line);margin-top:4px;padding-top:6px;text-align:right;font-size:12.5px;color:var(--navy)}
   .lbnote{padding:0 15px 8px;font-size:12px;line-height:1.45}
+  .acaest{margin:0 15px 8px;padding:7px 10px;border:1px solid #e6bd85;background:#fdf6ea;border-radius:8px;font-size:11.5px;line-height:1.45;color:#6b4a12}
+  .acaest:empty{display:none}
+  .fld.needsub input{border-color:#d8a23a;background:#fdf6ea;box-shadow:0 0 0 2px rgba(216,162,58,.25)}
+  .fld.needsub label{color:#8a5111;font-weight:700}
+  .fld.needsub label:after{content:' — may qualify, look this up';font-weight:400;font-size:10px}
+  .acaest .bad{color:#a12525}
   .popwrap{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
   .popgauge{position:relative;width:132px;height:132px;flex:0 0 132px;margin:0 auto}
   .popnum{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -508,6 +514,7 @@
       <div class="fld"><label>Carrier</label><input id="in_carrier" placeholder="BCBS"></div>
       <div class="fld"><label>Plan name</label><input id="in_plan" placeholder="Bronze"></div>
       <div class="fld"><label>Monthly premium</label><input id="in_prem" type="number" step="0.01" placeholder="1082"></div>
+      <div class="fld" id="subsidyFld"><label>Monthly ACA subsidy <small>APTC — look up on HealthSherpa</small></label><input id="in_subsidy" placeholder="$0"></div>
       <div class="fld"><label>Annual deductible</label>
         <select id="in_ded_sel" class="selfld"><option value="2500">$2,500</option><option value="5000">$5,000</option><option value="10600" selected>$10,600</option><option value="12200">$12,200 (2026)</option><option value="other">Other…</option></select>
         <input id="in_ded" type="number" placeholder="Enter deductible" style="display:none;margin-top:6px">
@@ -519,7 +526,9 @@
 
     <div class="intake-sec">Finances &amp; Retirement</div>
     <div class="intakegrid">
-      <div class="fld"><label>Annual household income</label><input id="in_income" type="number" placeholder="for ACA eligibility"></div>
+      <div class="fld"><label>Primary annual income</label><input id="in_pincome" placeholder="$0"></div>
+      <div class="fld"><label>Spouse annual income</label><input id="in_sincome" placeholder="$0"></div>
+      <div class="fld"><label>Household income <small>auto-adds unless you type it</small></label><input id="in_income" class="keyfield" placeholder="$0"></div>
       <div class="fld"><label>Target retirement age</label><input id="in_retage" type="number" placeholder="65"></div>
       <div class="fld"><label>Liquid savings</label><input id="in_savings" type="number" placeholder="emergency reserves"></div>
     </div>
@@ -578,8 +587,12 @@
         <!-- ACA -->
         <div class="panel aca">
           <div class="ptitle">Your ACA / Marketplace Plan<small>The plan they have — or would buy on the exchange</small></div>
+          <div class="acaest hidein-client" id="acaEstNote"></div>
           <div class="doccallout" id="o_aca_doc"></div>
           <div class="row"><div class="lab">Monthly premium<small>From HealthSherpa / HealthCare.gov</small></div><input class="num money-in" id="a_prem" type="number" step="0.01"><span class="money-disp" data-for="a_prem"></span></div>
+          <div class="row" id="rowSubsidy" style="display:none"><div class="lab">Less ACA subsidy (APTC)<small>from the intake</small></div><div class="val" id="o_a_subsidy">—</div></div>
+          <div class="row hi" id="rowNetPrem" style="display:none"><div class="lab">Net monthly premium<small>what they actually pay</small></div><div class="val" id="o_a_netprem">—</div></div>
+          <div class="acaest" id="acaSubNote"></div>
           <div class="row"><div class="lab">Annual deductible</div><input class="num money-in" id="a_ded" type="number"><span class="money-disp" data-for="a_ded"></span></div>
           <div class="row"><div class="lab">Annual out-of-pocket max</div><input class="num money-in" id="a_oop" type="number"><span class="money-disp" data-for="a_oop"></span></div>
           <div class="row"><div class="lab">Medications (per month)</div><input class="num money-in" id="a_med" type="number" step="0.01"><span class="money-disp" data-for="a_med"></span></div>
@@ -926,6 +939,70 @@ function ratingAge(){ var a=+S.client.page||0,b=+S.client.sage||0; return Math.m
 function householdKey(){ var w=(S.intake&&S.intake.who)||{}; var sp=!!w.spouse,kd=!!w.kids; return sp&&kd?'f':(sp?'s':(kd?'c':'i')); }
 function sdrEscalate(){ var I=S.intake||{}; if(ratingAge()<50) return false; return !!(I.diabetic||I.majorcond||I.famcancer||I.famheart||(typeof overBuild==='function'&&overBuild())); }
 var LVLNAME={ElitePlus:'Elite Plus',Elite:'Elite',ClassicPlus:'Classic Plus',Classic:'Classic'};
+/* ===== ACA PLACEHOLDER ESTIMATES — unsubsidized marketplace averages =====
+   Banded by age (25/35/45/55) and household type. [monthly premium, deductible].
+   These are starting placeholders only — the agent edits to the client's real quote. */
+var ACA_EST={
+ 25:{single:[312,10600],couple:[624,10600], adultkids:[787,10600], family:[1100,10600]},
+ 35:{single:[394,10600],couple:[787,10600], adultkids:[886,9200],  family:[1280,10600]},
+ 45:{single:[465,9200], couple:[930,9200],  adultkids:[957,9200],  family:[1422,9200]},
+ 55:{single:[718,9200], couple:[1436,9200], adultkids:[1210,10600],family:[1928,9200]}
+};
+var ACA_THRESH={single:44000,couple:84000,adultkids:112000,family:128000};
+var ACA_HNAME={single:'Single',couple:'Couple',adultkids:'Adult w/ Kids',family:'Family'};
+function acaBand(a){ a=+a||25; return a<35?25:(a<45?35:(a<55?45:55)); }
+function acaHouseType(){
+  var w=(S.intake&&S.intake.who)||{};
+  if(w.kids&&w.spouse) return 'family';      // primary + spouse + kids
+  if(w.kids) return 'adultkids';             // primary + kids, no spouse
+  if(w.spouse) return 'couple';
+  return 'single';
+}
+function moneyVal(v){ var d=String(v==null?'':v).replace(/[^0-9.]/g,''); var n=parseFloat(d); return isNaN(n)?0:n; }
+function householdIncome(){
+  var I=S.intake||{};
+  if(I.hhManual&&+I.income) return +I.income;
+  var s=(+I.pincome||0)+(+I.sincome||0);
+  return s||(+I.income||0);
+}
+function acaEstimate(){
+  var age=ratingAge()||25, b=acaBand(age), ht=acaHouseType(), row=(ACA_EST[b]||{})[ht];
+  if(!row) return null;
+  var inc=householdIncome(), thr=ACA_THRESH[ht];
+  return {prem:row[0], ded:row[1], band:b, house:ht, age:age, income:inc, threshold:thr,
+          maySubsidize:(inc>0&&inc<thr)};
+}
+/* Fill the ACA side as a placeholder — only when the agent hasn't already put a premium in */
+function applyAcaEstimate(force){
+  var e=acaEstimate(); if(!e) return;
+  if(!force && (+S.aca.prem>0)) return;
+  S.aca.prem=e.prem; S.aca.ded=e.ded;
+  if(!(+S.aca.oop>0)) S.aca.oop=e.ded;
+  S.acaEst=true;
+}
+function renderAcaNote(){
+  var e=acaEstimate(), names=ACA_HNAME;
+  var el=$('acaEstNote');
+  if(el){
+    if(!e||!S.acaEst){ el.innerHTML=''; }
+    else{
+      var h='<b>Estimate</b> — '+names[e.house]+', age band '+e.band+'. Unsubsidized marketplace average; replace with their real quote from HealthSherpa.';
+      if(e.maySubsidize) h+='<br><span class="bad">⚠ Household income '+fmt(e.income)+' is under the '+fmt(e.threshold)+' threshold for '+names[e.house]+' — this client <b>MAY qualify for a subsidy</b>. Look it up and enter it on the Intake.</span>';
+      el.innerHTML=h;
+    }
+  }
+  // Explain the subsidy line, or state plainly that they don't qualify (shown in BOTH views)
+  var sn=$('acaSubNote'); if(sn){
+    var sub=+S.aca.subsidy||0;
+    if(sub>0) sn.innerHTML='The monthly premium above is the full plan cost. The subsidy is deducted to show what they actually pay. <b>The deductible is not reduced by the subsidy</b> — it still counts in full toward TRUE COST.';
+    else if(e&&!e.maySubsidize&&e.income>0) sn.innerHTML='<b>* This client does not qualify for ACA subsidies</b> — household income '+fmt(e.income)+' exceeds the '+fmt(e.threshold)+' threshold for '+names[e.house]+'. They pay the full marketplace premium.';
+    else sn.innerHTML='';
+    sn.classList.toggle('hidein-client', sub>0);   // the "no subsidy" note stays visible to clients
+  }
+  // Highlight the intake subsidy field when they may qualify but nothing's entered
+  var fld=$('subsidyFld');
+  if(fld) fld.classList.toggle('needsub', !!(e&&e.maySubsidize&&!(+S.aca.subsidy>0)));
+}
 function lbLabel(c){ return c==='other'?'Other carrier':(LB_RATES[c]?LB_RATES[c].label:c); }
 function renderLB(applyPrice){
   var host=$('lbRows'); if(!host) return;
@@ -1346,7 +1423,7 @@ function blankState(){
     client:{pname:'',sname:'',date:'',sdob:'',agent:'',state:'TX',zip:'78163',page:'49',sage:'45',address:''},
     docs:{docs:'',meds:'',net:false,rx:false,famcancer:false},
     tabLabels:{good:'Affordable core',better:'Solid package',best:'Full package of protection'},
-    aca:{prem:1082.90,ded:10600,oop:10600,med:0,visits:0,copay:0,fullded:true},
+    aca:{subsidy:0,prem:1082.90,ded:10600,oop:10600,med:0,visits:0,copay:0,fullded:true},
     activeTab:'best',
     library:defLibrary(),
     defaults:{good:defProducts('good'),better:defProducts('better'),best:defProducts('best')},
@@ -1358,7 +1435,7 @@ function blankState(){
     pension:{monthly:100,note:'e.g., IUL / tax-free retirement savings for your future',cv10:0,cv20:0,cv30:0,leg1:0,leg25:0},
     big:{desc:'Hospital stay – 7 days',charge:41660.41,disc:18747.18,days:7,daily:4000,adm:2000,his:10000,other:0},
     reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
-    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobaccoP:false,tobaccoS:false,maternityP:false,maternityS:false,maternity:false,dv:false,famcancerP:false,famcancerS:false,famcancer:false,famheartP:false,famheartS:false,famheart:false,mentalP:false,mentalS:false,mental:false,surg2yrP:false,surg2yrS:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'70',pweight:'',sheight:'70',sweight:'',psex:'',ssex:'',kidsNote:'',routeNote:'',docsNote:'',whyShop:'',effDate:''},
+    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobaccoP:false,tobaccoS:false,maternityP:false,maternityS:false,maternity:false,dv:false,famcancerP:false,famcancerS:false,famcancer:false,famheartP:false,famheartS:false,famheart:false,mentalP:false,mentalS:false,mental:false,surg2yrP:false,surg2yrS:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,pincome:0,sincome:0,hhManual:false,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'70',pweight:'',sheight:'70',sweight:'',psex:'',ssex:'',kidsNote:'',routeNote:'',docsNote:'',whyShop:'',effDate:''},
     recommended:'best',
     lb:{p:{carrier:'americo',face:'auto'},s:{carrier:'americo',face:'auto'}},
     recFlags:[],
@@ -1460,7 +1537,7 @@ function fill(){
 }
 
 function read(){
-  S.aca={prem:+$('a_prem').value||0,ded:+$('a_ded').value||0,oop:+$('a_oop').value||0,med:+$('a_med').value||0,visits:+$('a_visits').value||0,copay:+$('a_copay').value||0,fullded:$('a_fullded').checked};
+  S.aca={subsidy:+S.aca.subsidy||0,prem:+$('a_prem').value||0,ded:+$('a_ded').value||0,oop:+$('a_oop').value||0,med:+$('a_med').value||0,visits:+$('a_visits').value||0,copay:+$('a_copay').value||0,fullded:$('a_fullded').checked};
   var pk=S.packages[S.activeTab]; pk.lb=+$('p_lb').value||0; pk.rxBenefit=+$('p_rxben').value||0; pk.lbCarrier=$('p_lb_carrier').value; pk.lbCov=$('p_lb_cov').value;
   S.pension={monthly:+$('p_pension').value||0,note:$('p_pnote').value,cv10:+$('pp_cv10').value||0,cv20:+$('pp_cv20').value||0,cv30:+$('pp_cv30').value||0,leg1:+$('pp_leg1').value||0,leg25:+$('pp_leg25').value||0};
   S.big={desc:$('b_desc').value,charge:+$('b_charge').value||0,disc:+$('b_disc').value||0,days:+$('b_days').value||0,daily:+$('b_daily').value||0,adm:+$('b_adm').value||0,his:+$('b_his').value||0,other:+$('b_other').value||0};
@@ -1474,12 +1551,18 @@ function compute(){
   if($('o_aca_doc')) $('o_aca_doc').innerHTML=dcA((S.intake&&S.intake.keepaca)||'');
   if($('o_pop_doc')) $('o_pop_doc').innerHTML=dcF((S.intake&&S.intake.keepafc)||'');
   var a=S.aca;
-  var annPrem=a.prem*12;
+  var sub=+a.subsidy||0;
+  var netPrem=Math.max(0,(+a.prem||0)-sub);   // subsidy reduces premium; deductible is untouched
+  var annPrem=netPrem*12;
   var dedMo=a.ded/12;
   var copayYr=(a.visits||0)*(a.copay||0);
   var copayMo=copayYr/12;
-  var trueMo=(a.fullded? (a.prem+dedMo+a.med) : (a.prem+a.med))+copayMo;
+  var trueMo=(a.fullded? (netPrem+dedMo+a.med) : (netPrem+a.med))+copayMo;
   var trueYr=(a.fullded? (annPrem+a.ded+a.med*12) : (annPrem+a.med*12))+copayYr;
+  if($('rowSubsidy')) $('rowSubsidy').style.display=sub>0?'':'none';
+  if($('rowNetPrem')) $('rowNetPrem').style.display=sub>0?'':'none';
+  if($('o_a_subsidy')) $('o_a_subsidy').textContent='− '+fmt2(sub);
+  if($('o_a_netprem')) $('o_a_netprem').textContent=fmt2(netPrem);
   $('o_a_annprem').textContent=fmt2(annPrem);
   $('o_a_dedmo').textContent=fmt2(dedMo);
   $('o_a_copaymo').textContent=fmt2(copayMo);
@@ -1496,7 +1579,7 @@ function compute(){
   $('o_p_mo').textContent=fmt2(pMo);
   $('o_p_yr').textContent=fmt2(pYr);
 
-  var aMo=(a.prem+a.med)-pMo, aYr=(annPrem+a.med*12)-pYr;
+  var aMo=(netPrem+a.med)-pMo, aYr=(annPrem+a.med*12)-pYr;
   var tMo=trueMo-pMo, tYr=trueYr-pYr;
   $('o_sav_amo').textContent=saves(aMo,'/mo');$('o_sav_ayr').textContent=saves(aYr,'/yr');
   $('o_sav_tmo').textContent=saves(tMo,'/mo');$('o_sav_tyr').textContent=saves(tYr,'/yr');
@@ -1541,6 +1624,7 @@ function compute(){
   refreshClientDisp();
   if($('estBody')) renderEstimate();
   if($('recFlags')) renderFlags();
+  if($('acaEstNote')) renderAcaNote();
   if($('lbRows')) renderLB(false);
   if($('popScoreBody')) renderPopScore();
   if(S.step==='enroll') renderEnroll();
@@ -1568,9 +1652,10 @@ function tierTotals(t){
   var mo=prod+(+pk.med||0);
   return {mo:mo,yr:mo*12,pk:pk};
 }
+function acaNetPrem(){ var a=S.aca; return Math.max(0,(+a.prem||0)-(+a.subsidy||0)); }
 function acaTrue(){
-  var a=S.aca; var annPrem=a.prem*12; var dedMo=a.ded/12; var copayYr=(a.visits||0)*(a.copay||0);
-  var trueMo=(a.fullded?(a.prem+dedMo+a.med):(a.prem+a.med))+copayYr/12;
+  var a=S.aca; var np=acaNetPrem(); var annPrem=np*12; var dedMo=a.ded/12; var copayYr=(a.visits||0)*(a.copay||0);
+  var trueMo=(a.fullded?(np+dedMo+a.med):(np+a.med))+copayYr/12;
   var trueYr=(a.fullded?(annPrem+a.ded+a.med*12):(annPrem+a.med*12))+copayYr;
   return {mo:trueMo,yr:trueYr};
 }
@@ -1599,7 +1684,8 @@ function buildPrintout(){
   var labels={good:['GOOD',S.tabLabels.good],better:['BETTER',S.tabLabels.better],best:['BEST',S.tabLabels.best]};
   var tiers=['good','better','best'].map(function(t){var x=tierTotals(t);x.t=t;return x;}).filter(function(x){return x.mo>0;});
   var aca=acaTrue();
-  var annPrem=a.prem*12;
+  var netPrem=acaNetPrem();
+  var annPrem=netPrem*12;
 
   /* ---- header + client meta ---- */
   var html='<div class="po-head"><b>'+esc(agency)+'</b><span>Package of Protection · Personalized Quote</span></div>';
@@ -1637,7 +1723,7 @@ function buildPrintout(){
   /* ---- detail sections for the selected package ---- */
   var at=S.activeTab, atLab=labels[at][0], pk=S.packages[at]||{products:[],lb:0,med:0};
   var pMo=tierTotals(at).mo, pYr=pMo*12;
-  var aMo=(a.prem+a.med)-pMo, aYr=(annPrem+a.med*12)-pYr;
+  var aMo=(netPrem+a.med)-pMo, aYr=(annPrem+a.med*12)-pYr;
   var tMo=aca.mo-pMo, tYr=aca.yr-pYr;
 
   html+='<div class="po-navy"><div class="cap">Your savings vs ACA<small>Based on your '+atLab+' package</small></div>'
@@ -1764,7 +1850,8 @@ function readIntake(){
   S.intake.priority=$('in_priority').value; S.intake.notes=$('in_notes').value;
   S.intake.carrier=$('in_carrier').value; S.intake.plan=$('in_plan').value;
   S.intake.health=$('in_health').value;
-  S.intake.income=+$('in_income').value||0; S.intake.retage=$('in_retage').value;
+  S.intake.pincome=moneyVal($('in_pincome').value); S.intake.sincome=moneyVal($('in_sincome').value);
+  S.intake.income=moneyVal($('in_income').value); S.intake.retage=$('in_retage').value;
   S.intake.savings=+$('in_savings').value||0; S.intake.invest=+$('in_invest').value||0; S.intake.invprot=$('in_invprot').checked; S.intake.invsra=$('in_invsra').checked; S.intake.invnote=$('in_invnote').value;
   S.intake.docs1=$('in_docs1').value; S.intake.docs2=$('in_docs2').value; S.intake.docs3=$('in_docs3').value;
   S.intake.keepaca=$('in_keepaca').value; S.intake.keepafc=$('in_keepafc').value; S.intake.docnote=$('in_docnote').value;
@@ -1776,7 +1863,7 @@ function captureIntake(){
   readIntake();
   S.client.pname=$('in_pname').value; S.client.sname=$('in_sname').value; S.client.agent=$('in_agent').value;
   S.client.state=$('in_state').value; S.client.zip=$('in_zip').value; S.client.page=$('in_page').value; S.client.sage=$('in_sage').value; S.client.date=$('in_date').value; S.client.sdob=$('in_sdob').value; S.client.address=$('in_address').value;
-  S.aca.prem=+$('in_prem').value||0; S.aca.ded=effDed(); S.aca.oop=+$('in_oop').value||0; S.aca.visits=+$('in_visits').value||0; S.aca.copay=+$('in_copay').value||0;
+  S.aca.prem=+$('in_prem').value||0; S.aca.subsidy=moneyVal($('in_subsidy').value); S.aca.ded=effDed(); S.aca.oop=+$('in_oop').value||0; S.aca.visits=+$('in_visits').value||0; S.aca.copay=+$('in_copay').value||0;
   updateMedTotal();
   S.docs.docs=[$('in_docs1').value,$('in_docs2').value,$('in_docs3').value].filter(function(x){return x&&x.trim();}).join('; ');
   S.docs.meds=((S.intake.medList||[]).map(function(m){return m.name;}).filter(function(x){return x&&String(x).trim();})).join(', ');
@@ -1801,9 +1888,10 @@ function fillIntake(){
   $('in_pheight').value=I.pheight||'70'; $('in_pweight').value=I.pweight||''; $('in_sheight').value=I.sheight||'70'; $('in_sweight').value=I.sweight||''; $('in_psex').value=I.psex||''; $('in_ssex').value=I.ssex||''; $('in_kids').value=I.kidsNote||''; $('in_routenote').value=I.routeNote||''; $('in_docsnote').value=I.docsNote||''; $('in_whyshop').value=I.whyShop||''; $('in_effdate').value=I.effDate||''; updateBMI('p'); updateBMI('s'); buildFlag('p'); buildFlag('s');
   $('in_net').checked=!!S.docs.net; $('in_rx').checked=!!S.docs.rx;
   $('in_carrier').value=I.carrier||''; $('in_plan').value=I.plan||'';
-  $('in_prem').value=S.aca.prem||''; $('in_oop').value=S.aca.oop||''; $('in_visits').value=S.aca.visits||''; $('in_copay').value=S.aca.copay||'';
+  $('in_prem').value=S.aca.prem||''; $('in_subsidy').value=(+S.aca.subsidy)?fmtMoneyStr(String(S.aca.subsidy)):''; $('in_oop').value=S.aca.oop||''; $('in_visits').value=S.aca.visits||''; $('in_copay').value=S.aca.copay||'';
   fillDed();
-  $('in_income').value=I.income||''; $('in_retage').value=I.retage||''; $('in_savings').value=I.savings||''; $('in_invest').value=I.invest||''; $('in_invprot').checked=!!I.invprot; $('in_invsra').checked=!!I.invsra; $('in_invnote').value=I.invnote||'';
+  $('in_pincome').value=I.pincome?fmtMoneyStr(String(I.pincome)):''; $('in_sincome').value=I.sincome?fmtMoneyStr(String(I.sincome)):'';
+  $('in_income').value=I.income?fmtMoneyStr(String(I.income)):''; $('in_retage').value=I.retage||''; $('in_savings').value=I.savings||''; $('in_invest').value=I.invest||''; $('in_invprot').checked=!!I.invprot; $('in_invsra').checked=!!I.invsra; $('in_invnote').value=I.invnote||'';
   $('in_budget').value=I.budget||''; $('in_priority').value=I.priority||'coverage'; $('in_notes').value=I.notes||'';
   renderMeds();
   $('in_aphone').value=fmtPhone($('in_aphone').value); $('in_phone').value=fmtPhone($('in_phone').value); $('in_date').value=fmtDate($('in_date').value); $('in_sdob').value=fmtDate($('in_sdob').value);
@@ -1910,6 +1998,7 @@ function recommendBundles(){
 }
 function buildQuote(){
   captureIntake();
+  applyAcaEstimate(false);   // placeholder ACA numbers unless the agent already entered a premium
   recommendBundles();
   autoPriceTiers();
   S.activeTab=S.recommended;
@@ -2183,6 +2272,25 @@ function bindInputs(){
   document.querySelectorAll('.sayico').forEach(function(s){ s.onclick=function(){ openScript(s.dataset.set||'intake', +s.dataset.beat||0); }; });
   $('p_lb_cov').addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); });
   $('in_effdate').addEventListener('input',function(){ this.value=fmtDate(this.value); });
+  $('in_subsidy').addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); captureIntake(); compute(); });
+  // Income: currency-format all three. Primary/Spouse auto-sum into Household unless Household was typed.
+  ['in_pincome','in_sincome'].forEach(function(id){ $(id).addEventListener('input',function(){
+    this.value=fmtMoneyStr(this.value);
+    S.intake=S.intake||{};
+    if(!S.intake.hhManual){
+      var t=moneyVal($('in_pincome').value)+moneyVal($('in_sincome').value);
+      $('in_income').value=t?fmtMoneyStr(String(t)):'';
+    }
+    captureIntake(); }); });
+  $('in_income').addEventListener('input',function(){
+    this.value=fmtMoneyStr(this.value);
+    S.intake=S.intake||{};
+    S.intake.hhManual=!!this.value;              // typed household wins; clear it to resume auto-sum
+    if(!S.intake.hhManual){
+      var t=moneyVal($('in_pincome').value)+moneyVal($('in_sincome').value);
+      this.value=t?fmtMoneyStr(String(t)):'';
+    }
+    captureIntake(); });
   ['in_tobacco_p','in_tobacco_s','in_famcancer_p','in_famcancer_s','in_famheart_p','in_famheart_s','in_maternity_p','in_maternity_s','in_mental_p','in_mental_s','in_surg2yr_p','in_surg2yr_s'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('change',function(){ syncChips(); captureIntake(); }); });
   document.querySelectorAll('textarea.autogrow').forEach(function(t){ t.addEventListener('input',function(){ autoGrow(t); }); });
   document.querySelectorAll('#ageseg button').forEach(function(b){ b.onclick=function(){ S.estBand=+b.dataset.band; renderEstimate(); autosave(); }; });
