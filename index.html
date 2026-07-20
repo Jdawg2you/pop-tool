@@ -1581,28 +1581,48 @@ var PLAN_CATALOG=[
 ];
 /* Price one catalog entry for THIS client — state, rating age, household, sex,
    tobacco all come from the intake. Returns null if no rate is loaded. */
-function catalogPrice(p){
-  if(p.manual!==undefined) return p.manual;
+function catalogPrice(p){ var r=catalogPriceInfo(p); return r.price; }
+/* Returns {price, tag} — three DIFFERENT failures get three different messages,
+   so "I haven't filled the intake yet" never looks like "this plan isn't available". */
+function catalogPriceInfo(p){
+  if(p.manual!==undefined)
+    return {price:p.manual, tag:p.manual?(' — $'+p.manual.toFixed(2)+'/mo (flat)'):' — enter price'};
+  var st=(S.client.state||'').toUpperCase(), ag=ratingAge();
+  if(!st||!ag) return {price:null, tag:' — needs state + age'};
   try{
     var c2=cfgClone(effCfg(S.activeTab||'best'));
     p.set(c2);
     var hit=(buildTierProducts(c2,null,[])||[]).filter(function(x){ return x.k===p.k; })[0];
-    return hit? (+hit.monthly||0) : null;
-  }catch(e){ return null; }
+    if(!hit) return {price:null, tag:' — not filed in '+st};
+    var v=+hit.monthly||0;
+    return {price:v, tag:v?(' — $'+v.toFixed(2)+'/mo'):(' — not filed in '+st)};
+  }catch(e){ return {price:null, tag:' — not filed in '+st}; }
 }
 function libOptions(){
   var s='<option value="">— pick a plan —</option>', last='';
   PLAN_CATALOG.forEach(function(p,i){
     if(p.g!==last){ if(last) s+='</optgroup>'; s+='<optgroup label="'+esc(p.g)+'">'; last=p.g; }
-    var pr=catalogPrice(p), tag;
-    if(pr==null)      tag=' — rate not loaded';
-    else if(pr===0)   tag=' — enter price';
-    else              tag=' — $'+pr.toFixed(2)+'/mo';
-    s+='<option value="'+i+'">'+esc(p.n+tag)+'</option>';
+    s+='<option value="'+i+'">'+esc(p.n+catalogPriceInfo(p).tag)+'</option>';
   });
   if(last) s+='</optgroup>';
   s+='<option value="custom">Custom (type below)</option>';
   return s;
+}
+/* Dropdown labels are built at render time, so they go stale the moment the
+   intake changes. Re-label in place (keeps the open/selected state) whenever
+   the rating basis moves. */
+var _lastOptBasis=null;
+function refreshPickLabels(force){
+  var b=(S.client.state||'')+'|'+ratingAge()+'|'+householdKey()+'|'+(S.activeTab||'');
+  if(!force && b===_lastOptBasis) return;
+  _lastOptBasis=b;
+  var tags=PLAN_CATALOG.map(function(p){ return p.n+catalogPriceInfo(p).tag; });
+  Array.prototype.forEach.call(document.querySelectorAll('#prodlist select.pick'),function(sel){
+    Array.prototype.forEach.call(sel.options,function(o){
+      var i=+o.value;
+      if(o.value!=='' && o.value!=='custom' && !isNaN(i) && tags[i]) o.text=tags[i];
+    });
+  });
 }
 /* Apply a catalog pick to the active tier. Fills the matching slot, or adds a
    manual-priced extra line if that slot is already taken (lets you double up). */
@@ -1656,10 +1676,9 @@ function renderLib(){
       h.style.cssText='font-weight:700;color:var(--navy);font-size:12px;letter-spacing:.04em;text-transform:uppercase;margin:12px 0 4px';
       h.textContent=p.g; host.appendChild(h); last=p.g;
     }
-    var pr=catalogPrice(p), txt, col='var(--navy)';
-    if(pr==null){ txt='rate not loaded'; col='var(--muted)'; }
-    else if(pr===0){ txt='enter price'; col='var(--muted)'; }
-    else txt='$'+pr.toFixed(2);
+    var info=catalogPriceInfo(p), txt, col='var(--navy)';
+    if(info.price==null||info.price===0){ txt=info.tag.replace(/^ — /,''); col='var(--muted)'; }
+    else txt='$'+info.price.toFixed(2);
     var row=document.createElement('div'); row.className='librow';
     var nm=document.createElement('div'); nm.className='lname'; nm.style.cssText='padding:6px 2px'; nm.textContent=p.n;
     var pe=document.createElement('div'); pe.className='lprice'; pe.style.cssText='padding:6px 2px;text-align:right;font-weight:700;color:'+col; pe.textContent=txt;
@@ -1726,6 +1745,7 @@ function read(){
 
 function compute(){
   read();
+  refreshPickLabels();
   var dcA=function(v){ return v==='yes' ? '<span class="ok">✓ Keeps current doctors</span>' : (v==='no' ? '<span class="warn">⚠ Loses current doctors</span>' : ''); };
   var dcF=function(v){ return v==='yes' ? '<span class="ok">✓ Keeps current doctors</span>' : (v==='no' ? '<span class="orange">⚠ May lose current doctors</span>' : ''); };
   if($('o_aca_doc')) $('o_aca_doc').innerHTML=dcA((S.intake&&S.intake.keepaca)||'');
