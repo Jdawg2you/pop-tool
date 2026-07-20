@@ -432,10 +432,10 @@
     <div class="intake-sec" id="sec_client">Client Information <span class="sayico" data-beat="1" title="Say this — opens the script">Say this</span></div>
     <div class="fld" style="margin-bottom:8px"><label>Why shopping / current-plan pain <small>what prompted them · what they dislike</small></label><input id="in_whyshop" placeholder="e.g. premium jumped, deductible too high, lost group plan"></div>
     <div class="intakegrid">
-      <div class="fld"><label>Primary name</label><input id="in_pname" class="keyfield" placeholder="First Last"></div>
+      <div class="fld"><label>Primary name</label><input id="in_pname" class="keyfield" placeholder="First and Last"></div>
       <div class="fld"><label>Date of birth</label><input id="in_date" class="keyfield" placeholder="MM/DD/YYYY"></div>
       <div class="fld"><label>Age <small>auto from DOB</small></label><input id="in_page" placeholder="49"></div>
-      <div class="fld"><label>Sex <small>at birth</small></label><select id="in_psex" class="selfld"><option value="">—</option><option value="M">Male</option><option value="F">Female</option></select></div>
+      <div class="fld"><label>Sex <small>at birth</small></label><select id="in_psex" class="selfld keyfield"><option value="">—</option><option value="M">Male</option><option value="F">Female</option></select></div>
       <div class="fld"><label>Height</label><select id="in_pheight" class="selfld keyfield"></select></div>
       <div class="fld"><label>Weight (lbs)</label><input id="in_pweight" class="keyfield" type="number" placeholder="180"></div>
       <div class="fld"><label>BMI <small>auto</small></label><input id="in_pbmi" readonly placeholder="—"></div>
@@ -450,10 +450,10 @@
 
     <div class="intake-sec" id="sec_spouse">Spouse Information <span class="sayico" data-beat="5" title="Say this — opens the script">Say this</span> <span class="secnote" id="spouseHint">(to expand, select <b>Spouse</b> under “Who needs coverage” above)</span></div>
     <div class="intakegrid" id="spouseGrid" style="display:none">
-      <div class="fld"><label>Spouse name</label><input id="in_sname" placeholder="First Last"></div>
+      <div class="fld"><label>Spouse name</label><input id="in_sname" placeholder="First and Last"></div>
       <div class="fld"><label>Date of birth</label><input id="in_sdob" class="keyfield" placeholder="MM/DD/YYYY"></div>
       <div class="fld"><label>Age <small>auto from DOB</small></label><input id="in_sage" placeholder="45"></div>
-      <div class="fld"><label>Sex <small>at birth</small></label><select id="in_ssex" class="selfld"><option value="">—</option><option value="M">Male</option><option value="F">Female</option></select></div>
+      <div class="fld"><label>Sex <small>at birth</small></label><select id="in_ssex" class="selfld keyfield"><option value="">—</option><option value="M">Male</option><option value="F">Female</option></select></div>
       <div class="fld"><label>Height</label><select id="in_sheight" class="selfld"></select></div>
       <div class="fld"><label>Weight (lbs)</label><input id="in_sweight" type="number" placeholder="140"></div>
       <div class="fld"><label>BMI <small>auto</small></label><input id="in_sbmi" readonly placeholder="—"></div>
@@ -2165,31 +2165,44 @@ var SCRIPT_HELP=[
    "<p class=say>The tool runs left to right: <b>Intake → Quote → Enroll</b>. Work them in order and most of the rest fills itself in.</p>"},
  {title:"Step 1 · Intake — capture the client",html:
    "<p class=say>This is your discovery call. Grab the basics first — state, both dates of birth, and who's being covered — then keep the conversation going and fill in the rest as it comes up. Nothing has to be entered in order, and it saves as you type.</p>"
-  +"<p class=note>The <b>green-outlined fields</b> are the ones the tool needs in order to price a plan: name, date of birth, height, weight, phone, email, state and ZIP. Get those and you can quote.</p>"},
+  +"<p class=note>The <b>green-outlined fields</b> are the ones the tool needs in order to price a plan: name, date of birth, sex, height, weight, phone, email, state and ZIP. Get those and you can quote.</p>"},
  {title:"The “Say this” bubbles",html:
-   "<p class=say>Every section header has a small <b>Say this</b> bubble. Click it and a script window opens with the exact words for that part of the call, with Prev/Next to walk the whole conversation.</p>"
-  +"<p class=say>Drag that window to a second screen and it stays put — clicking a different section just swaps the script inside it. The section you're on gets outlined in gold so you never lose your place.</p>"
+   "<p class=say>Every section header has a small <b>Say this</b> bubble. Click it and a script window opens with the exact words for that part of the call.</p>"
+  +"<p class=say>As you click <b>Next</b> through the script, the tool follows along — it jumps to the part of the form that matches what you're saying and outlines it in gold. So the fields you need are always sitting right in front of you as you talk, and you're never hunting for where to type.</p>"
+  +"<p class=say>Drag the script window to a second screen and it stays put. Clicking a different section just swaps the script inside that same window.</p>"
   +"<p class=note>On the Quote step there's also an <b>Objections</b> bubble with Feel · Felt · Found answers to the ten things clients say most.</p>"},
  {title:"Step 2 · Quote — the pricing is done for you",html:
    "<p class=say>Hit <b>Build Quote</b> and all three packages price themselves from ManhattanLife's current rate guide. No lookups, no spreadsheets.</p>"
-  +"<p class=say>It automatically uses the state you picked, the <b>older of the two ages</b> (that's how these plans rate), and whether a spouse or children are covered. Policy fees are already folded in.</p>"
-  +"<p class=note>If a rate isn't on file for that state, the line still appears with a “verify” note so nothing silently disappears. And every price stays editable — type over any number and it sticks.</p>"},
+  +"<p class=say>It automatically uses the state you picked, the <b>older of the two ages</b> (that's how these plans rate), and whether a spouse or children are covered. Policy fees are already folded in, and the ACA side pre-fills with a marketplace estimate you can replace with their real quote.</p>"
+  +"<p class=note>If a rate isn't on file for that state, the line still appears with a “verify” note so nothing silently disappears.</p>"},
+ {title:"Nothing is locked — tweak any price",html:
+   "<p class=say>Every price in the tool is editable. If you want to nudge someone's coverage up or down without moving them to a whole different tier, you have two ways to do it: <b>pick a different option from the dropdown</b>, or <b>type the exact price</b> on that line.</p>"
+  +"<p class=say>That's true on the package products, on Living Benefits, and on the ACA side. Add a bit more coverage and type the new premium — the totals, savings, and POP Score all update instantly.</p>"
+  +"<p class=note>A typed price sticks until you touch that line's dropdown again, which snaps it back to the rate sheet. Manually-entered prices are shaded so you can spot them at a glance.</p>"},
  {title:"Good / Better / Best",html:
-   "<p class=say>Three packages are always built. They carry the same core protection, stepped by <b>coverage amount</b> rather than by pulling products out. Best carries the richest coverage plus home health care; Good keeps the essentials at the lowest monthly.</p>"},
+   "<p class=say>Three packages are always built. They carry the same core protection, stepped by <b>coverage amount</b> rather than by pulling products out. Best carries the richest coverage plus home health care; Good keeps the essentials at the lowest monthly.</p>"
+  +"<p class=say>You can customize any tier without leaving it — swap a product from its dropdown or type a price on any line to give them a little more or a little less. You're never stuck choosing between three fixed options.</p>"},
  {title:"The POP Score",html:
    "<p class=say>The dial scores how completely a package protects <b>this specific client</b>, 0 to 100. It weighs seven areas: everyday care, preventive, hospitalization, accident, critical illness, dental/vision/hearing, and income protection.</p>"
   +"<p class=say>It's personalized. A family history of cancer pushes critical illness up. Being older, or heavier for their height, pushes hospitalization up. A young, healthy client isn't penalized for lighter coverage the way a 58-year-old would be.</p>"
-  +"<p class=note><b>What's lifting it</b> shows what's already working — those are your talking points for why the package is strong.</p>"},
+  +"<p class=note><b>What's lifting it</b> shows what's already working — those are your talking points for why the package is strong.</p>"
+  +"<p class=note><b>The score evolves.</b> We keep refining how it weighs risk as more data comes in, so a quote you reopen months from now may score a little differently — that's expected, not an error.<br>The aim is to match each client to the most complete protection that fits their budget <i>and</i> their real exposure. Someone carrying health risks — or who simply worries more about being covered — should see a score that leans them toward fuller protection, while a young, healthy client with no history isn't pushed to over-buy.</p>"},
  {title:"Raising the score",html:
    "<p class=say><b>How to raise it</b> lists exactly what to add, biggest impact first, showing the <b>points gained</b> and the <b>monthly cost</b> side by side.</p>"
   +"<p class=say>Click any one and it's added to the package — the price and the score both update instantly. That's your upgrade conversation in one line: “for about $15 more a month, we close this gap.”</p>"},
- {title:"Step 3 · Enroll",html:
-   "<p class=say>Confirm the package, then the carrier buttons take you straight to the application portal. Email the quote to the client in one click — Gmail, Outlook, or your default mail — and use <b>Print / PDF Quote</b> to save the comparison and attach it.</p>"},
+ {title:"Saving a quote and picking it back up",html:
+   "<p class=say><b>Save Quote</b> downloads the quote to your computer and names the file for you — the client's name plus today's date — so you're never guessing which file is which.</p>"
+  +"<p class=say>To return to it later, open the tool and click <b>Load Quote</b>, then choose that file from wherever it saved. Everything comes back exactly as you left it and you can keep working.</p>"
+  +"<p class=note>The tool also autosaves your current quote as you go, so a closed tab won't lose your work.</p>"},
+ {title:"Step 3 · Enroll — apply and send",html:
+   "<p class=say>Confirm the package, then the carrier buttons take you straight to the application portal.</p>"
+  +"<p class=say>To send it: click <b>Email to client — Gmail</b> or <b>Outlook</b> and a message opens with the subject and wording already written. Then click <b>Print / PDF Quote</b>, save the PDF, and attach it to that email yourself.</p>"
+  +"<p class=note>Attaching is manual on purpose. Quotes evolve as you adjust coverage, so this way you're always sending the exact version you just walked through with them — never an older one.</p>"},
  {title:"Worth knowing",html:
-   "<p class=note>• Everything autosaves as you go. <b>Save Quote</b> writes a file you can reopen later and pick up where you left off.<br>"
-  +"• <b>Client view</b> hides your notes and agent-only tools — switch to it before you share your screen.<br>"
+   "<p class=note>• <b>Client view</b> hides your notes and agent-only tools — switch to it before you share your screen.<br>"
   +"• Medication prices you look up on the intake feed the package math automatically.<br>"
-  +"• Build-chart and underwriting flags appear as you enter height and weight, so you'll know early if something needs a closer look.</p>"}
+  +"• Build-chart and underwriting flags appear as you enter height and weight, so you'll know early if something needs a closer look.<br>"
+  +"• If household income is under the subsidy threshold, the ACA subsidy field on the Intake lights up — look it up and enter it, and it comes off the marketplace premium on the Quote.</p>"}
 ];
 var SCRIPTS={
  help:{label:"How to use this tool",mode:"list",beats:SCRIPT_HELP},
