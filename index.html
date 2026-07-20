@@ -442,17 +442,17 @@
     <div class="intakegrid">
       <div class="fld"><label>Primary name</label><input id="in_pname" class="keyfield" placeholder="First and Last"></div>
       <div class="fld"><label>Date of birth</label><input id="in_date" class="keyfield" placeholder="MM/DD/YYYY"></div>
-      <div class="fld"><label>Age <small>auto from DOB</small></label><input id="in_page" placeholder="49"></div>
+      <div class="fld"><label>Age <small>auto from DOB</small></label><input id="in_page" placeholder=""></div>
       <div class="fld"><label>Sex <small>at birth</small></label><select id="in_psex" class="selfld keyfield"><option value="">—</option><option value="M">Male</option><option value="F">Female</option></select></div>
       <div class="fld"><label>Height</label><select id="in_pheight" class="selfld keyfield"></select></div>
-      <div class="fld"><label>Weight (lbs)</label><input id="in_pweight" class="keyfield" type="number" placeholder="180"></div>
+      <div class="fld"><label>Weight (lbs)</label><input id="in_pweight" class="keyfield" type="number" placeholder="lbs"></div>
       <div class="fld"><label>BMI <small>auto</small></label><input id="in_pbmi" readonly placeholder="—"></div>
       <div class="fld"><label>Build check <small>ManhattanLife</small></label><input id="in_pbuild" readonly placeholder="—"></div>
       <div class="fld"><label>Client phone</label><input id="in_phone" class="keyfield" placeholder="(000) 000-0000"></div>
       <div class="fld"><label>Client email</label><input id="in_email" class="keyfield" placeholder="name@example.com"></div>
       <div class="fld"><label>Address</label><input id="in_address" placeholder="Street, City"></div>
       <div class="fld"><label>State</label><select id="in_state" class="selfld keyfield"><option value="">—</option><option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option><option value="DC">DC</option><option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option></select></div>
-      <div class="fld"><label>ZIP</label><input id="in_zip" class="keyfield" placeholder="78163"></div>
+      <div class="fld"><label>ZIP</label><input id="in_zip" class="keyfield" placeholder="ZIP"></div>
       <div class="fld"><label>Desired effective date <small>1st/15th · ≥15 days out</small></label><input id="in_effdate" placeholder="MM/DD/YYYY"></div>
     </div>
 
@@ -460,10 +460,10 @@
     <div class="intakegrid" id="spouseGrid" style="display:none">
       <div class="fld"><label>Spouse name</label><input id="in_sname" placeholder="First and Last"></div>
       <div class="fld"><label>Date of birth</label><input id="in_sdob" class="keyfield" placeholder="MM/DD/YYYY"></div>
-      <div class="fld"><label>Age <small>auto from DOB</small></label><input id="in_sage" placeholder="45"></div>
+      <div class="fld"><label>Age <small>auto from DOB</small></label><input id="in_sage" placeholder=""></div>
       <div class="fld"><label>Sex <small>at birth</small></label><select id="in_ssex" class="selfld keyfield"><option value="">—</option><option value="M">Male</option><option value="F">Female</option></select></div>
       <div class="fld"><label>Height</label><select id="in_sheight" class="selfld"></select></div>
-      <div class="fld"><label>Weight (lbs)</label><input id="in_sweight" type="number" placeholder="140"></div>
+      <div class="fld"><label>Weight (lbs)</label><input id="in_sweight" type="number" placeholder="lbs"></div>
       <div class="fld"><label>BMI <small>auto</small></label><input id="in_sbmi" readonly placeholder="—"></div>
       <div class="fld"><label>Build check <small>ManhattanLife</small></label><input id="in_sbuild" readonly placeholder="—"></div>
     </div>
@@ -519,8 +519,8 @@
 
     <div class="intake-sec" id="sec_curins">Current Insurance <span class="sayico" data-beat="8" title="Say this — opens the script">Say this</span> <span class="secnote">— fills the ACA side · look up on</span> <a href="https://www.healthsherpa.com/sessions/new" target="_blank" rel="noopener" class="seclink">HealthSherpa ↗</a></div>
     <div class="intakegrid">
-      <div class="fld"><label>Carrier</label><input id="in_carrier" placeholder="BCBS"></div>
-      <div class="fld"><label>Plan name</label><input id="in_plan" placeholder="Bronze"></div>
+      <div class="fld"><label>Carrier</label><input id="in_carrier" placeholder="carrier"></div>
+      <div class="fld"><label>Plan name</label><input id="in_plan" placeholder="plan name"></div>
       <div class="fld"><label>Monthly premium</label><input id="in_prem" placeholder="$0"></div>
       <div class="fld" id="subsidyFld"><label>Monthly ACA subsidy <small>APTC — look up on HealthSherpa</small></label><input id="in_subsidy" placeholder="$0"></div>
       <div class="fld"><label>Annual deductible</label>
@@ -822,7 +822,7 @@ function dateOK(v){ var d=(v||'').replace(/\D/g,''); if(d.length!==8) return fal
 function emailOK(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||''); }
 function markValid(el,ok){ if(el) el.classList.toggle('invalid', !!(el.value && !ok)); }
 function ageFromDOB(v){ var d=(v||'').replace(/\D/g,''); if(d.length!==8) return ''; var mm=+d.slice(0,2), dd=+d.slice(2,4), yy=+d.slice(4,8); var t=new Date(); var age=t.getFullYear()-yy; if((t.getMonth()+1)<mm || ((t.getMonth()+1)===mm && t.getDate()<dd)) age--; return (age>=0&&age<130)?String(age):''; }
-function fillHeightOpts(sel){ if(!sel) return; var s=''; for(var i=48;i<=84;i++){ s+='<option value="'+i+'"'+(i===70?' selected':'')+'>'+Math.floor(i/12)+"'"+(i%12)+'"</option>'; } sel.innerHTML=s; }
+function fillHeightOpts(sel){ if(!sel) return; var s='<option value="">—</option>'; for(var i=48;i<=84;i++){ s+='<option value="'+i+'">'+Math.floor(i/12)+"'"+(i%12)+'"</option>'; } sel.innerHTML=s; }
 function bmiCat(b){ return b<18.5?'Underweight':(b<25?'Normal':(b<30?'Overweight':(b<35?'Obese':'Obese II+'))); }
 function autoGrow(t){ if(!t) return; t.style.height='auto'; t.style.height=(t.scrollHeight)+'px'; }
 
@@ -959,7 +959,12 @@ function lbCompute(){
 }
 
 /* ===== RATE-SHEET AUTO-PRICING (rate sheet = source of truth; manual edits win once set) ===== */
-function ratingAge(){ var a=+S.client.page||0,b=+S.client.sage||0; return Math.max(a,b)||0; }
+function ratingAge(){
+  var a=+S.client.page||0;
+  var w=(S.intake&&S.intake.who)||{};
+  var b=w.spouse?(+S.client.sage||0):0;   // spouse age only counts when the spouse is actually covered
+  return Math.max(a,b)||0;
+}
 function householdKey(){ var w=(S.intake&&S.intake.who)||{}; var sp=!!w.spouse,kd=!!w.kids; return sp&&kd?'f':(sp?'s':(kd?'c':'i')); }
 function sdrEscalate(){ var I=S.intake||{}; if(ratingAge()<50) return false; return !!(I.diabetic||I.majorcond||I.famcancer||I.famheart||(typeof overBuild==='function'&&overBuild())); }
 var LVLNAME={ElitePlus:'Elite Plus',Elite:'Elite',ClassicPlus:'Classic Plus',Classic:'Classic'};
@@ -1495,7 +1500,7 @@ function defProducts(tier){
 function blankState(){
   return {
     agency:'HealthFirst',agentPhone:'',agentEmail:'',
-    client:{pname:'',sname:'',date:'',sdob:'',agent:'',state:'TX',zip:'78163',page:'49',sage:'45',address:''},
+    client:{pname:'',sname:'',date:'',sdob:'',agent:'',state:'',zip:'',page:'',sage:'',address:''},
     docs:{docs:'',meds:'',net:false,rx:false,famcancer:false},
     tabLabels:{good:'Affordable core',better:'Solid package',best:'Full package of protection'},
     aca:{subsidy:0,prem:0,ded:0,oop:0,med:0,visits:0,copay:0,fullded:true},
@@ -1510,7 +1515,7 @@ function blankState(){
     pension:{monthly:100,note:'e.g., IUL / tax-free retirement savings for your future',cv10:0,cv20:0,cv30:0,leg1:0,leg25:0},
     big:{desc:'Hospital stay – 7 days',charge:41660.41,disc:18747.18,days:7,daily:4000,adm:2000,his:10000,other:0},
     reg:{desc:'Colonoscopy w/ anesthesia',charge:2800,pay:3600,aca:2800},
-    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobaccoP:false,tobaccoS:false,maternityP:false,maternityS:false,maternity:false,dv:false,famcancerP:false,famcancerS:false,famcancer:false,famheartP:false,famheartS:false,famheart:false,mentalP:false,mentalS:false,mental:false,surg2yrP:false,surg2yrS:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,pincome:0,sincome:0,hhManual:false,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'70',pweight:'',sheight:'70',sweight:'',psex:'',ssex:'',kidsNote:'',routeNote:'',docsNote:'',whyShop:'',effDate:''},
+    intake:{who:{app:true,spouse:false,kids:false},phone:'',email:'',tobaccoP:false,tobaccoS:false,maternityP:false,maternityS:false,maternity:false,dv:false,famcancerP:false,famcancerS:false,famcancer:false,famheartP:false,famheartS:false,famheart:false,mentalP:false,mentalS:false,mental:false,surg2yrP:false,surg2yrS:false,surg2yr:false,majorcond:false,majorcondNote:'',diabetic:false,diabeticNote:'',health:'',income:0,pincome:0,sincome:0,hhManual:false,retage:'',savings:0,invest:0,invprot:false,invsra:false,invnote:'',docs1:'',docs2:'',docs3:'',keepaca:'',keepafc:'',docnote:'',medList:[],budget:0,priority:'coverage',notes:'',carrier:'',plan:'',pheight:'',pweight:'',sheight:'',sweight:'',psex:'',ssex:'',kidsNote:'',routeNote:'',docsNote:'',whyShop:'',effDate:''},
     recommended:'best',
     acaEdited:false,
     oopEdited:false,
@@ -1964,7 +1969,7 @@ function fillIntake(){
   $('in_health').value=I.health||'';
   $('in_docs1').value=I.docs1||''; $('in_docs2').value=I.docs2||''; $('in_docs3').value=I.docs3||'';
   $('in_keepaca').value=I.keepaca||''; $('in_keepafc').value=I.keepafc||''; $('in_docnote').value=I.docnote||'';
-  $('in_pheight').value=I.pheight||'70'; $('in_pweight').value=I.pweight||''; $('in_sheight').value=I.sheight||'70'; $('in_sweight').value=I.sweight||''; $('in_psex').value=I.psex||''; $('in_ssex').value=I.ssex||''; $('in_kids').value=I.kidsNote||''; $('in_routenote').value=I.routeNote||''; $('in_docsnote').value=I.docsNote||''; $('in_whyshop').value=I.whyShop||''; $('in_effdate').value=I.effDate||''; updateBMI('p'); updateBMI('s'); buildFlag('p'); buildFlag('s');
+  $('in_pheight').value=I.pheight||''; $('in_pweight').value=I.pweight||''; $('in_sheight').value=I.sheight||''; $('in_sweight').value=I.sweight||''; $('in_psex').value=I.psex||''; $('in_ssex').value=I.ssex||''; $('in_kids').value=I.kidsNote||''; $('in_routenote').value=I.routeNote||''; $('in_docsnote').value=I.docsNote||''; $('in_whyshop').value=I.whyShop||''; $('in_effdate').value=I.effDate||''; updateBMI('p'); updateBMI('s'); buildFlag('p'); buildFlag('s');
   $('in_net').checked=!!S.docs.net; $('in_rx').checked=!!S.docs.rx;
   $('in_carrier').value=I.carrier||''; $('in_plan').value=I.plan||'';
   $('in_prem').value=S.aca.prem?fmtMoneyStr(String(S.aca.prem)):''; $('in_subsidy').value=(+S.aca.subsidy)?fmtMoneyStr(String(S.aca.subsidy)):''; $('in_oop').value=S.aca.oop?fmtMoneyStr(String(S.aca.oop)):''; $('in_visits').value=S.aca.visits||''; $('in_copay').value=S.aca.copay||'';
