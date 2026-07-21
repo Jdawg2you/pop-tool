@@ -656,22 +656,22 @@
     <div class="sectitle" style="margin-bottom:8px">TFRA <span style="font-family:-apple-system,sans-serif;font-weight:400;font-size:12px;color:var(--muted)">— Tax-Free Retirement Account · optional savings option, not related to your Healthcare Package of Protection</span></div>
     <div class="row hidein-client" style="border:1px solid var(--line);border-radius:8px">
       <div class="lab">TFRA — monthly contribution<small>Set 0 to hide it from the comparison.</small></div>
-      <input class="num" id="p_pension" type="number" step="0.01">
+      <input class="num money-in" id="p_pension" type="text" inputmode="decimal"><span class="money-disp" data-for="p_pension"></span>
     </div>
     <div id="tfraFunded">
     <div class="row" style="border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px"><div class="lab">TFRA — note</div><input id="p_pnote" style="flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;background:#fff" placeholder="e.g., IUL / tax-free retirement savings for your future"></div>
     <div class="pdetail" id="pensionDetail">
       <div class="pcol">
         <div class="phdr">Approximate cash value</div>
-        <div class="prow"><span class="plab">10 years</span><span><input class="num money-in" id="pp_cv10" type="number" step="0.01"><span class="money-disp" data-for="pp_cv10"></span></span></div>
-        <div class="prow"><span class="plab">20 years</span><span><input class="num money-in" id="pp_cv20" type="number" step="0.01"><span class="money-disp" data-for="pp_cv20"></span></span></div>
-        <div class="prow"><span class="plab">30 years</span><span><input class="num money-in" id="pp_cv30" type="number" step="0.01"><span class="money-disp" data-for="pp_cv30"></span></span></div>
+        <div class="prow"><span class="plab">10 years</span><span><input class="num money-in" id="pp_cv10" type="text" inputmode="decimal"><span class="money-disp" data-for="pp_cv10"></span></span></div>
+        <div class="prow"><span class="plab">20 years</span><span><input class="num money-in" id="pp_cv20" type="text" inputmode="decimal"><span class="money-disp" data-for="pp_cv20"></span></span></div>
+        <div class="prow"><span class="plab">30 years</span><span><input class="num money-in" id="pp_cv30" type="text" inputmode="decimal"><span class="money-disp" data-for="pp_cv30"></span></span></div>
         <div class="pnote">These numbers are approximate based on market returns.</div>
       </div>
       <div class="pcol legacy">
         <div class="phdr">Legacy protection</div>
-        <div class="prow"><span class="plab">Day one</span><span><input class="num money-in" id="pp_leg1" type="number" step="0.01"><span class="money-disp" data-for="pp_leg1"></span></span></div>
-        <div class="prow"><span class="plab">25 years</span><span><input class="num money-in" id="pp_leg25" type="number" step="0.01"><span class="money-disp" data-for="pp_leg25"></span></span></div>
+        <div class="prow"><span class="plab">Day one</span><span><input class="num money-in" id="pp_leg1" type="text" inputmode="decimal"><span class="money-disp" data-for="pp_leg1"></span></span></div>
+        <div class="prow"><span class="plab">25 years</span><span><input class="num money-in" id="pp_leg25" type="text" inputmode="decimal"><span class="money-disp" data-for="pp_leg25"></span></span></div>
         <div class="pnote">Amount paid to their family.</div>
       </div>
     </div>
@@ -815,6 +815,9 @@ function fmtMoneyStr(v){
   var out='$'+(+(whole||'0')).toLocaleString('en-US')+'.';
   return out+dec;   // trailing '.' preserved so you can keep typing cents
 }
+/* Reads a number out of a currency-formatted field ("$1,250.00" -> 1250).
+   parseFloat can't do this — it stops at the "$" and returns NaN. */
+function moneyNum(v){ var s=String(v==null?'':v).replace(/[^0-9.]/g,''); return s?(+s||0):0; }
 function phoneOK(v){ return (v||'').replace(/\D/g,'').length===10; }
 function dateOK(v){ var d=(v||'').replace(/\D/g,''); if(d.length!==8) return false; var m=+d.slice(0,2), day=+d.slice(2,4), y=+d.slice(4,8); return m>=1&&m<=12&&day>=1&&day<=31&&y>=1900&&y<=2100; }
 function emailOK(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||''); }
@@ -1732,8 +1735,8 @@ function fill(){
   $('a_prem').value=S.aca.prem;$('a_ded').value=S.aca.ded;$('a_oop').value=S.aca.oop;$('a_med').value=S.aca.med;$('a_visits').value=S.aca.visits;$('a_copay').value=S.aca.copay;$('a_fullded').checked=S.aca.fullded;
   var pk=S.packages[S.activeTab];
   $('p_lb').value=pk.lb;$('p_rxben').value=pk.rxBenefit||'';$('p_lb_carrier').value=pk.lbCarrier||'';$('p_lb_cov').value=pk.lbCov||'';
-  $('p_pension').value=S.pension.monthly;$('p_pnote').value=S.pension.note;
-  $('pp_cv10').value=S.pension.cv10||'';$('pp_cv20').value=S.pension.cv20||'';$('pp_cv30').value=S.pension.cv30||'';$('pp_leg1').value=S.pension.leg1||'';$('pp_leg25').value=S.pension.leg25||'';
+  $('p_pension').value=(+S.pension.monthly)?fmtMoneyStr(String(S.pension.monthly)):'';$('p_pnote').value=S.pension.note;
+  ;['cv10','cv20','cv30','leg1','leg25'].forEach(function(k){ $('pp_'+k).value=(+S.pension[k])?fmtMoneyStr(String(S.pension[k])):''; });
   $('b_desc').value=S.big.desc;$('b_charge').value=S.big.charge;$('b_disc').value=S.big.disc;$('b_days').value=S.big.days;$('b_daily').value=S.big.daily;$('b_adm').value=S.big.adm;$('b_his').value=S.big.his;$('b_other').value=S.big.other;
   $('r_desc').value=S.reg.desc;$('r_charge').value=S.reg.charge;$('r_pay').value=S.reg.pay;$('r_aca').value=S.reg.aca;
   $('tl_good').textContent=S.tabLabels.good;$('tl_better').textContent=S.tabLabels.better;$('tl_best').textContent=S.tabLabels.best;
@@ -1744,7 +1747,7 @@ function fill(){
 function read(){
   S.aca={subsidy:+S.aca.subsidy||0,prem:+$('a_prem').value||0,ded:+$('a_ded').value||0,oop:+$('a_oop').value||0,med:+$('a_med').value||0,visits:+$('a_visits').value||0,copay:+$('a_copay').value||0,fullded:$('a_fullded').checked};
   var pk=S.packages[S.activeTab]; pk.lb=+$('p_lb').value||0; pk.rxBenefit=+$('p_rxben').value||0; pk.lbCarrier=$('p_lb_carrier').value; pk.lbCov=$('p_lb_cov').value;
-  S.pension={monthly:+$('p_pension').value||0,note:$('p_pnote').value,cv10:+$('pp_cv10').value||0,cv20:+$('pp_cv20').value||0,cv30:+$('pp_cv30').value||0,leg1:+$('pp_leg1').value||0,leg25:+$('pp_leg25').value||0};
+  S.pension={monthly:moneyNum($('p_pension').value),note:$('p_pnote').value,cv10:moneyNum($('pp_cv10').value),cv20:moneyNum($('pp_cv20').value),cv30:moneyNum($('pp_cv30').value),leg1:moneyNum($('pp_leg1').value),leg25:moneyNum($('pp_leg25').value)};
   S.big={desc:$('b_desc').value,charge:+$('b_charge').value||0,disc:+$('b_disc').value||0,days:+$('b_days').value||0,daily:+$('b_daily').value||0,adm:+$('b_adm').value||0,his:+$('b_his').value||0,other:+$('b_other').value||0};
   S.reg={desc:$('r_desc').value,charge:+$('r_charge').value||0,pay:+$('r_pay').value||0,aca:+$('r_aca').value||0};
 }
@@ -1840,7 +1843,7 @@ function compute(){
 function refreshClientDisp(){
   document.querySelectorAll('.money-disp').forEach(function(sp){
     var inp=document.getElementById(sp.getAttribute('data-for'));
-    if(inp) sp.textContent=fmt2(parseFloat(inp.value)||0);
+    if(inp) sp.textContent=fmt2(moneyNum(inp.value));
   });
 }
 
@@ -2493,6 +2496,9 @@ function bindInputs(){
   $('addMed').onclick=function(){ S.intake.medList=S.intake.medList||[]; S.intake.medList.push({name:'',cost:0,forP:true,forS:false}); renderMeds(); };
   document.querySelectorAll('.sayico').forEach(function(s){ s.onclick=function(){ openScript(s.dataset.set||'intake', +s.dataset.beat||0); }; });
   $('p_lb_cov').addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); });
+  ['p_pension','pp_cv10','pp_cv20','pp_cv30','pp_leg1','pp_leg25'].forEach(function(id){
+    var el=$(id); if(el) el.addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); });
+  });
   $('in_effdate').addEventListener('input',function(){ this.value=fmtDate(this.value); });
   $('in_subsidy').addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); captureIntake(); compute(); });
   ['in_prem','in_oop','in_savings','in_invest'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',function(){ this.value=fmtMoneyStr(this.value); captureIntake(); }); });
