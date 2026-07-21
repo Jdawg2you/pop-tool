@@ -686,14 +686,14 @@
     <div id="tfraAd" class="tfra-ad">
       <div class="tfra-eyebrow">Your next step</div>
       <div class="tfra-head">Put your savings toward your future — <span>TAX-FREE</span></div>
-      <p class="tfra-body">You’re already saving <b id="ad_bmo">$—</b>/mo versus your current marketplace plan. Here’s what those same dollars add up to if you simply set them aside — before any growth at all.</p>
+      <p class="tfra-body" id="ad_body"></p>
       <div class="tfra-tiles">
-        <div class="tfra-tile"><div class="tl">You save now</div><div class="tv" id="ad_mo">$—</div></div>
+        <div class="tfra-tile"><div class="tl" id="ad_l1">You save now</div><div class="tv" id="ad_mo">$—</div></div>
         <div class="tfra-tile"><div class="tl">That’s a year</div><div class="tv" id="ad_yr">$—</div></div>
         <div class="tfra-tile"><div class="tl">Over 20 years</div><div class="tv" id="ad_20">$—</div></div>
       </div>
-      <div class="tfra-hl">That’s the money alone, sitting still. In a Tax-Free Retirement Account it doesn’t sit still — <span>ask me what it actually becomes.</span></div>
-      <div class="tfra-cta-row"><div class="tfra-cta">Ask me how to use your savings to build your future — tax-free</div><div class="tfra-fine">Simple total of your monthly savings set aside — no investment growth assumed.</div></div>
+      <div class="tfra-hl" id="ad_hl">That’s the money alone, sitting still. In a Tax-Free Retirement Account it doesn’t sit still — <span>ask me what it actually becomes.</span></div>
+      <div class="tfra-cta-row"><div class="tfra-cta">Ask me how to use your savings to build your future — tax-free</div><div class="tfra-fine" id="ad_fine"></div></div>
     </div>
   </div>
 
@@ -1800,10 +1800,33 @@ function compute(){
   $('o_tot_net_mo').textContent=saves(trueMo-totMo,'/mo');
   $('o_tot_net_yr').textContent=saves(trueYr-totYr,'/yr');
   if($('pensionDetail')) $('pensionDetail').style.display=(pen>0)?'':'none';
-  var showAd=(pen<=0 && aMo>0);
+  /* TFRA advertisement — shown when the client isn't funding a TFRA.
+     Prefer the plain premium difference. If the package costs more month-to-month
+     (common with a subsidy or a cheap bronze plan) fall back to TRUE COST, and say
+     plainly that the deductible is what's being counted. */
+  var adAmt=0, adBasis='';
+  if(aMo>0){ adAmt=aMo; adBasis='actual'; }
+  else if(tMo>0){ adAmt=tMo; adBasis='true'; }
+  var showAd=(pen<=0 && adAmt>0);
   if($('tfraFunded')) $('tfraFunded').style.display=showAd?'none':'';
   if($('tfraAd')){ $('tfraAd').style.display=showAd?'':'none';
-    if(showAd){ $('ad_mo').textContent=fmt(aMo); $('ad_bmo').textContent=fmt(aMo); $('ad_yr').textContent=fmt(aMo*12); $('ad_20').textContent=fmt(aMo*240); }
+    if(showAd){
+      $('ad_mo').textContent=fmt(adAmt); $('ad_yr').textContent=fmt(adAmt*12); $('ad_20').textContent=fmt(adAmt*240);
+      if(adBasis==='actual'){
+        $('ad_l1').textContent='You save now';
+        $('ad_body').innerHTML='You’re already saving <b>'+fmt(adAmt)+'</b>/mo versus your current marketplace plan. '
+          +'Here’s what those same dollars add up to if you simply set them aside — before any growth at all.';
+        $('ad_fine').textContent='Simple total of your monthly savings set aside — no investment growth assumed.';
+      } else {
+        $('ad_l1').textContent='You save / mo';
+        $('ad_body').innerHTML='Your marketplace plan costs <b>'+fmt(netPrem)+'</b>/mo in premium — but its '
+          +fmt(a.ded)+' deductible is another <b>'+fmt(dedMo)+'</b>/mo you have to be ready to pay. '
+          +'That’s <b>'+fmt(trueMo)+'</b>/mo in true cost. Your Package of Protection is <b>'+fmt(pMo)+'</b>/mo. '
+          +'So when you count the deductible, you’re <b>'+fmt(adAmt)+'</b>/mo better off — here’s what that adds up to '
+          +'if you simply set it aside, before any growth at all.';
+        $('ad_fine').textContent='Based on your ACA true cost (premium + deductible ÷ 12) minus your package, assuming the deductible is met. Simple total set aside — no investment growth assumed.';
+      }
+    }
   }
 
   var b=S.big;
@@ -1963,17 +1986,27 @@ function buildPrintout(){
           +'<div class="n">Amount paid to their family.</div></div>'
         +'</div>';
     }
-  } else if(aMo>0){
+  } else if(aMo>0 || tMo>0){
+    var adAmt = aMo>0 ? aMo : tMo;
+    var adLbl = aMo>0 ? 'You save now' : 'You save / mo';
+    var adBody, adFine;
+    if(aMo>0){
+      adBody='You are already saving '+fmt2(adAmt)+'/mo versus your current marketplace plan. Here is what those same dollars add up to if you simply set them aside — before any growth at all.';
+      adFine='Simple total of your monthly savings set aside — no investment growth assumed.';
+    } else {
+      adBody='Your marketplace plan costs '+fmt2(netPrem)+'/mo in premium — but its '+fmt2(a.ded)+' deductible is another '+fmt2(a.ded/12)+'/mo you have to be ready to pay. That is '+fmt2(aca.mo)+'/mo in true cost. Your Package of Protection is '+fmt2(pMo)+'/mo. So when you count the deductible, you are '+fmt2(adAmt)+'/mo better off — here is what that adds up to if you simply set it aside, before any growth at all.';
+      adFine='Based on your ACA true cost (premium + deductible ÷ 12) minus your package, assuming the deductible is met. Simple total set aside — no investment growth assumed.';
+    }
     html+='<div class="po-ad"><div class="eb">Your next step</div>'
       +'<h4>Put your savings toward your future — TAX-FREE</h4>'
-      +'<p>You are already saving '+fmt2(aMo)+'/mo versus your current marketplace plan. Here is what those same dollars add up to if you simply set them aside — before any growth at all.</p>'
+      +'<p>'+adBody+'</p>'
       +'<div class="tiles">'
-        +'<div class="tile"><div class="l">You save now</div><div class="v">'+fmt2(aMo)+'</div></div>'
-        +'<div class="tile"><div class="l">That\'s a year</div><div class="v">'+fmt2(aMo*12)+'</div></div>'
-        +'<div class="tile"><div class="l">Over 20 years</div><div class="v">'+fmt2(aMo*240)+'</div></div>'
+        +'<div class="tile"><div class="l">'+adLbl+'</div><div class="v">'+fmt2(adAmt)+'</div></div>'
+        +'<div class="tile"><div class="l">That\'s a year</div><div class="v">'+fmt2(adAmt*12)+'</div></div>'
+        +'<div class="tile"><div class="l">Over 20 years</div><div class="v">'+fmt2(adAmt*240)+'</div></div>'
       +'</div>'
       +'<div class="hl">That is the money alone, sitting still. In a Tax-Free Retirement Account it does not sit still — ask me what it actually becomes.</div>'
-      +'<div class="fine"><b style="color:#12213b">→ Ask me how to use your savings to build your future — tax-free.</b>  Simple total of your monthly savings set aside — no investment growth assumed.</div></div>';
+      +'<div class="fine"><b style="color:#12213b">→ Ask me how to use your savings to build your future — tax-free.</b>  '+adFine+'</div></div>';
   }
 
   /* ---- event illustrations ---- */
