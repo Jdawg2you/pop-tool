@@ -658,8 +658,7 @@
       <div class="lab">TFRA — monthly contribution<small>Set 0 to hide it from the comparison.</small></div>
       <input class="num money-in" id="p_pension" type="text" inputmode="decimal"><span class="money-disp" data-for="p_pension"></span>
     </div>
-    <div id="tfraFunded">
-    <div class="row" style="border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px"><div class="lab">TFRA — note</div><input id="p_pnote" style="flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;background:#fff" placeholder="e.g., IUL / tax-free retirement savings for your future"></div>
+    <div class="row" id="tfraNoteRow" style="border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px"><div class="lab">TFRA — note</div><input id="p_pnote" style="flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 8px;font:inherit;background:#fff" placeholder="e.g., IUL / tax-free retirement savings for your future"></div>
     <div class="pdetail" id="pensionDetail">
       <div class="pcol">
         <div class="phdr">Approximate cash value</div>
@@ -675,6 +674,7 @@
         <div class="pnote">Amount paid to their family.</div>
       </div>
     </div>
+    <div id="tfraFunded">
     <div class="greenband" style="margin-top:14px">INCLUDING ADDITIONAL PROGRAMS</div>
     <div class="savegrid green">
       <div class="h l">&nbsp;</div><div class="h">Monthly</div><div class="h">Annual</div>
@@ -1799,7 +1799,6 @@ function compute(){
   $('o_tot_mo').textContent=fmt2(totMo);$('o_tot_yr').textContent=fmt2(totYr);
   $('o_tot_net_mo').textContent=saves(trueMo-totMo,'/mo');
   $('o_tot_net_yr').textContent=saves(trueYr-totYr,'/yr');
-  if($('pensionDetail')) $('pensionDetail').style.display=(pen>0)?'':'none';
   /* TFRA advertisement — shown when the client isn't funding a TFRA.
      Prefer the plain premium difference. If the package costs more month-to-month
      (common with a subsidy or a cheap bronze plan) fall back to TRUE COST, and say
@@ -1808,6 +1807,13 @@ function compute(){
   if(aMo>0){ adAmt=aMo; adBasis='actual'; }
   else if(tMo>0){ adAmt=tMo; adBasis='true'; }
   var showAd=(pen<=0 && adAmt>0);
+  /* The agent ALWAYS keeps the input fields — otherwise showing the ad would hide
+     the very boxes you need to type in to turn it off. The client sees either the
+     funded numbers or the ad, never the empty inputs. */
+  var isAgent=!document.body.classList.contains('client');
+  var showInputs=(isAgent || !showAd) ? '' : 'none';
+  if($('tfraNoteRow'))    $('tfraNoteRow').style.display=showInputs;
+  if($('pensionDetail'))  $('pensionDetail').style.display=showInputs;
   if($('tfraFunded')) $('tfraFunded').style.display=showAd?'none':'';
   if($('tfraAd')){ $('tfraAd').style.display=showAd?'':'none';
     if(showAd){
