@@ -901,30 +901,55 @@ function pHHC(R,st,age,col){
    Mutual of Omaha TLE : gender-rated, issue ages 18-50. ONLY 18-27 loaded/verified;
    28-50 intentionally absent -> engine returns null + "rate not loaded" so nothing is guessed. */
 var LB_RATES={
- americo:{label:'Americo Term 125',unisex:true,min:20,max:64,r:{20:[12.09,15.63,14.89,21.23],21:[12.09,15.63,14.89,21.23],22:[12.09,15.63,14.89,21.23],23:[12.09,15.63,14.89,21.23],24:[12.09,15.63,14.89,21.23],25:[12.09,15.63,14.89,21.23],26:[12.3,16.06,15.2,21.85],27:[12.52,16.48,15.51,22.47],28:[12.68,16.82,15.84,23.13],29:[12.92,17.29,16.15,23.75],30:[13.16,17.77,16.51,24.46],31:[13.42,18.29,17.1,25.65],32:[13.68,18.81,17.69,26.84],33:[13.94,19.33,18.29,28.03],34:[14.2,19.86,18.88,29.21],35:[14.46,20.38,19.48,30.4],36:[15.03,21.52,20.66,32.78],37:[15.56,22.56,21.87,35.2],38:[16.15,23.75,23.06,37.57],39:[16.72,24.89,24.3,40.04],40:[17.27,25.98,25.46,42.37],41:[18.05,27.55,27.41,46.27],42:[18.81,29.07,29.33,50.11],43:[19.55,30.54,31.28,54.01],44:[20.31,32.06,33.2,57.86],45:[21.19,33.82,35.13,61.7],46:[22.54,36.53,37.34,66.12],47:[23.87,39.19,39.54,70.54],48:[25.22,41.9,41.75,74.96],49:[26.58,44.6,43.99,79.42],50:[27.91,47.26,46.24,83.93],51:[30.0,51.44,49.66,90.77],52:[32.06,55.58,53.08,97.61],53:[34.15,59.76,56.53,104.5],54:[36.24,63.94,59.95,111.34],55:[38.36,68.16,63.41,118.28],56:[42.23,75.91,70.28,132.0],57:[46.6,84.65,77.97,147.39],58:[51.51,94.48,86.69,164.83],59:[57.12,105.69,96.45,184.35],60:[63.44,118.32,107.45,206.34],61:[66.45,124.36,113.98,219.4],62:[69.64,130.72,120.94,233.32],63:[72.98,137.42,128.35,248.14],64:[76.52,144.5,136.25,263.96]}},
- moo:{label:'Mutual of Omaha TLE',unisex:false,min:18,max:50,r:{18:{M:[8.70,12.06,12.75,20.16],F:[8.50,11.66,11.66,17.98]},19:{M:[8.70,12.06,12.75,20.16],F:[8.50,11.66,11.66,17.98]},20:{M:[8.70,12.06,12.75,20.16],F:[8.50,11.66,11.66,17.98]},21:{M:[8.70,12.06,12.75,20.16],F:[8.50,11.66,11.66,17.98]},22:{M:[8.70,12.06,12.75,20.16],F:[8.50,11.66,11.66,17.98]},23:{M:[8.70,12.06,12.77,20.20],F:[8.50,11.66,11.66,17.98]},24:{M:[8.70,12.06,12.77,20.20],F:[8.50,11.66,11.66,17.98]},25:{M:[8.70,12.06,12.77,20.20],F:[8.50,11.66,11.66,17.98]},26:{M:[8.86,12.37,12.88,20.43],F:[8.63,11.93,11.88,18.42]},27:{M:[9.01,12.68,12.95,20.56],F:[8.81,12.28,12.06,18.78]},28:{M:[9.21,13.08,13.04,20.74],F:[8.97,12.59,12.28,19.22]},29:{M:[9.37,13.39,13.13,20.92],F:[9.17,12.99,12.50,19.67]},30:{M:[9.57,13.80,13.22,21.09],F:[9.32,13.31,12.75,20.16]},31:{M:[9.77,14.20,13.71,22.07],F:[9.50,13.66,13.22,21.09]},32:{M:[9.99,14.64,14.22,23.10],F:[9.68,14.02,13.71,22.07]},33:{M:[10.21,15.09,14.77,24.21],F:[9.86,14.37,14.22,23.10]},34:{M:[10.44,15.53,15.37,25.41],F:[10.06,14.77,14.75,24.16]},35:{M:[10.68,16.02,15.98,26.61],F:[10.26,15.17,15.35,25.37]},36:{M:[11.15,16.95,16.91,28.48],F:[10.72,16.11,16.22,27.10]},37:{M:[11.66,17.98,17.96,30.57],F:[11.21,17.09,17.15,28.97]},38:{M:[12.22,19.09,19.07,32.80],F:[11.75,18.16,18.20,31.06]},39:{M:[12.86,20.38,20.27,35.20],F:[12.35,19.36,19.34,33.33]},40:{M:[13.51,21.67,21.56,37.78],F:[13.02,20.69,20.56,35.78]},41:{M:[14.20,23.05,23.07,40.81],F:[13.66,21.98,21.87,38.40]},42:{M:[14.93,24.52,24.70,44.06],F:[14.37,23.41,23.43,41.52]},43:{M:[15.73,26.12,26.48,47.62],F:[15.11,24.88,25.10,44.86]},44:{M:[16.62,27.90,28.44,51.53],F:[15.93,26.52,26.92,48.51]},45:{M:[17.58,29.82,30.57,55.80],F:[16.82,28.30,28.93,52.51]},46:{M:[18.62,31.91,32.35,59.36],F:[17.82,30.30,30.62,55.89]},47:{M:[19.78,34.22,34.29,63.23],F:[18.89,32.44,32.44,59.54]},48:{M:[21.00,36.67,36.33,67.33],F:[20.07,34.80,34.35,63.37]},49:{M:[22.34,39.34,38.54,71.73],F:[21.34,37.34,36.51,67.68]},50:{M:[23.83,42.32,40.90,76.45],F:[22.74,40.14,38.74,72.13]}}}
+ americo:{label:'Americo Term 125',unisex:true,min:20,max:64,max30:null,r:{20:{"20":[12.09,15.63,null,14.89,21.23,null]},21:{"20":[12.09,15.63,null,14.89,21.23,null]},22:{"20":[12.09,15.63,null,14.89,21.23,null]},23:{"20":[12.09,15.63,null,14.89,21.23,null]},24:{"20":[12.09,15.63,null,14.89,21.23,null]},25:{"20":[12.09,15.63,null,14.89,21.23,null]},26:{"20":[12.3,16.06,null,15.2,21.85,null]},27:{"20":[12.52,16.48,null,15.51,22.47,null]},28:{"20":[12.68,16.82,null,15.84,23.13,null]},29:{"20":[12.92,17.29,null,16.15,23.75,null]},30:{"20":[13.16,17.77,null,16.51,24.46,null]},31:{"20":[13.42,18.29,null,17.1,25.65,null]},32:{"20":[13.68,18.81,null,17.69,26.84,null]},33:{"20":[13.94,19.33,null,18.29,28.03,null]},34:{"20":[14.2,19.86,null,18.88,29.21,null]},35:{"20":[14.46,20.38,null,19.48,30.4,null]},36:{"20":[15.03,21.52,null,20.66,32.78,null]},37:{"20":[15.56,22.56,null,21.87,35.2,null]},38:{"20":[16.15,23.75,null,23.06,37.57,null]},39:{"20":[16.72,24.89,null,24.3,40.04,null]},40:{"20":[17.27,25.98,null,25.46,42.37,null]},41:{"20":[18.05,27.55,null,27.41,46.27,null]},42:{"20":[18.81,29.07,null,29.33,50.11,null]},43:{"20":[19.55,30.54,null,31.28,54.01,null]},44:{"20":[20.31,32.06,null,33.2,57.86,null]},45:{"20":[21.19,33.82,null,35.13,61.7,null]},46:{"20":[22.54,36.53,null,37.34,66.12,null]},47:{"20":[23.87,39.19,null,39.54,70.54,null]},48:{"20":[25.22,41.9,null,41.75,74.96,null]},49:{"20":[26.58,44.6,null,43.99,79.42,null]},50:{"20":[27.91,47.26,null,46.24,83.93,null]},51:{"20":[30.0,51.44,null,49.66,90.77,null]},52:{"20":[32.06,55.58,null,53.08,97.61,null]},53:{"20":[34.15,59.76,null,56.53,104.5,null]},54:{"20":[36.24,63.94,null,59.95,111.34,null]},55:{"20":[38.36,68.16,null,63.41,118.28,null]},56:{"20":[42.23,75.91,null,70.28,132.0,null]},57:{"20":[46.6,84.65,null,77.97,147.39,null]},58:{"20":[51.51,94.48,null,86.69,164.83,null]},59:{"20":[57.12,105.69,null,96.45,184.35,null]},60:{"20":[63.44,118.32,null,107.45,206.34,null]},61:{"20":[66.45,124.36,null,113.98,219.4,null]},62:{"20":[69.64,130.72,null,120.94,233.32,null]},63:{"20":[72.98,137.42,null,128.35,248.14,null]},64:{"20":[76.52,144.5,null,136.25,263.96,null]}}},
+ moo:{label:'Mutual of Omaha TLE',unisex:false,min:18,max:50,max30:50,r:{18:{M:{"20":[8.70,12.06,null,12.75,20.16,null]},F:{"20":[8.50,11.66,null,11.66,17.98,null]}},19:{M:{"20":[8.70,12.06,null,12.75,20.16,null]},F:{"20":[8.50,11.66,null,11.66,17.98,null]}},20:{M:{"20":[8.70,12.06,null,12.75,20.16,null]},F:{"20":[8.50,11.66,null,11.66,17.98,null]}},21:{M:{"20":[8.70,12.06,null,12.75,20.16,null]},F:{"20":[8.50,11.66,null,11.66,17.98,null]}},22:{M:{"20":[8.70,12.06,null,12.75,20.16,null]},F:{"20":[8.50,11.66,null,11.66,17.98,null]}},23:{M:{"20":[8.70,12.06,null,12.77,20.20,null]},F:{"20":[8.50,11.66,null,11.66,17.98,null]}},24:{M:{"20":[8.70,12.06,null,12.77,20.20,null]},F:{"20":[8.50,11.66,null,11.66,17.98,null]}},25:{M:{"20":[8.70,12.06,null,12.77,20.20,null]},F:{"20":[8.50,11.66,null,11.66,17.98,null]}},26:{M:{"20":[8.86,12.37,null,12.88,20.43,null]},F:{"20":[8.63,11.93,null,11.88,18.42,null]}},27:{M:{"20":[9.01,12.68,null,12.95,20.56,null]},F:{"20":[8.81,12.28,null,12.06,18.78,null]}},28:{M:{"20":[9.21,13.08,null,13.04,20.74,null]},F:{"20":[8.97,12.59,null,12.28,19.22,null]}},29:{M:{"20":[9.37,13.39,null,13.13,20.92,null]},F:{"20":[9.17,12.99,null,12.50,19.67,null]}},30:{M:{"20":[9.57,13.80,null,13.22,21.09,null]},F:{"20":[9.32,13.31,null,12.75,20.16,null]}},31:{M:{"20":[9.77,14.20,null,13.71,22.07,null]},F:{"20":[9.50,13.66,null,13.22,21.09,null]}},32:{M:{"20":[9.99,14.64,null,14.22,23.10,null]},F:{"20":[9.68,14.02,null,13.71,22.07,null]}},33:{M:{"20":[10.21,15.09,null,14.77,24.21,null]},F:{"20":[9.86,14.37,null,14.22,23.10,null]}},34:{M:{"20":[10.44,15.53,null,15.37,25.41,null]},F:{"20":[10.06,14.77,null,14.75,24.16,null]}},35:{M:{"20":[10.68,16.02,null,15.98,26.61,null]},F:{"20":[10.26,15.17,null,15.35,25.37,null]}},36:{M:{"20":[11.15,16.95,null,16.91,28.48,null]},F:{"20":[10.72,16.11,null,16.22,27.10,null]}},37:{M:{"20":[11.66,17.98,null,17.96,30.57,null]},F:{"20":[11.21,17.09,null,17.15,28.97,null]}},38:{M:{"20":[12.22,19.09,null,19.07,32.80,null]},F:{"20":[11.75,18.16,null,18.20,31.06,null]}},39:{M:{"20":[12.86,20.38,null,20.27,35.20,null]},F:{"20":[12.35,19.36,null,19.34,33.33,null]}},40:{M:{"20":[13.51,21.67,null,21.56,37.78,null]},F:{"20":[13.02,20.69,null,20.56,35.78,null]}},41:{M:{"20":[14.20,23.05,null,23.07,40.81,null]},F:{"20":[13.66,21.98,null,21.87,38.40,null]}},42:{M:{"20":[14.93,24.52,null,24.70,44.06,null]},F:{"20":[14.37,23.41,null,23.43,41.52,null]}},43:{M:{"20":[15.73,26.12,null,26.48,47.62,null]},F:{"20":[15.11,24.88,null,25.10,44.86,null]}},44:{M:{"20":[16.62,27.90,null,28.44,51.53,null]},F:{"20":[15.93,26.52,null,26.92,48.51,null]}},45:{M:{"20":[17.58,29.82,null,30.57,55.80,null]},F:{"20":[16.82,28.30,null,28.93,52.51,null]}},46:{M:{"20":[18.62,31.91,null,32.35,59.36,null]},F:{"20":[17.82,30.30,null,30.62,55.89,null]}},47:{M:{"20":[19.78,34.22,null,34.29,63.23,null]},F:{"20":[18.89,32.44,null,32.44,59.54,null]}},48:{M:{"20":[21.00,36.67,null,36.33,67.33,null]},F:{"20":[20.07,34.80,null,34.35,63.37,null]}},49:{M:{"20":[22.34,39.34,null,38.54,71.73,null]},F:{"20":[21.34,37.34,null,36.51,67.68,null]}},50:{M:{"20":[23.83,42.32,null,40.90,76.45,null]},F:{"20":[22.74,40.14,null,38.74,72.13,null]}}}}
 };
-function lbIdx(tob,face){ return (tob?2:0)+(face==50000?1:0); }
-function lbRate(carrier,age,sex,tob,face){
+/* slot order per term: [nonTob25, nonTob50, nonTob100, tob25, tob50, tob100] */
+function lbIdx(tob,face){ var f=(face==100000?2:(face==50000?1:0)); return (tob?3:0)+f; }
+/* Is the 30-year term issuable for this carrier at this age?
+   max30 null means we have not confirmed the carrier's limit — do not offer it. */
+function lbTerm30OK(carrier,age){
+  var C=LB_RATES[carrier]; if(!C||C.max30==null) return false;
+  return (+age||0)>0 && +age<=C.max30;
+}
+function lbTermsFor(carrier,age){ return lbTerm30OK(carrier,age)?['30','20']:['20']; }
+function lbRate(carrier,age,sex,tob,face,term){
+  term=String(term||'20');
   var C=LB_RATES[carrier]; if(!C) return {price:null,note:'unknown carrier'};
   age=+age||0;
   if(!age) return {price:null,note:'enter age'};
   if(age<C.min||age>C.max) return {price:null,note:C.label+' issue ages '+C.min+'-'+C.max+' only'};
+  if(term==='30'&&!lbTerm30OK(carrier,age))
+    return {price:null,note:'30-year not issuable at age '+age};
   var row=C.r[age];
   if(!row) return {price:null,note:'rate not loaded for age '+age+' — verify in portal'};
-  var arr;
-  if(C.unisex){ arr=row; }
+  var byTerm;
+  if(C.unisex){ byTerm=row; }
   else { if(sex!=='M'&&sex!=='F') return {price:null,note:'select sex at birth'};
-         arr=row[sex]; if(!arr) return {price:null,note:'rate not loaded — verify'}; }
+         byTerm=row[sex]; if(!byTerm) return {price:null,note:'rate not loaded — verify'}; }
+  var arr=byTerm[term];
+  if(!arr) return {price:null,note:term+'-year rates not loaded yet'};
   var v=arr[lbIdx(tob,face)];
-  if(v==null) return {price:null,note:'rate not loaded for age '+age+' — verify in portal'};
+  if(v==null) return {price:null,note:'$'+(face/1000)+'K '+term+'-year not loaded yet'};
   return {price:v,note:''};
 }
 /* $100 rule: default to $50K, but drop to $25K when $50K would exceed $100/mo */
-function lbAutoFace(carrier,age,sex,tob){
-  var f50=lbRate(carrier,age,sex,tob,50000);
-  if(f50.price!=null&&f50.price>100) return 25000;
-  return 50000;
+/* The $100 ladder, per person. Reach for the most coverage for the longest time,
+   then shorten the term, then step the face amount down. First rung at or under
+   $100/mo wins. The agent can always override. */
+var LB_LADDER=[{face:100000,term:'30'},{face:100000,term:'20'},{face:50000,term:'20'},{face:25000,term:'20'}];
+function lbAutoPick(carrier,age,sex,tob){
+  var firstPriced=null;
+  for(var i=0;i<LB_LADDER.length;i++){
+    var rung=LB_LADDER[i];
+    var r=lbRate(carrier,age,sex,tob,rung.face,rung.term);
+    if(r.price==null) continue;              // not loaded / not issuable — try the next rung
+    if(!firstPriced) firstPriced=rung;
+    if(r.price<=100) return {face:rung.face,term:rung.term,capped:false};
+  }
+  // nothing fits under $100 — take the smallest we can actually price
+  if(firstPriced) return {face:25000,term:'20',capped:true};
+  return {face:50000,term:'20',capped:false};
 }
 /* One slot per person actually being covered, straight off the intake checkboxes */
 function lbPersons(){
@@ -940,20 +965,26 @@ function lbCompute(){
   S.lb=S.lb||{};
   var lines=[], total=0, missing=false;
   lbPersons().forEach(function(p){
-    if(!S.lb[p.k]) S.lb[p.k]={carrier:'americo',face:'',manual:null};
+    if(!S.lb[p.k]) S.lb[p.k]={carrier:'americo',face:'',term:'',manual:null};
     var cfg=S.lb[p.k];
     if(!cfg.carrier) cfg.carrier='americo';
     var isOtherCarrier=(cfg.carrier==='other');
-    var auto=(cfg.face===''&&!isOtherCarrier)?String(lbAutoFace(cfg.carrier,p.age,p.sex,p.tob)):(cfg.face||'50000');
+    var pick=(!isOtherCarrier)?lbAutoPick(cfg.carrier,p.age,p.sex,p.tob):null;
+    var auto=(cfg.face===''&&pick)?String(pick.face):(cfg.face||'50000');
+    var term=cfg.term||(pick?pick.term:'20');
+    // a chosen term that isn't issuable at this age falls back rather than erroring
+    if(term==='30'&&!lbTerm30OK(cfg.carrier,p.age)) term='20';
     var rated=null,note='';
     if(isOtherCarrier){ note='enter the monthly price'; }
-    else if(auto!=='other'){ var r=lbRate(cfg.carrier,p.age,p.sex,p.tob,+auto); rated=r.price; note=r.note; }
+    else if(auto!=='other'){ var r=lbRate(cfg.carrier,p.age,p.sex,p.tob,+auto,term); rated=r.price; note=r.note; }
     else { note='enter the monthly price'; }
     var price=(cfg.manual!=null)?cfg.manual:rated;
     if(price==null) missing=true; else total+=price;
     lines.push({k:p.k,tag:p.tag,age:p.age,sex:p.sex,tob:p.tob,carrier:cfg.carrier,
-                faceSel:auto, face:(auto==='other'?null:+auto), price:price, manual:(cfg.manual!=null), note:note,
-                dropped:(cfg.face===''&&auto==='25000')});
+                faceSel:auto, face:(auto==='other'?null:+auto), term:term,
+                terms:lbTermsFor(cfg.carrier,p.age),
+                price:price, manual:(cfg.manual!=null), note:note,
+                dropped:(cfg.face===''&&pick&&pick.capped)});
   });
   if(!lines.length) return {total:null,lines:[]};
   return {total:missing?null:Math.round(total*100)/100, lines:lines};
@@ -1090,30 +1121,35 @@ function renderLB(applyPrice){
           +'<option value="moo"'+(l.carrier==='moo'?' selected':'')+'>Mutual of Omaha TLE</option>'
           +'<option value="other"'+(l.carrier==='other'?' selected':'')+'>Other</option></select>'
         +'<select class="selfld lbsel" data-k="'+l.k+'" data-f="face">'
+          +'<option value="100000"'+(l.faceSel==='100000'?' selected':'')+'>$100,000</option>'
           +'<option value="50000"'+(l.faceSel==='50000'?' selected':'')+'>$50,000</option>'
           +'<option value="25000"'+(l.faceSel==='25000'?' selected':'')+'>$25,000</option>'
           +'<option value="other"'+(l.faceSel==='other'?' selected':'')+'>Other</option></select>'
+        +'<select class="selfld lbsel" data-k="'+l.k+'" data-f="term">'
+          +(l.terms||['20']).map(function(t){ return '<option value="'+t+'"'+(l.term===t?' selected':'')+'>'+t+'-year</option>'; }).join('')
+          +'</select>'
         +'<div class="lbpw'+(l.manual?' man':'')+'"><span>$</span>'
           +'<input class="lbmanual" data-k="'+l.k+'" type="number" step="0.01" placeholder="—" value="'+(l.price!=null?l.price.toFixed(2):'')+'">'
           +'<em>/mo</em></div>'
       +'</div></div>';
     if(l.price==null&&l.note) html+='<div class="lbrownote bad">'+l.tag+': '+l.note+'</div>';
     else if(l.manual) html+='<div class="lbrownote warn">'+l.tag+' price entered manually — pick a coverage amount again to go back to the rate sheet.</div>';
-    else if(l.dropped) html+='<div class="lbrownote warn">'+l.tag+' set to $25,000 — $50,000 would exceed $100/mo.</div>';
+    else if(l.dropped) html+='<div class="lbrownote warn">'+l.tag+' stepped down to $25,000 / 20-year — nothing larger stays under $100/mo.</div>';
   });
   if(r.lines.length>1&&r.total!=null) html+='<div class="lbtotal">Living Benefits total <b>$'+r.total.toFixed(2)+'/mo</b></div>';
   if(r.total==null) html+='<div class="lbrownote warn">Total left blank until every line prices — fill the missing rate manually or switch that person’s carrier.</div>';
   host.innerHTML=html;
   host.querySelectorAll('select.lbsel').forEach(function(sel){
     sel.onchange=function(){ var k=sel.dataset.k, f=sel.dataset.f;
-      S.lb=S.lb||{}; S.lb[k]=S.lb[k]||{carrier:'americo',face:'',manual:null};
+      S.lb=S.lb||{}; S.lb[k]=S.lb[k]||{carrier:'americo',face:'',term:'',manual:null};
       S.lb[k][f]=sel.value;
+      if(f==='carrier') S.lb[k].term='';
       S.lb[k].manual=null;              // any dropdown click re-takes the rate-sheet price
       renderLB(true); compute(); };
   });
   host.querySelectorAll('input.lbmanual').forEach(function(inp){
     inp.oninput=function(){ var k=inp.dataset.k;
-      S.lb=S.lb||{}; S.lb[k]=S.lb[k]||{carrier:'americo',face:'',manual:null};
+      S.lb=S.lb||{}; S.lb[k]=S.lb[k]||{carrier:'americo',face:'',term:'',manual:null};
       var v=parseFloat(inp.value);
       S.lb[k].manual=isNaN(v)?null:v;   // manual entry wins until a dropdown is touched
       var pk=S.packages[S.activeTab], t=lbCompute();
@@ -1126,7 +1162,7 @@ function renderLB(applyPrice){
     var pk=S.packages[S.activeTab];
     if(pk){ pk.lb=(r.total==null)?0:r.total;
       pk.lbCarrier=r.lines.map(function(l){return l.tag+': '+lbLabel(l.carrier);}).join(' | ');
-      pk.lbCov=r.lines.map(function(l){return l.tag+' '+(l.face?('$'+(l.face/1000)+'K'):'custom');}).join(' + ');
+      pk.lbCov=r.lines.map(function(l){return l.tag+' '+(l.face?('$'+(l.face/1000)+'K'):'custom')+(l.term?(' / '+l.term+'yr'):'');}).join(' + ');
       if($('p_lb')) $('p_lb').value=pk.lb||'';
       if($('p_lb_carrier')) $('p_lb_carrier').value=pk.lbCarrier;
       if($('p_lb_cov')) $('p_lb_cov').value=pk.lbCov;
@@ -1523,7 +1559,7 @@ function blankState(){
     oopEdited:false,
     lastBasis:'',
     follow:{},
-    lb:{p:{carrier:'americo',face:'auto'},s:{carrier:'americo',face:'auto'}},
+    lb:{p:{carrier:'americo',face:'',term:''},s:{carrier:'americo',face:'',term:''}},
     recFlags:[],
     step:'intake',
     estBand:null
