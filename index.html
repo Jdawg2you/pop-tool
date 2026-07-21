@@ -1815,7 +1815,8 @@ function compute(){
   if($('tfraNoteRow'))    $('tfraNoteRow').style.display=showInputs;
   if($('pensionDetail'))  $('pensionDetail').style.display=showInputs;
   if($('tfraFunded')) $('tfraFunded').style.display=showAd?'none':'';
-  if($('tfraAd')){ $('tfraAd').style.display=showAd?'':'none';
+  /* The ad is a client-facing piece — the agent view stays a clean input form. */
+  if($('tfraAd')){ $('tfraAd').style.display=(showAd && !isAgent)?'':'none';
     if(showAd){
       $('ad_mo').textContent=fmt(adAmt); $('ad_yr').textContent=fmt(adAmt*12); $('ad_20').textContent=fmt(adAmt*240);
       if(adBasis==='actual'){
