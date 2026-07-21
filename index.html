@@ -1595,7 +1595,12 @@ function catalogPriceInfo(p){
     var hit=(buildTierProducts(c2,null,[])||[]).filter(function(x){ return x.k===p.k; })[0];
     if(!hit) return {price:null, tag:' — not filed in '+st};
     var v=+hit.monthly||0;
-    return {price:v, tag:v?(' — $'+v.toFixed(2)+'/mo'):(' — not filed in '+st)};
+    if(!v) return {price:null, tag:' — not filed in '+st};
+    /* The engine falls back to the base table when a state isn't filed and says so
+       in .note. Never show that price as if it were this state's rate. */
+    if(/not loaded|verify/i.test(hit.note||''))
+      return {price:v, fallback:true, tag:' — ~$'+v.toFixed(2)+' ⚠ no '+st+' rate, verify'};
+    return {price:v, tag:' — $'+v.toFixed(2)+'/mo'};
   }catch(e){ return {price:null, tag:' — not filed in '+st}; }
 }
 function libOptions(){
@@ -1678,6 +1683,7 @@ function renderLib(){
     }
     var info=catalogPriceInfo(p), txt, col='var(--navy)';
     if(info.price==null||info.price===0){ txt=info.tag.replace(/^ — /,''); col='var(--muted)'; }
+    else if(info.fallback){ txt=info.tag.replace(/^ — /,''); col='var(--maroon)'; }
     else txt='$'+info.price.toFixed(2);
     var row=document.createElement('div'); row.className='librow';
     var nm=document.createElement('div'); nm.className='lname'; nm.style.cssText='padding:6px 2px'; nm.textContent=p.n;
